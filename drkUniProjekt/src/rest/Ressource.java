@@ -3,7 +3,7 @@ package rest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public abstract class Ressource
+public class Ressource
 {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 	{

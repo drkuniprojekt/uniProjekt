@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet("/backend")
 public class backend extends HttpServlet {
-	public static ArrayList<Ressource> res = new ArrayList<Ressource>();
+	
 	private static final long serialVersionUID = 1L;
-       
+    private RessourceFactory factory; 
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -31,7 +31,7 @@ public class backend extends HttpServlet {
         super();
         
         // Ressourcen instanziiern
-        res.add(new AuthRes());
+        factory	= new RessourceFactory();
     }
 
 	/**
@@ -39,14 +39,7 @@ public class backend extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		switch (request.getPathInfo())
-		{
-		case "/auth":
-			res.get(0).doGet(request, response);
-			break;
-		default:
-			response.setStatus(404);
-		}
+		factory.getRessource(request.getPathInfo()).doGet(request, response);
 	}
 
 	/**
@@ -79,26 +72,14 @@ public class backend extends HttpServlet {
 //			response.getWriter().flush();
 //			response.getWriter().close();
 //		}
-		switch (request.getPathInfo())
-		{
-		case "/auth":
-			res.get(0).doPost(request, response);
-			break;
-		default:
-			response.setStatus(404);
-		}		
+		
+		factory.getRessource(request.getPathInfo()).doGet(request, response);	
 	}
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		switch (request.getPathInfo())
-		{
-		case "/auth":
-			res.get(0).doPost(request, response);
-			break;
-		default:
-			response.setStatus(404);
-		}
+		factory.getRessource(request.getPathInfo()).doGet(request, response);
 	}
+	
 	private String sendGCMMessage(String body) throws IOException
 	{
 		URL url = new URL("https://gcm-http.googleapis.com/gcm/send");
