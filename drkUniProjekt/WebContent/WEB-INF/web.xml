@@ -9,14 +9,5 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  <servlet>
-    <description></description>
-    <display-name>testServlet</display-name>
-    <servlet-name>testServlet</servlet-name>
-    <servlet-class>rest.testServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>testServlet</servlet-name>
-    <url-pattern>/testServlet</url-pattern>
-  </servlet-mapping>
+ <!-- Servlets bitte nicht hier eintragen, sondern die @Servlet annotation verwenden. Eclipse macht das nicht ganz konsistent! -->
 </web-app>
