@@ -9,5 +9,9 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  <resource-ref>
+    <res-ref-name>jdbc/DefaultDB</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+  </resource-ref>
  <!-- Servlets bitte nicht hier eintragen, sondern die @Servlet annotation verwenden. Eclipse macht das nicht ganz konsistent! -->
 </web-app>

@@ -39,6 +39,7 @@ public class auth extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
+		
 		JSONObject answer	= new JSONObject();
 		answer.put("token", "{bearer 12345678910}");
 		helper.setResponseJSON(response, answer);
