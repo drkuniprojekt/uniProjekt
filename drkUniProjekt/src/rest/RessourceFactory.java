@@ -8,7 +8,7 @@ public class RessourceFactory
 	
 	public RessourceFactory()
 	{
-		res.add(new Ressource());
+		res.add(new NullRes());
 		res.add(new AuthRes());
 	}
 	public Ressource getRessource(String path)

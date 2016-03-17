@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class backend
  */
-@WebServlet("/backend")
+@WebServlet("/backend/*")
 public class backend extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
@@ -41,7 +41,11 @@ public class backend extends HttpServlet {
 	{
 		factory.getRessource(request.getPathInfo()).doGet(request, response);
 	}
-
+	
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		factory.getRessource(request.getPathInfo()).doPut(request, response);
+	}
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -73,11 +77,11 @@ public class backend extends HttpServlet {
 //			response.getWriter().close();
 //		}
 		
-		factory.getRessource(request.getPathInfo()).doGet(request, response);	
+		factory.getRessource(request.getPathInfo()).doPost(request, response);	
 	}
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		factory.getRessource(request.getPathInfo()).doGet(request, response);
+		factory.getRessource(request.getPathInfo()).doDelete(request, response);
 	}
 	
 	private String sendGCMMessage(String body) throws IOException
