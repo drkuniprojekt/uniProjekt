@@ -82,7 +82,7 @@ public class DatabaseHandler
 
 			while (rs.next())
 			{
-				tmp = rs.getString(0);
+				tmp = rs.getString(1);
 				System.out.println("Read from Dataabase" + tmp);
 			}			
 		} catch (SQLException e)

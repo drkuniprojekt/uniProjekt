@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONObject;
+
 import Database.DatabaseHandler;
 
 /**
@@ -16,12 +18,13 @@ import Database.DatabaseHandler;
 @WebServlet("/test/*")
 public class testServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	private Helper helper;   
     /**
      * @see HttpServlet#HttpServlet()
      */
     public testServlet() {
         super();
+        helper	= new Helper();
         // TODO Auto-generated constructor stub
     }
 
@@ -29,7 +32,10 @@ public class testServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		DatabaseHandler.getdb().test();
+		String test			= DatabaseHandler.getdb().test();
+		JSONObject answer	= new JSONObject();
+		answer.put("Test_Output", test);		
+		helper.setResponseJSON(response, answer);
 	}
 
 	/**
