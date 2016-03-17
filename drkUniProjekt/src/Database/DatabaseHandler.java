@@ -133,31 +133,10 @@ public class DatabaseHandler
 		{
 			JSONObject row	= new JSONObject();
 			for (int index = 1; index <= columnCount; index++) {
-	            column = rsmd.getColumnName(1);
-	            Object value = rs.getObject(column);
-//	            if (value == null) {
-//	                tmp.put(column, null);
-//	            } else if (value instanceof Integer) {
-//	                tmp.put(column, (Integer) value);
-//	            } else if (value instanceof String) {
-//	                tmp.put(column, (String) value);                
-//	            } else if (value instanceof Boolean) {
-//	                tmp.put(column, (Boolean) value);           
-//	            } else if (value instanceof Date) {
-//	                tmp.put(column, ((Date) value).getTime());                
-//	            } else if (value instanceof Long) {
-//	                tmp.put(column, (Long) value);                
-//	            } else if (value instanceof Double) {
-//	                tmp.put(column, (Double) value);                
-//	            } else if (value instanceof Float) {
-//	                tmp.put(column, (Float) value);                
-//	            } else if (value instanceof Byte) {
-//	                tmp.put(column, (Byte) value);
-//	            } else if (value instanceof byte[]) {
-//	                tmp.put(column, (byte[]) value);                
-//	            } else {
-	            	row.put(column, value);
-//	            }
+	            column 			= rsmd.getColumnName(1);
+	            Object value 	= rs.getObject(column);
+	            row.put(column, value);
+
 			}
 			tmp.add(row);
 		}
