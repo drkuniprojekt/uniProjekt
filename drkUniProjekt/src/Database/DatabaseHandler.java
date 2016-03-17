@@ -16,6 +16,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class DatabaseHandler
@@ -95,15 +96,15 @@ public class DatabaseHandler
 		}
 		return tmp;
 	}
-	public JSONObject JsonTest()
+	public JSONArray JsonTest()
 	{
 		try 
 		{
 			return executeQuery("SELECT * FROM TESTTABELLE");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			JSONObject j	= new JSONObject();
-			j.put("Error", e);
+			JSONArray j	= new JSONArray();
+			j.add(e);
 			return j;
 		}
 		
@@ -114,7 +115,7 @@ public class DatabaseHandler
 	 * @return An JSONObject containing thhe result
 	 * @throws SQLException 
 	 */
-	public JSONObject executeQuery(String query) throws SQLException
+	public JSONArray executeQuery(String query) throws SQLException
 	{
 		Statement stmt 	= conn.createStatement();
 		ResultSet rs 	= stmt.executeQuery(query);	
@@ -122,13 +123,15 @@ public class DatabaseHandler
 		
 	}
 
-	private JSONObject rsToJSON(ResultSet rs) throws SQLException {
-		JSONObject tmp	= new JSONObject();
+	private JSONArray rsToJSON(ResultSet rs) throws SQLException {
+		JSONArray tmp = new JSONArray();
+		
 		ResultSetMetaData rsmd = rs.getMetaData();
 	    int columnCount = rsmd.getColumnCount();
 	    String column;    
 		while (rs.next())
 		{
+			JSONObject row	= new JSONObject();
 			for (int index = 1; index <= columnCount; index++) {
 	            column = rsmd.getColumnName(1);
 	            Object value = rs.getObject(column);
@@ -153,9 +156,10 @@ public class DatabaseHandler
 //	            } else if (value instanceof byte[]) {
 //	                tmp.put(column, (byte[]) value);                
 //	            } else {
-	            	tmp.put(column, value);
+	            	row.put(column, value);
 //	            }
 			}
+			tmp.add(row);
 		}
 		System.out.println("Read from Dataabase" + tmp);			
 		return tmp;

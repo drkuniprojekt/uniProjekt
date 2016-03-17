@@ -32,10 +32,10 @@ public class testServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String test			= DatabaseHandler.getdb().test();
-		JSONObject answer	= new JSONObject();
-		answer.put("Test_Output", test);		
-		helper.setResponseJSON(response, answer);
+		//String test			= DatabaseHandler.getdb().test();
+		//JSONObject answer	= new JSONObject();
+		//answer.put("Test_Output", test);		
+		helper.setResponseJSON(response, DatabaseHandler.getdb().JsonTest());
 	}
 
 	/**
