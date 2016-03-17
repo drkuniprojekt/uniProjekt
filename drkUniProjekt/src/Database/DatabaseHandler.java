@@ -31,7 +31,7 @@ public class DatabaseHandler
 					.lookup("java:comp/env/jdbc/DefaultDB");
 			conn = ds.getConnection();
 
-			testStm = conn.prepareStatement("SELECT * FROM artikel");	
+			testStm = conn.prepareStatement("SELECT * FROM TESTTABELLE");	
 
 			System.out.println("Databaseconnection successfull ");
 
@@ -78,7 +78,7 @@ public class DatabaseHandler
 		{
 			ResultSet rs = testStm.executeQuery();	
 			
-			//System.out.println("Ausgabe: ");
+			System.out.println("Ausgabe: ");
 
 			while (rs.next())
 			{
