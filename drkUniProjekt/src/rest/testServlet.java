@@ -35,7 +35,7 @@ public class testServlet extends HttpServlet {
 		//String test			= DatabaseHandler.getdb().test();
 		//JSONObject answer	= new JSONObject();
 		//answer.put("Test_Output", test);		
-		helper.setResponseJSON(response, DatabaseHandler.getdb().JsonTest());
+		helper.setResponseJSONArray(response, DatabaseHandler.getdb().JsonTest());
 	}
 
 	/**
