@@ -2,8 +2,9 @@
 ##POST /auth
 Use to obtain an authentication token for the API
 Request Parameter
-----------------|-------------------------------|-----------
+
 name 			|description					|type (body or URL)
+----------------|-------------------------------|-----------
 login_name 		|Login Name of the User			|body
 password		|Password of the User			|body
 registration_id	|Registration Id for Phonegap	|body
