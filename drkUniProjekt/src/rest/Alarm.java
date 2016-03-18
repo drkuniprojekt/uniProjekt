@@ -31,7 +31,7 @@ public class Alarm
 	{
 		checkAuthority();
 		String currentTime = DatabaseHandler.getdb().getTimeStamp();
-		//TODO: Attribut Name und Town?
+		//TODO: Attribut Name, Town und User-ID?
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (alertevent, starttime, ?)"
 				+ " VALUES(TRUE, " + currentTime + ", ?)", JSON);
 		//TODO: Push-Message
