@@ -5,9 +5,9 @@ Request Parameter
 
 name 			|description					|type (body or URL)
 ----------------|-------------------------------|-----------
-login_name 		|Login Name of the User			|body
-password		|Password of the User			|body
-registration_id	|Registration Id for Phonegap	|body
+login_id 	|Login Name of the User			|body
+userpassword	|Password of the User			|body
+device_id	|Registration Id for Phonegap	|body
 
 Response example:
 ```json
