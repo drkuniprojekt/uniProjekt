@@ -1,5 +1,6 @@
 package Database;
 
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.Binding;
@@ -18,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 public class DatabaseHandler
 {
@@ -64,7 +67,7 @@ public class DatabaseHandler
 	}
 
 	
-	private String getTimeStamp()
+	public String getTimeStamp()
 	{
 		Date now = new Date();
 		java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(
@@ -118,7 +121,81 @@ public class DatabaseHandler
 			stmt.setString(i, arguments[i]);
 		}
 		int rs 	= stmt.executeUpdate();	
-		return rs;			
+		return rs;
+	}
+	
+	/**
+	 * Executes a simple UPDATE-Statement.
+	 * @param query Statement to execute
+	 * @return Numbers of rows affected
+	 * @throws SQLException
+	 */
+	public int executeUpdate(String query) throws SQLException
+	{
+		Statement stmt = conn.createStatement();
+		return stmt.executeUpdate(query);
+	}
+	
+	/**
+	 * Executes a an UPDATE-Statement or INSERT-Statement that can be filled in with the data of a JSONObject
+	 * Use ? as placeholder for the data to be filled from the JSONObject
+	 * Example1: "UPDATE table_name SET ? WHERE where_condition"
+	 * Example2: "INSERT INTO table_name (?) VALUES (?)"
+	 * @param query Querty to execute
+	 * @param json JSONObject with all relevant data for the new or changed entry
+	 * @return Number of rows affected
+	 * @throws SQLException
+	 */
+	public int executeUpdate(String query, JSONObject json) throws SQLException
+	{
+		PreparedStatement stmt 	= conn.prepareStatement(query);
+		
+		if(json.size() == 0)
+			return 0;
+		
+		query = query.toUpperCase();
+		String tmp1 = "";
+		String tmp2 = "";
+		
+		for(Iterator iterator = json.keySet().iterator(); iterator.hasNext();)
+		{
+			String column = (String) iterator.next();
+			String value = (String) json.get(column);
+			if(query.startsWith("UPDATE"))
+			{
+				tmp1 = tmp1 + column + " = " + "'" + value + "', ";
+				
+				if(!iterator.hasNext())
+				{
+					tmp1 = tmp1.substring(0, (tmp1.length()-2));
+				}
+			}
+			else if(query.startsWith("INSERT"))
+			{
+				tmp1 = tmp1 + column + ", ";
+				tmp2 = tmp2 + "'" + value + "', ";
+				
+				if(!iterator.hasNext())
+				{
+					tmp1 = tmp1.substring(0, (tmp1.length()-2));
+					tmp2 = tmp2.substring(0, (tmp2.length()-2));
+				}
+			}
+			else
+				return 0;
+		}
+		
+		try
+		{
+			stmt.setString(1, tmp1);
+			stmt.setString(2, tmp2);
+		} catch (SQLException e)
+		{
+			//Ignore Exception
+		}
+		
+		int rs 	= stmt.executeUpdate();	
+		return rs;	
 	}
 
 	private JSONArray rsToJSON(ResultSet rs) throws SQLException {
