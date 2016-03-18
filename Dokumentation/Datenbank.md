@@ -50,3 +50,13 @@ ANSWER		|BOOLEAN	|  |  |IF true (1) then user takes part
 AVIABLECAR|BOOLEAN	|  |  |IF true (1) then a car is aviable
 EVENT	|INT	|  |X|References to EVENT(EVENT_ID)
 ANSWERER     |VARCHAR(255)      |  |X |References to USER(USER_ID)
+
+----------------------------------------------
+
+#PHONEGAPID
+Attributname 		|Type    |Key     |Foreign Key  |Notes
+------|------|------|------|------|
+DEVICE_ID|VARCHAR(255)	|X |  |
+REGISTERTIME|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
+REGISTREDUSER|VARCHAR(255)	|X |X |
+
