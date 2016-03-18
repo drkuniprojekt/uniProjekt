@@ -33,6 +33,13 @@ ZIP		|INT	|  |  |
 TOWN	|VARCHAR(255)	|  |  |
 CREATOR     |VARCHAR(255)    |  |X  |References to USER(USER_ID)
 
+Example SQL statement, to insert a timestamp  
+```
+INSERT INTO "test" VALUES(  
+    TO_TIMESTAMP('2011-05-11 12:59.99','YYYY-MM-DD HH:SS.FF2') 
+);
+```
+
 ----------------------------------------------
 
 #EVENTANSWER
