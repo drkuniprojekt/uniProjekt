@@ -1,6 +1,7 @@
 package rest;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -35,7 +36,14 @@ public class testServlet extends HttpServlet {
 		//String test			= DatabaseHandler.getdb().test();
 		//JSONObject answer	= new JSONObject();
 		//answer.put("Test_Output", test);		
-		helper.setResponseJSONArray(response, DatabaseHandler.getdb().JsonTest());
+		try {
+			helper.setResponseJSONArray(response, DatabaseHandler.getdb().executeQuery("SELECT * FROM TESTTABELLE"));
+		} catch (SQLException e) {
+			JSONObject eo	= new JSONObject();
+			eo.put("Error", e);
+			helper.setResponseJSON(response, eo);
+			e.printStackTrace();
+		}
 	}
 
 	/**

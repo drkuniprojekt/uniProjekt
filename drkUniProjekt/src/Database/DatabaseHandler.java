@@ -22,7 +22,7 @@ import org.json.simple.JSONObject;
 public class DatabaseHandler
 {
 	Connection conn;
-	PreparedStatement testStm;
+	
 	
 	private static DatabaseHandler db;
 
@@ -34,8 +34,6 @@ public class DatabaseHandler
 			DataSource ds = (DataSource) ctx
 					.lookup("java:comp/env/jdbc/DefaultDB");
 			conn = ds.getConnection();
-
-			testStm = conn.prepareStatement("SELECT * FROM TESTTABELLE");	
 
 			System.out.println("Databaseconnection successfull ");
 
@@ -75,65 +73,65 @@ public class DatabaseHandler
 		return currentTimestamp.toString();
 	}
 	
-	public String test()
-	{
-		String tmp = null;
-		try
-		{
-			ResultSet rs = testStm.executeQuery();	
-			
-			System.out.println("Ausgabe: ");
-
-			while (rs.next())
-			{
-				tmp = rs.getString(1);
-				System.out.println("Read from Dataabase" + tmp);
-			}			
-		} catch (SQLException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return tmp;
-	}
-	public JSONArray JsonTest()
-	{
-		try 
-		{
-			return executeQuery("SELECT * FROM TESTTABELLE");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			JSONArray j	= new JSONArray();
-			j.add(e);
-			return j;
-		}
-		
-	}
-	/**
-	 * 
-	 * @param Query The Query to execute
-	 * @return An JSONObject containing thhe result
+	/**	 * 
+	 * @param query The Query to execute
+	 * @return An JSONObject containing the result
 	 * @throws SQLException 
 	 */
 	public JSONArray executeQuery(String query) throws SQLException
 	{
 		Statement stmt 	= conn.createStatement();
 		ResultSet rs 	= stmt.executeQuery(query);	
-		return rsToJSON(rs);				
-		
+		return rsToJSON(rs);			
+	}
+	
+	/**
+	 * Executes a prepared GET-Statement. WARNING im not sure, if this will only work for Strings. Has to be tested
+	 * @param query Query to execute ( Using ? as placeholder for Arguments)
+	 * @param arguments String array containing the Arguments
+	 * @return An JSONObject containing the result
+	 * @throws SQLException
+	 */
+	public JSONArray executeQuery(String query, String[] arguments) throws SQLException
+	{
+		PreparedStatement stmt 	= conn.prepareStatement(query);
+		for (int i = 0; i < arguments.length; i++) 
+		{
+			stmt.setString(i, arguments[i]);
+		}
+		ResultSet rs 	= stmt.executeQuery();	
+		return rsToJSON(rs);			
+	}
+	
+	/**
+	 * Executes a prepared UPDATE-Statement. WARNING im not sure, if this will only work for Strings. Has to be tested
+	 * @param query Query to execute ( Using ? as placeholder for Arguments)
+	 * @param arguments String array containing the Arguments
+	 * @return Result int from the DB
+	 * @throws SQLException
+	 */
+	public int executeUpdate(String query, String[] arguments) throws SQLException
+	{
+		PreparedStatement stmt 	= conn.prepareStatement(query);
+		for (int i = 0; i < arguments.length; i++) 
+		{
+			stmt.setString(i, arguments[i]);
+		}
+		int rs 	= stmt.executeUpdate();	
+		return rs;			
 	}
 
 	private JSONArray rsToJSON(ResultSet rs) throws SQLException {
 		JSONArray tmp = new JSONArray();
 		
-		ResultSetMetaData rsmd = rs.getMetaData();
-	    int columnCount = rsmd.getColumnCount();
+		ResultSetMetaData rsmd 	= rs.getMetaData();
+	    int columnCount 		= rsmd.getColumnCount();
 	    String column;    
 		while (rs.next())
 		{
 			JSONObject row	= new JSONObject();
 			for (int index = 1; index <= columnCount; index++) {
-	            column 			= rsmd.getColumnName(1);
+	            column 			= rsmd.getColumnName(1).toLowerCase();
 	            Object value 	= rs.getObject(column);
 	            row.put(column, value);
 
