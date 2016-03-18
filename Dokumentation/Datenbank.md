@@ -1,14 +1,17 @@
 #Announcment
 Nothing yet.
 
+###Version
+18.03.2016
+
 ----------------------------------------------
 
 #USER
 Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
-LOGIN_ID 		  |VARCHAR(255)	|X |  |Wird zum einloggen benötigt
+LOGIN_ID 		  |VARCHAR(255)	|X |  |Needed for Log-On
 DISPLAYNAME		|VARCHAR(255)	|  |  |
-USERPASSWORD	|VARCHAR(255)	|  |  |Wird zum einloggen benötigt
+USERPASSWORD	|VARCHAR(255)	|  |  |Needed for Log-On
 ADMINROLE     |BOOLEAN      |  |  |
 
 ----------------------------------------------
@@ -17,15 +20,18 @@ ADMINROLE     |BOOLEAN      |  |  |
 Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 EVENT_ID 		  |INT	|X |  |
-DISPLAYNAME		|VARCHAR(255)	|  |  |
-USERPASSWORD	|VARCHAR(255)	|  |  |
-ADMINROLE     |BOOLEAN      |  |  |
-DISPLAYNAME		|VARCHAR(255)	|  |  |
-USERPASSWORD	|VARCHAR(255)	|  |  |
-ADMINROLE     |BOOLEAN      |  |  |
-DISPLAYNAME		|VARCHAR(255)	|  |  |
-USERPASSWORD	|VARCHAR(255)	|  |  |
-ADMINROLE     |BOOLEAN      |  |  |
+NAME		|VARCHAR(255)	|  |  |
+DESCRIPTION	|VARCHAR(5000)	|  |  |
+ALERTEVENT     |BOOLEAN      |  |  |IF true (1) then the event is an alert
+REQUIREDTHINGS		|VARCHAR(5000)	|  |  |Plain text, describing what is needed for the event
+QUANTITYMEMBERS	|INT	|  |  |
+STARTTIME     |TIMESTAMP      |  |  |YYYY-MM-DD HH:SS
+ENDTIME		|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
+STREET	|VARCHAR(255)	|  |  |
+HOUSENUMBER     |VARCHAR(10)      |  |  |
+ZIP		|INT	|  |  |
+TOWN	|VARCHAR(255)	|  |  |
+CREATOR     |VARCHAR(255)    |  |X  |References to USER(USER_ID)
 
 ----------------------------------------------
 
