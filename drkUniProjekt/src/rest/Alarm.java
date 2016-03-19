@@ -1,7 +1,9 @@
 package rest;
 
 import java.sql.SQLException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
 import Database.DatabaseHandler;
 
 public class Alarm
@@ -12,7 +14,7 @@ public class Alarm
 	 * Designed for using with GET and DELETE (Alarm-Ressource)
 	 * @throws SQLException
 	 */
-	public Alarm() throws SQLException
+	public Alarm() throws SQLException, IllegalStateException
 	{
 		JSON = fetchJSONFromDatabase();
 	}
@@ -31,7 +33,7 @@ public class Alarm
 	{
 		checkAuthority();
 		String currentTime = DatabaseHandler.getdb().getTimeStamp();
-		//TODO: Attribut Name, Town und User-ID?
+		//TODO: Attribut Town und User-ID?
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (alertevent, starttime, ?)"
 				+ " VALUES(TRUE, " + currentTime + ", ?)", JSON);
 		//TODO: Push-Message
@@ -40,7 +42,7 @@ public class Alarm
 	public void change() throws SQLException
 	{
 		checkAuthority();
-		//TODO: Attribut Name und Town?
+		//TODO: Attribut Town?
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NOT NULL", JSON);
 		//TODO: Push-Message neu generieren?
 	}
@@ -66,16 +68,21 @@ public class Alarm
 		//}
 	}
 	
-	private JSONObject fetchJSONFromDatabase() throws SQLException
+	private JSONObject fetchJSONFromDatabase() throws SQLException, IllegalStateException
 	{
-		JSONObject json;
-		json = (JSONObject) DatabaseHandler.getdb().executeQuery(
-				"SELECT * FROM event WHERE alertevent = TRUE AND endtime IS NULL").get(0); //TODO: Initial-Abfrage so?
+		JSONArray array = DatabaseHandler.getdb().executeQuery(
+				"SELECT * FROM event WHERE alertevent = TRUE AND endtime IS NULL"); //TODO: Initial-Abfrage so?
 		
-		//TODO: Fall mehrere Datensätze abfangen?
-		//TODO: Fall Kein Alarm abfangen?
+		JSONObject json = (JSONObject) array.get(0);
 		
-		return json;
+		try
+		{
+			array.get(1);
+			throw new IllegalStateException("Inconsistent data in database - More than one alertevent found!");
+		} catch(IndexOutOfBoundsException e)
+		{ 
+			return json;
+		}
 	}
 	
 	public void setJSON(JSONObject JSON)
