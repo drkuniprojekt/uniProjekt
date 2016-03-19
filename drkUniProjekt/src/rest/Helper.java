@@ -14,7 +14,7 @@ import org.json.simple.JSONObject;
 
 public class Helper 
 {
-	public void setResponseJSON(HttpServletResponse response, JSONObject text) throws IOException
+	public static void setResponseJSON(HttpServletResponse response, JSONObject text) throws IOException
 	{
 		response.setContentType("application/json");
 		PrintWriter writer = response.getWriter();
@@ -22,7 +22,7 @@ public class Helper
 		writer.flush();
 		writer.close();
 	}
-	public void setResponseJSONArray(HttpServletResponse response, JSONArray json) throws IOException
+	public static void setResponseJSONArray(HttpServletResponse response, JSONArray json) throws IOException
 	{
 		response.setContentType("application/json");
 		PrintWriter writer = response.getWriter();

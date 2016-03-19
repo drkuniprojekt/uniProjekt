@@ -26,8 +26,7 @@ public class testServlet extends HttpServlet {
     public testServlet() {
         super();
         helper	= new Helper();
-        // TODO Auto-generated constructor stub
-        //TODO Steffen war hier wieder löschen
+      
     }
 
 	/**
