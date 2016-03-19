@@ -1,7 +1,7 @@
 /**
  * 
  */
-package Auth;
+package drkprojekt.auth;
 
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;

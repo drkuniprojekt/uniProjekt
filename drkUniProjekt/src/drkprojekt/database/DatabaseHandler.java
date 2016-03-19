@@ -1,4 +1,4 @@
-package Database;
+package drkprojekt.database;
 
 import java.io.FileReader;
 import java.sql.Connection;

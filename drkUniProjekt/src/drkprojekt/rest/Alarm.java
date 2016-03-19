@@ -1,10 +1,11 @@
-package rest;
+package drkprojekt.rest;
 
 import java.sql.SQLException;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import Database.DatabaseHandler;
+import drkprojekt.database.DatabaseHandler;
 
 public class Alarm
 {
@@ -17,6 +18,7 @@ public class Alarm
 	public Alarm() throws SQLException, IllegalStateException
 	{
 		JSON = fetchJSONFromDatabase();
+		System.out.println("Test4242");
 	}
 
 	/**

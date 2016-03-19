@@ -1,4 +1,4 @@
-package Auth;
+package drkprojekt.auth;
 
 
 import java.io.BufferedReader;
@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
 
-import rest.Helper;
+import drkprojekt.rest.Helper;
 
 /**
  * Servlet implementation class backend

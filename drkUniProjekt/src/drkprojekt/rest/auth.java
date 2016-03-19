@@ -1,4 +1,4 @@
-package rest;
+package drkprojekt.rest;
 
 
 import java.io.BufferedReader;

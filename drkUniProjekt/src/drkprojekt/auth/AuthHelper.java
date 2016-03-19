@@ -1,7 +1,7 @@
 /**
  * 
  */
-package Auth;
+package drkprojekt.auth;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
