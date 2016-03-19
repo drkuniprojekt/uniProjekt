@@ -75,12 +75,14 @@ public class Alarm
 		
 		JSONObject json = (JSONObject) array.get(0);
 		
-		if(array.get(1) != null)
+		try
 		{
+			array.get(1);
 			throw new IllegalStateException("Inconsistent data in database - More than one alertevent found!");
+		} catch(IndexOutOfBoundsException e)
+		{ 
+			return json;
 		}
-		
-		return json;
 	}
 	
 	public void setJSON(JSONObject JSON)
