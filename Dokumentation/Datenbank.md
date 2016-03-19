@@ -1,8 +1,11 @@
-#Announcment
+##Announcment
 Nothing yet.
 
-###Version
-18.03.2016
+##Changelog
+###20.03.2016  
+Coming soon!
+###18.03.2016  
+Initial version created
 
 ----------------------------------------------
 
