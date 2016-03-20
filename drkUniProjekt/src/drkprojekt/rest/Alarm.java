@@ -10,14 +10,17 @@ import drkprojekt.database.DatabaseHandler;
 public class Alarm
 {
 	private JSONObject JSON;
+	private int eventId;
 	
 	/**
 	 * Designed for using with GET and DELETE (Alarm-Ressource)
+	 * Designed for using with AlarmResponse-Ressource
 	 * @throws SQLException
 	 */
 	public Alarm() throws SQLException, IllegalStateException
 	{
 		JSON = fetchJSONFromDatabase();
+		eventId = fetchEventIdFromDatabase();
 	}
 
 	/**
@@ -60,9 +63,21 @@ public class Alarm
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET endtime = CURRENT_TIMESTAMP WHERE alertevent = TRUE AND endtime IS NULL");
 	}
 	
-	public void accept(boolean accepted, boolean car)
+	public void accept(boolean accepted, boolean car, String user) throws SQLException, IllegalStateException
 	{
+		if(JSON.isEmpty())
+			throw new IllegalStateException("No alertevent found!");
 		
+		DatabaseHandler.getdb().executeUpdate("INSERT INTO eventanswer VALUES(EVENTANSWER_ID.NEXTVAL, " + accepted + ", "
+				+ car + ", " + eventId + ", '" + user + "')");
+	}
+	
+	public JSONArray getAllAnswers() throws SQLException, IllegalStateException
+	{
+		if(JSON.isEmpty())
+			throw new IllegalStateException("No alertevent found!");
+		
+		return DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, answerer FROM eventanswer WHERE event = " + eventId);
 	}
 
 	private void checkAuthority() throws SecurityException
@@ -94,6 +109,19 @@ public class Alarm
 		{ 
 			return json;
 		}
+	}
+	
+	private int fetchEventIdFromDatabase() throws SQLException
+	{
+		JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT event_id "
+				+ "FROM event WHERE alertevent = TRUE AND endtime IS NULL");
+		
+		if(array.isEmpty())
+			return 0;
+
+		JSONObject json = (JSONObject) array.get(0);
+
+		return (int) json.get("event_id");
 	}
 	
 	public JSONObject getJSON()

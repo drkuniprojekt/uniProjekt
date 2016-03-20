@@ -132,6 +132,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query) throws SQLException
 	{
+		System.out.println("Executing " + query);
 		Statement stmt = conn.createStatement();
 		return stmt.executeUpdate(query);
 	}
