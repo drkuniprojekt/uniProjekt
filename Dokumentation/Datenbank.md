@@ -2,7 +2,7 @@
 Nothing yet.
 
 ##Changelog
-`20.03.2016` Coming soon!   
+`20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER  
 `18.03.2016` Initial version created   
 
 ----------------------------------------------
@@ -48,7 +48,7 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 EVENTANSWER_ID|INT	|X |  |
 ANSWER		|BOOLEAN	|  |  |IF true (1) then user takes part
-AVIABLECAR|BOOLEAN	|  |  |IF true (1) then a car is aviable
+AVAILABLECAR|BOOLEAN	|  |  |IF true (1) then a car is available
 EVENT	|INT	|  |X|References to EVENT(EVENT_ID)
 ANSWERER     |VARCHAR(255)      |  |X |References to USER(USER_ID)
 
