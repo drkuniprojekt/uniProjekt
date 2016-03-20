@@ -2,7 +2,7 @@
 Nothing yet.
 
 ##Changelog
-`20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER  
+`20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER | Sequencer for auto_increment added   
 `18.03.2016` Initial version created   
 
 ----------------------------------------------
@@ -20,7 +20,7 @@ ADMINROLE     |BOOLEAN      |  |  |
 #EVENT
 Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
-EVENT_ID 		  |INT	|X |  |
+EVENT_ID 		  |INT	|X |  |Use sequencer EVENT_ID.nextval for insert
 NAME		|VARCHAR(255)	|  |  |
 DESCRIPTION	|VARCHAR(5000)	|  |  |
 ALERTEVENT     |BOOLEAN      |  |  |IF true (1) then the event is an alert
@@ -46,7 +46,7 @@ INSERT INTO "test" VALUES(
 #EVENTANSWER
 Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
-EVENTANSWER_ID|INT	|X |  |
+EVENTANSWER_ID|INT	|X |  |Use sequencer EVENTANSWER_ID.nextval  for insert
 ANSWER		|BOOLEAN	|  |  |IF true (1) then user takes part
 AVAILABLECAR|BOOLEAN	|  |  |IF true (1) then a car is available
 EVENT	|INT	|  |X|References to EVENT(EVENT_ID)
