@@ -26,7 +26,6 @@ public class Alarm
 	 */
 	public Alarm(JSONObject json)
 	{
-		//TODO: GGfls (je nach Schnittstelle) müssen hier noch die überflüssigen Variablen (Username/Token) raus
 		this.JSON = json;
 	}
 	
@@ -36,7 +35,6 @@ public class Alarm
 		if(!fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("An alertevent is already running!");
 			
-		//TODO: Attribut Town und Creator?
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, starttime, ?)"
 				+ " VALUES(EVENT_ID.NEXTVAL, TRUE, CURRENT_TIMESTAMP, ?)", JSON);
 		//TODO: Push-Message
@@ -48,7 +46,7 @@ public class Alarm
 		if(fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
-		//TODO: Attribut Town? Creator ändern zulassen?
+		//TODO: Creator ändern zulassen?
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NULL", JSON);
 		//TODO: Push-Message neu generieren?
 	}
@@ -78,9 +76,8 @@ public class Alarm
 	
 	private JSONObject fetchJSONFromDatabase() throws SQLException, IllegalStateException
 	{
-		//TODO: Attribut town
 		JSONArray array = DatabaseHandler.getdb().executeQuery(
-				"SELECT event_id, description, requiredthings, quantitymembers, street, housenumber, zip, town "
+				"SELECT description, requiredthings, quantitymembers, street, housenumber, zip, town "
 				+ "FROM event WHERE alertevent = TRUE AND endtime IS NULL");
 		
 		if(array.isEmpty())
