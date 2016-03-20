@@ -2,7 +2,7 @@
 Nothing yet.
 
 ##Changelog
-`20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER  
+`20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER | Sequencer for auto_increment added   
 `18.03.2016` Initial version created   
 
 ----------------------------------------------
