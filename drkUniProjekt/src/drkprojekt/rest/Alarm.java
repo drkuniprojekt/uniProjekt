@@ -42,17 +42,23 @@ public class Alarm
 		//TODO: Push-Message
 	}
 
-	public void change() throws SQLException
+	public void change() throws SQLException, IllegalStateException
 	{
 		checkAuthority();
-		//TODO: Attribut Town?
-		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NOT NULL", JSON);
+		if(fetchJSONFromDatabase().isEmpty())
+			throw new IllegalStateException("No alertevent found!");
+		
+		//TODO: Attribut Town? Creator ändern zulassen?
+		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NULL", JSON);
 		//TODO: Push-Message neu generieren?
 	}
 
-	public void delete() throws SQLException
+	public void delete() throws SQLException, IllegalStateException
 	{
 		checkAuthority();
+		if(fetchJSONFromDatabase().isEmpty())
+			throw new IllegalStateException("No alertevent found!");
+		
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET endtime = CURRENT_TIMESTAMP WHERE alertevent = TRUE AND endtime IS NULL");
 	}
 	
