@@ -39,12 +39,12 @@ public class Authentication extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		
+		//TODO: Password und username mit datenbankeintrag vergleichen, register id setzen, token erzeugen und zurückgeben
 		JSONObject answer	= new JSONObject();
 		answer.put("token", "{bearer 12345678910}");
 		Helper.setResponseJSON(response, answer);
 	}
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response){
-	    
+	    	//TODO: wie kann das Token gelöscht werden, wenn es nur vom Client gespeichert wird, wie setzt man es effektiv auf outdated
 	}
 }

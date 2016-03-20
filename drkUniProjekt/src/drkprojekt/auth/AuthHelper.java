@@ -8,6 +8,8 @@ import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import net.oauth.jsontoken.JsonToken;
 import net.oauth.jsontoken.JsonTokenParser;
 import net.oauth.jsontoken.crypto.HmacSHA256Signer;
@@ -85,7 +87,7 @@ public class AuthHelper {
      * @throws SignatureException
      * @throws InvalidKeyException
      */
-    public static TokenInfo verifyToken(String token)  
+    private static TokenInfo verifyToken(String token)  
     {
         try {
             final Verifier hmacVerifier = new HmacSHA256Verifier(SIGNING_KEY.getBytes());
@@ -139,6 +141,24 @@ public class AuthHelper {
             throw new RuntimeException(e1);
         }
     }
-
-
+    
+    public static boolean isAdmin(HttpServletRequest request){
+	if(AuthHelper.isRegistered(request)){
+	    return AuthHelper.getToken(request).isAdmin();
+	}
+	return false;
+    }
+    public static boolean isRegistered(HttpServletRequest request){
+	try{
+	    //User is not registered, if his token is expired
+	    if(AuthHelper.verifyToken(request.getHeader("Token")).getExpires().isBeforeNow()) return false;
+	}catch(RuntimeException e){
+	    //User is not registered, if his token is not valid
+	    return false;
+	}
+	return true;
+    }
+    public static TokenInfo getToken(HttpServletRequest request){
+	return AuthHelper.verifyToken(request.getHeader("Token"));
+    }
 }

@@ -13,7 +13,7 @@ public class TokenInfo {
     private String userRole;
     private String userName;
     
-    public Boolean getAdminrole() {
+    public Boolean isAdmin() {
        if(userRole.equals("admin")) return true;
        else return false;
     }
