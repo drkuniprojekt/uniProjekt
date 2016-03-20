@@ -30,13 +30,15 @@ public class Alarm
 		this.JSON = json;
 	}
 	
-	public void create() throws SQLException
+	public void create() throws SQLException, IllegalStateException
 	{
 		checkAuthority();
-		String currentTime = DatabaseHandler.getdb().getTimeStamp();
-		//TODO: Attribut Town und User-ID?
-		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (alertevent, starttime, ?)"
-				+ " VALUES(TRUE, " + currentTime + ", ?)", JSON);
+		if(!fetchJSONFromDatabase().isEmpty())
+			throw new IllegalStateException("An alertevent is already running!");
+			
+		//TODO: Attribut Town und Creator?
+		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, starttime, ?)"
+				+ " VALUES(EVENT_ID.NEXTVAL, TRUE, CURRENT_TIMESTAMP, ?)", JSON);
 		//TODO: Push-Message
 	}
 
@@ -51,8 +53,7 @@ public class Alarm
 	public void delete() throws SQLException
 	{
 		checkAuthority();
-		String currentTime = DatabaseHandler.getdb().getTimeStamp();
-		DatabaseHandler.getdb().executeUpdate("UPDATE event SET endtime = " + currentTime + " WHERE alertevent = TRUE AND endtime IS NULL");
+		DatabaseHandler.getdb().executeUpdate("UPDATE event SET endtime = CURRENT_TIMESTAMP WHERE alertevent = TRUE AND endtime IS NULL");
 	}
 	
 	public void accept(boolean accepted, boolean car)
@@ -60,12 +61,12 @@ public class Alarm
 		
 	}
 
-	private void checkAuthority()
+	private void checkAuthority() throws SecurityException
 	{
 		//TODO: Authority-Check
 		//if()
 		//{
-			throw new SecurityException("Authorization failed - You are not an organizer!");
+		//	throw new SecurityException("Authorization failed - You are not an organizer!");
 		//}
 	}
 	
@@ -75,6 +76,9 @@ public class Alarm
 		JSONArray array = DatabaseHandler.getdb().executeQuery(
 				"SELECT event_id, description, requiredthings, quantitymembers, street, housenumber, zip, town "
 				+ "FROM event WHERE alertevent = TRUE AND endtime IS NULL");
+		
+		if(array.isEmpty())
+			return new JSONObject();
 		
 		JSONObject json = (JSONObject) array.get(0);
 		System.out.println("Entire JSON: " + json);

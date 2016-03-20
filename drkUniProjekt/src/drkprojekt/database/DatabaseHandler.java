@@ -148,7 +148,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, JSONObject json) throws SQLException
 	{
-		PreparedStatement stmt 	= conn.prepareStatement(query);
+		Statement stmt 	= conn.createStatement();
 		
 		if(json.size() == 0)
 			return 0;
@@ -160,7 +160,7 @@ public class DatabaseHandler
 		for(Iterator iterator = json.keySet().iterator(); iterator.hasNext();)
 		{
 			String column = (String) iterator.next();
-			String value = (String) json.get(column);
+			String value = (String) json.get(column).toString();
 			if(query.startsWith("UPDATE"))
 			{
 				tmp1 = tmp1 + column + " = " + "'" + value + "', ";
@@ -185,16 +185,15 @@ public class DatabaseHandler
 				return 0;
 		}
 		
-		try
-		{
-			stmt.setString(1, tmp1);
-			stmt.setString(2, tmp2);
-		} catch (SQLException e)
-		{
-			//Ignore Exception
-		}
+		System.out.println("SQL-String: " + query);
+		System.out.println("First '?' replaced with: " + tmp1);
+		System.out.println("First '?' replaced with: " + tmp2);
 		
-		int rs 	= stmt.executeUpdate();	
+		query = query.replace("?", "placeholder");
+		query = query.replaceFirst("placeholder", tmp1);
+		query = query.replaceFirst("placeholder", tmp2);
+		
+		int rs 	= stmt.executeUpdate(query);	
 		return rs;	
 	}
 

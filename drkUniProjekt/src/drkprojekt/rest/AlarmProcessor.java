@@ -36,7 +36,19 @@ public class AlarmProcessor extends HttpServlet
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		
+		Alarm alarm = new Alarm(Helper.getRequestJSON(request));
+		try
+		{
+			alarm.create();
+		} catch (IllegalStateException e)
+		{
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_CONFLICT);
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		}
 	}
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
