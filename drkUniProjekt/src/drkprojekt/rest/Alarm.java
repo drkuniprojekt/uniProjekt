@@ -56,7 +56,7 @@ public class Alarm
 	public void delete() throws SQLException, IllegalStateException
 	{
 		checkAuthority();
-		if(fetchJSONFromDatabase().isEmpty())
+		if(JSON.isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET endtime = CURRENT_TIMESTAMP WHERE alertevent = TRUE AND endtime IS NULL");

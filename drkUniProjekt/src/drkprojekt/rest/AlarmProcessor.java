@@ -70,9 +70,9 @@ public class AlarmProcessor extends HttpServlet
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 		try
 		{
+			Alarm alarm = new Alarm();
 			alarm.delete();
 		} catch (IllegalStateException e)
 		{
