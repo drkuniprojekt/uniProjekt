@@ -99,11 +99,6 @@ public class Alarm
 		}
 	}
 	
-	public void setJSON(JSONObject JSON)
-	{
-		this.JSON = JSON;
-	}
-	
 	public JSONObject getJSON()
 	{
 		return JSON;

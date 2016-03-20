@@ -3,7 +3,9 @@ package drkprojekt.rest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,7 +16,7 @@ import org.json.simple.parser.ParseException;
 
 public class Helper 
 {
-	public static JSONObject getRequestJSON(HttpServletRequest request) throws IOException
+	public static JSONObject getRequestJSON(HttpServletRequest request) throws IOException, ParseException
 	{
 		StringBuffer jb = new StringBuffer();
 		String line = null;		
@@ -26,13 +28,7 @@ public class Helper
 			jb.append(line);
 		}
 
-		try
-		{
-			json = (JSONObject) new JSONParser().parse(jb.toString());
-		} catch (ParseException e)
-		{
-			throw new IOException("Error parsing JSON request string");
-		}
+		json = (JSONObject) new JSONParser().parse(jb.toString());
 		
 		return json;
 	}
@@ -53,5 +49,24 @@ public class Helper
 		writer.print(json);
 		writer.flush();
 		writer.close();
+	}
+	
+	public static void handleException(Exception e, HttpServletResponse response) throws IOException
+	{
+		if(e instanceof IllegalStateException)
+		{
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_CONFLICT);
+		}
+		else if(e instanceof SQLException)
+		{
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		}
+		else if(e instanceof ParseException)
+		{
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		}
 	}
 }

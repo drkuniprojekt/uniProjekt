@@ -10,78 +10,59 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 @WebServlet("/alarm/*")
 public class AlarmProcessor extends HttpServlet
 {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-			try
-			{
-				Alarm alarm = new Alarm();
-				JSONObject responseJSON = alarm.getJSON();
-				if(responseJSON.isEmpty())
-					response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-				Helper.setResponseJSON(response, responseJSON);
-			} catch (IllegalStateException e)
-			{
-				e.printStackTrace();
-				response.sendError(HttpServletResponse.SC_CONFLICT);
-			} catch (SQLException e)
-			{
-				e.printStackTrace();
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			}	
+		try
+		{
+			Alarm alarm = new Alarm();
+			JSONObject responseJSON = alarm.getJSON();
+			if(responseJSON.isEmpty())
+				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			Helper.setResponseJSON(response, responseJSON);
+		} catch (IllegalStateException | SQLException e)
+		{
+			Helper.handleException(e, response);
+		}
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 		try
 		{
+			Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 			alarm.create();
-		} catch (IllegalStateException e)
+		} catch (ParseException | IllegalStateException | SQLException e)
 		{
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_CONFLICT);
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			Helper.handleException(e, response);
 		}
 	}
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-	{
-		Alarm alarm = new Alarm(Helper.getRequestJSON(request));
+	{	
 		try
 		{
+			Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 			alarm.change();
-		} catch (IllegalStateException e)
+		} catch (ParseException | IllegalStateException | SQLException e)
 		{
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_CONFLICT);
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			Helper.handleException(e, response);
 		}
 	}
-	
+
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		try
 		{
 			Alarm alarm = new Alarm();
 			alarm.delete();
-		} catch (IllegalStateException e)
+		} catch (IllegalStateException | SQLException e)
 		{
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_CONFLICT);
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			Helper.handleException(e, response);
 		}
 	}
 }
