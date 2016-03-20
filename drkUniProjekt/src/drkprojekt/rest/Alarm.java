@@ -18,7 +18,6 @@ public class Alarm
 	public Alarm() throws SQLException, IllegalStateException
 	{
 		JSON = fetchJSONFromDatabase();
-		System.out.println("Test4242");
 	}
 
 	/**
@@ -72,10 +71,13 @@ public class Alarm
 	
 	private JSONObject fetchJSONFromDatabase() throws SQLException, IllegalStateException
 	{
+		//TODO: Attribut town
 		JSONArray array = DatabaseHandler.getdb().executeQuery(
-				"SELECT * FROM event WHERE alertevent = TRUE AND endtime IS NULL"); //TODO: Initial-Abfrage so?
+				"SELECT event_id, description, requiredthings, quantitymembers, street, housenumber, zip, town "
+				+ "FROM event WHERE alertevent = TRUE AND endtime IS NULL");
 		
 		JSONObject json = (JSONObject) array.get(0);
+		System.out.println("Entire JSON: " + json);
 		
 		try
 		{

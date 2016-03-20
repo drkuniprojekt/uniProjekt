@@ -199,23 +199,26 @@ public class DatabaseHandler
 	}
 
 	private JSONArray rsToJSON(ResultSet rs) throws SQLException {
-		JSONArray tmp = new JSONArray();
+		JSONArray jsonarray = new JSONArray();
 		
 		ResultSetMetaData rsmd 	= rs.getMetaData();
 	    int columnCount 		= rsmd.getColumnCount();
+	    System.out.println("Column Count: " + columnCount);
 	    String column;    
 		while (rs.next())
 		{
 			JSONObject row	= new JSONObject();
 			for (int index = 1; index <= columnCount; index++) {
-	            column 			= rsmd.getColumnName(1).toLowerCase();
+				System.out.println("Iteration " + index);
+	            column 			= rsmd.getColumnName(index).toLowerCase();
 	            Object value 	= rs.getObject(column);
 	            row.put(column, value);
-
+	            System.out.println("Row changed: " + row);
 			}
-			tmp.add(row);
+			
+			jsonarray.add(row);
 		}
-		System.out.println("Read from Dataabase" + tmp);			
-		return tmp;
+		System.out.println("Read from Dataabase" + jsonarray);			
+		return jsonarray;
 	}
 }
