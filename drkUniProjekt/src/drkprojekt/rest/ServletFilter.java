@@ -23,9 +23,9 @@ public class ServletFilter implements Filter
 	{
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
-		HttpSession session = request.getSession(true);
-		
+//		HttpSession session = request.getSession(true);
 		System.out.println("Filter durchlaufen");
+
 		addCORSHeaders(request, response);
 		String role	= checkToken(request.getHeader("Authorization")); //Verwenden?!?
 		chain.doFilter(req, res);
@@ -33,7 +33,7 @@ public class ServletFilter implements Filter
 
 	private String checkToken(String token)
 	{
-		//Pseudo Code -> Hier sollte überprüft werden !!!!!!!
+		//Pseudo Code -> Hier sollte ï¿½berprï¿½ft werden !!!!!!!
 		if(token != null)
 		{
 			return "admin";
