@@ -71,3 +71,11 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 SETTING|VARCHAR(255)	|X |  |
 SETTINGVALUE|BOOLEAN	|  |  |IF true (1) then setting is turned on
 USERACCOUNT|VARCHAR(255)	|X |X |References to USER(USER_ID)
+
+###Name convention for settings:  
+* car >> Option if a car is general available (pre-checked box in EVENTANSWER etc.)
+* gui_highcontrast >> Option if user wants app displayed with special colors
+* gui_showexpirationdate >> Option if user wants to see expiration dates in his calendar
+* notification_event >> Option if user wants to be notified when a new event (not alert) is created
+* notification_groupchat >> Option if user wants to be notified when a new groupmessage was written
+* notification_chat >> Option if user wants to be notified when a new chatmessage (one-to-one) was written
