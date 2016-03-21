@@ -63,3 +63,11 @@ DEVICE_ID|VARCHAR(255)	|X |  |
 REGISTERTIME|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
 REGISTREDUSER|VARCHAR(255)	|X |X |References to USER(USER_ID)
 
+----------------------------------------------
+
+#SETTING
+Attributname 		|Type    |Key     |Foreign Key  |Notes
+------|------|------|------|------|
+SETTING|VARCHAR(255)	|X |  |
+SETTINGVALUE|BOOLEAN	|  |  |IF true (1) then setting is turned on
+USERACCOUNT|VARCHAR(255)	|X |X |References to USER(USER_ID)
