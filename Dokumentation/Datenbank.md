@@ -2,7 +2,7 @@
 Nothing yet.
 
 ##Changelog
-`21.03.2016` EVENTANSWER changed  
+`21.03.2016` EVENTANSWER key changed  
 `20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER | Sequencer for EVENT_ID added   
 `18.03.2016` Initial version created   
 
@@ -52,7 +52,7 @@ AVAILABLECAR|BOOLEAN	|  |  |IF true (1) then a car is available
 EVENT	|INT	|X |X|References to EVENT(EVENT_ID)
 ANSWERER     |VARCHAR(255)      |X |X |References to USER(USER_ID)
 
-Just using foreign keys ensures that one user cannot habe multiple answers to one event.
+Using only foreign keys as primary key ensures that one user cannot make multiple answers for one event.
 
 ----------------------------------------------
 
