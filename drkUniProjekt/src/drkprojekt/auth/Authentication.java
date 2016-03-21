@@ -42,7 +42,7 @@ public class Authentication extends HttpServlet {
 	    try {
 		json = Helper.getRequestJSON(request);	    
 		array = DatabaseHandler.getdb().executeQuery(
-		    "Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = "+ json.get("login_id"));
+		    "Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = ?", (String)json.get("login_id"));
 		
 		if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) {
 		    JSONObject responseText = new JSONObject();

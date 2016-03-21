@@ -111,6 +111,24 @@ public class DatabaseHandler
 	}
 	
 	/**
+	 * Executes a prepared GET-Statement. WARNING im not sure, if this will only work for Strings. Has to be tested
+	 * @param query Query to execute ( Using ? as placeholder for Arguments)
+	 * @param arguments String containing the Argument
+	 * @return An JSONObject containing the result
+	 * @throws SQLException
+	 */
+	public JSONArray executeQuery(String query, String argument) throws SQLException
+	{
+		PreparedStatement stmt 	= conn.prepareStatement(query);		
+		stmt.setString(1, argument);
+		
+		ResultSet rs 	= stmt.executeQuery();	
+		JSONArray result = rsToJSON(rs);
+		closeResources(rs, stmt);
+		return result;
+	}
+	
+	/**
 	 * Executes a prepared UPDATE-Statement. WARNING im not sure, if this will only work for Strings. Has to be tested
 	 * @param query Query to execute ( Using ? as placeholder for Arguments)
 	 * @param arguments String array containing the Arguments
@@ -129,6 +147,21 @@ public class DatabaseHandler
 		return rowcount;
 	}
 	
+	/**
+	 * Executes a prepared UPDATE-Statement. WARNING im not sure, if this will only work for Strings. Has to be tested
+	 * @param query Query to execute ( Using ? as placeholder for Arguments)
+	 * @param arguments String containing the Argument
+	 * @return Result int from the DB
+	 * @throws SQLException
+	 */
+	public int executeUpdate(String query, String argument) throws SQLException
+	{
+		PreparedStatement stmt 	= conn.prepareStatement(query);		
+		stmt.setString(1, argument);		
+		int rowcount = stmt.executeUpdate();
+		closeStatement(stmt);
+		return rowcount;
+	}
 	/**
 	 * Executes a simple UPDATE-Statement.
 	 * @param query Statement to execute
