@@ -37,11 +37,12 @@ public class Authentication extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
+		DatabaseHandler db	= DatabaseHandler.getdb();
 	    JSONObject json;
 	    JSONArray array;
 	    try {
 		json = Helper.getRequestJSON(request);	    
-		array = DatabaseHandler.getdb().executeQuery(
+		array = db.executeQuery(
 		    "Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = ?", (String)json.get("login_id"));
 		
 		if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) {
@@ -50,8 +51,8 @@ public class Authentication extends HttpServlet {
 		    Helper.setResponseJSON(response, responseText);
 		    return;
 		}
-		DatabaseHandler.getdb().executeUpdate("INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES"
-			+ json.get("login_id")+ ", " + json.get("device_id") + ", CURRENT_TIMESTAMP");
+		String[] tmp	= {(String) json.get("login_id"), (String) json.get("device_id")};
+		db.executeUpdate("INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)", tmp);
 		
 		JSONObject responseText = new JSONObject();		
 		responseText.put("successful", true);
