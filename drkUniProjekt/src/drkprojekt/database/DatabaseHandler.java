@@ -84,8 +84,10 @@ public class DatabaseHandler
 	public JSONArray executeQuery(String query) throws SQLException
 	{
 		Statement stmt 	= conn.createStatement();
-		ResultSet rs 	= stmt.executeQuery(query);	
-		return rsToJSON(rs);			
+		ResultSet rs 	= stmt.executeQuery(query);
+		JSONArray result = rsToJSON(rs);
+		closeResources(rs, stmt);
+		return result;
 	}
 	
 	/**
@@ -103,7 +105,9 @@ public class DatabaseHandler
 			stmt.setString(i, arguments[i]);
 		}
 		ResultSet rs 	= stmt.executeQuery();	
-		return rsToJSON(rs);			
+		JSONArray result = rsToJSON(rs);
+		closeResources(rs, stmt);
+		return result;
 	}
 	
 	/**
@@ -120,8 +124,9 @@ public class DatabaseHandler
 		{
 			stmt.setString(i, arguments[i]);
 		}
-		int rs 	= stmt.executeUpdate();	
-		return rs;
+		int rowcount = stmt.executeUpdate();
+		closeStatement(stmt);
+		return rowcount;
 	}
 	
 	/**
@@ -134,7 +139,9 @@ public class DatabaseHandler
 	{
 		System.out.println("Executing " + query);
 		Statement stmt = conn.createStatement();
-		return stmt.executeUpdate(query);
+		int rowcount = stmt.executeUpdate(query);
+		closeStatement(stmt);
+		return rowcount;
 	}
 	
 	/**
@@ -149,11 +156,11 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, JSONObject json) throws SQLException
 	{
-		Statement stmt 	= conn.createStatement();
-		
 		if(json.size() == 0)
 			return 0;
 		
+		Statement stmt 	= conn.createStatement();
+			
 		query = query.toUpperCase();
 		String tmp1 = "";
 		String tmp2 = "";
@@ -183,7 +190,10 @@ public class DatabaseHandler
 				}
 			}
 			else
+			{
+				closeStatement(stmt);
 				return 0;
+			}
 		}
 		
 		System.out.println("SQL-String: " + query);
@@ -194,8 +204,9 @@ public class DatabaseHandler
 		query = query.replaceFirst("placeholder", tmp1);
 		query = query.replaceFirst("placeholder", tmp2);
 		
-		int rs 	= stmt.executeUpdate(query);	
-		return rs;	
+		int rowcount = stmt.executeUpdate(query);
+		closeStatement(stmt);
+		return rowcount;
 	}
 
 	private JSONArray rsToJSON(ResultSet rs) throws SQLException {
@@ -220,5 +231,33 @@ public class DatabaseHandler
 		}
 		System.out.println("Read from Dataabase" + jsonarray);			
 		return jsonarray;
+	}
+	
+	private void closeResources(ResultSet rs, Statement stmt)
+	{
+		closeResultSet(rs);
+		closeStatement(stmt);
+	}
+	
+	private void closeResultSet(ResultSet rs)
+	{
+		if(rs != null)
+		{
+			try
+			{
+				rs.close();
+			} catch (SQLException e) {}
+		}
+	}
+	
+	private void closeStatement(Statement stmt)
+	{
+		if(stmt != null)
+		{
+			try
+			{
+				stmt.close();
+			} catch (SQLException e) {}
+		}
 	}
 }
