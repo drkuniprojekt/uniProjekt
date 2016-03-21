@@ -70,7 +70,7 @@ answerer	|User ID of te answerer		|body
 
 
 ---------------------------------------------------------------------
-#/authentification
+#/authentication
 ##POST /authentfication
 Use to obtain an authentication token for the API
 Request Parameter
@@ -84,11 +84,11 @@ device_id	|Registration Id for Phonegap	|body
 Response example:
 ```json
 {
-	"TOKEN":"123456789"
+	"token":"123456789"
 }
 ```
 
-##DELETE /authentification/{token}
+##DELETE /authentication/{token}
 Use to delete your authentication token (logout)
 
 ---------------------------------------------------------------------
