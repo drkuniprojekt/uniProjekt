@@ -27,7 +27,6 @@ public class Helper
 		{
 			jb.append(line);
 		}
-
 		json = (JSONObject) new JSONParser().parse(jb.toString());
 		
 		return json;
