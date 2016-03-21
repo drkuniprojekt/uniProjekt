@@ -10,7 +10,8 @@ import com.google.android.gcm.server.Sender;
 
 public class PushService
 {
-	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U RegisterID: APA91bHfra32RNkNX7cjoqPC84lplF7m4Dl2yi1YeEwoGtIvQY6tAprUZWpPxg7hbgq0T0FKgbGceN4rQgRqwc2uvYxUDP24NJ_y0pTUL-erHgBHEj5liGxFjDTaHzWW07eUKlakJiMC";
+	//Emanuel:  APA91bHfra32RNkNX7cjoqPC84lplF7m4Dl2yi1YeEwoGtIvQY6tAprUZWpPxg7hbgq0T0FKgbGceN4rQgRqwc2uvYxUDP24NJ_y0pTUL-erHgBHEj5liGxFjDTaHzWW07eUKlakJiMC
+	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
 	
 	public static void sendUnicastMessage(String message, String deviceId)
 	{
