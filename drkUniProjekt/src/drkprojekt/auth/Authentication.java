@@ -49,13 +49,14 @@ public class Authentication extends HttpServlet {
 			if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) 
 			{
 				response.setStatus(403);
+				System.out.println("Invalid login attempt for User: " + (String)json.get("login_id"));
 			    JSONObject responseText = new JSONObject();
 			    responseText.put("successful", false);
 			    Helper.setResponseJSON(response, responseText);
 			    return;
 			}
 			String[] tmp	= {(String) json.get("login_id"), (String) json.get("device_id")};
-			db.executeUpdate("INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)", tmp);
+			db.executeUpdate("INSERT INTO phonegapid (registredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)", tmp);
 			
 			JSONObject responseText = new JSONObject();		
 			responseText.put("successful", true);
