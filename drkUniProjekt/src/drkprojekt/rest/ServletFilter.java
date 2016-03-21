@@ -27,20 +27,10 @@ public class ServletFilter implements Filter
 		
 		System.out.println("Filter durchlaufen");
 		addCORSHeaders(request, response);
-		String role	= checkToken(request.getHeader("Authorization")); //Verwenden?!?
+		//String role	= checkToken(request.getHeader("Authorization")); //Verwenden?!?
 		chain.doFilter(req, res);
 	}
 
-	private String checkToken(String token)
-	{
-		//Pseudo Code -> Hier sollte überprüft werden !!!!!!!
-		if(token != null)
-		{
-			return "admin";
-		}
-		return "NA";
-		
-	}
 
 	@Override
 	public void init(FilterConfig arg0) throws ServletException

@@ -10,6 +10,13 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
+import org.joda.time.DateTime;
+
+import com.google.common.collect.Lists;
+import com.google.gson.JsonObject;
+
 import net.oauth.jsontoken.JsonToken;
 import net.oauth.jsontoken.JsonTokenParser;
 import net.oauth.jsontoken.crypto.HmacSHA256Signer;
@@ -18,13 +25,6 @@ import net.oauth.jsontoken.crypto.SignatureAlgorithm;
 import net.oauth.jsontoken.crypto.Verifier;
 import net.oauth.jsontoken.discovery.VerifierProvider;
 import net.oauth.jsontoken.discovery.VerifierProviders;
-
-import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
-import org.joda.time.Instant;
-import com.google.common.collect.Lists;
-import com.google.gson.JsonObject;
 
 
 /**
@@ -48,7 +48,7 @@ public class AuthHelper {
      * @param durationDays
      * @return
      */
-    public static String createJsonWebToken(String userId, String userName, String userRole, Long durationDays)    {
+    public static String createJsonWebToken(String userId, String userName, boolean isAdmin, Long durationDays)    {
         //Current time and signing algorithm
         Calendar cal = Calendar.getInstance();
         HmacSHA256Signer signer;
@@ -68,8 +68,9 @@ public class AuthHelper {
         JsonObject request = new JsonObject();
         request.addProperty("userId", userId);
         request.addProperty("userName", userName);
-        request.addProperty("userRole", userRole);
-
+        if(isAdmin) request.addProperty("userRole", "admin");
+        else request.addProperty("userRole", "teamMember");
+        
         JsonObject payload = token.getPayloadAsJsonObject();
         payload.add("info", request);
 
@@ -151,7 +152,7 @@ public class AuthHelper {
     public static boolean isRegistered(HttpServletRequest request){
 	try{
 	    //User is not registered, if his token is expired
-	    if(AuthHelper.verifyToken(request.getHeader("Token")).getExpires().isBeforeNow()) return false;
+	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().isBeforeNow()) return false;
 	}catch(RuntimeException e){
 	    //User is not registered, if his token is not valid
 	    return false;
@@ -159,6 +160,6 @@ public class AuthHelper {
 	return true;
     }
     public static TokenInfo getToken(HttpServletRequest request){
-	return AuthHelper.verifyToken(request.getHeader("Token"));
+	return AuthHelper.verifyToken(request.getHeader("Authorization"));
     }
 }

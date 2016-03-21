@@ -1,14 +1,8 @@
 package drkprojekt.auth;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.ArrayList;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,8 +10,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
+import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.Helper;
 
 /**
@@ -37,14 +34,52 @@ public class Authentication extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		//TODO: Password und username mit datenbankeintrag vergleichen, register id setzen, token erzeugen und zurückgeben
-		JSONObject answer	= new JSONObject();
-		answer.put("token", "{bearer 12345678910}");
-		Helper.setResponseJSON(response, answer);
+	    JSONObject json;
+	    JSONArray array;
+	    try {
+		json = Helper.getRequestJSON(request);	    
+		array = DatabaseHandler.getdb().executeQuery(
+		    "Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = "+ json.get("login_id"));
+		
+		if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) {
+		    JSONObject responseText = new JSONObject();
+		    responseText.put("successful", false);
+		    Helper.setResponseJSON(response, responseText);
+		    return;
+		}
+		DatabaseHandler.getdb().executeUpdate("INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES"
+			+ json.get("login_id")+ ", " + json.get("device_id") + ", CURRENT_TIMESTAMP");
+		
+		JSONObject responseText = new JSONObject();		
+		responseText.put("successful", true);
+		responseText.put("token", 
+			AuthHelper.createJsonWebToken((String)json.get("login_id"), (String) json.get("displayname"), 
+				Boolean.parseBoolean((String) json.get("adminrole")), (long) 10000));
+		
+		Helper.setResponseJSON(response, responseText);		
+	    } catch (SQLException | ParseException e) {
+		Helper.handleException(e, response);		
+	    }
+	    
+	    JSONObject responseText = new JSONObject();
+		
+		Helper.setResponseJSON(response, responseText);
 	}
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response){
-	    	//TODO: wie kann das Token gelöscht werden, wenn es nur vom Client gespeichert wird, wie setzt man es effektiv auf outdated
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+	    JSONObject json;
+		try {
+		    json = Helper.getRequestJSON(request);
+		    DatabaseHandler.getdb().executeUpdate("DELETE FROM phonegapid WHERE device_id=" + (String)json.get("device_id") 
+		    	+ " AND registereduser=" + (String)json.get("login_id"));
+			    
+		} catch (ParseException | SQLException e) {
+		    Helper.handleException(e, response);
+		} 
+	   
+			 
 	}
 }
