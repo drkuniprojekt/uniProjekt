@@ -26,7 +26,7 @@ public class ServletFilter implements Filter
 		HttpSession session = request.getSession(true);
 		
 		System.out.println("Filter durchlaufen");
-
+		addCORSHeaders(request, response);
 		chain.doFilter(req, res);
 	}
 
@@ -36,5 +36,16 @@ public class ServletFilter implements Filter
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private static void addCORSHeaders(HttpServletRequest request, HttpServletResponse response)  
+	{  
+	     response.addHeader("Access-Control-Allow-Origin", "*");  
+	     response.addHeader("Access-Control-Allow-Methods", "GET,POST, PUT, DELETE, OPTIONS");    
+	     String requestCORSHeaders = request.getHeader("Access-Control-Request-Headers");  
+	     if (requestCORSHeaders != null)  
+	     {  
+	         response.addHeader("Access-Control-Allow-Headers", requestCORSHeaders);  
+	     }  
+	}  
 
 }
