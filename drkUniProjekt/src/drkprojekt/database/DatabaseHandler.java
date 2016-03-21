@@ -102,7 +102,7 @@ public class DatabaseHandler
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
 		{
-			stmt.setString(i, arguments[i]);
+			stmt.setString(i + 1, arguments[i]);
 		}
 		ResultSet rs 	= stmt.executeQuery();	
 		JSONArray result = rsToJSON(rs);
@@ -140,7 +140,7 @@ public class DatabaseHandler
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
 		{
-			stmt.setString(i, arguments[i]);
+			stmt.setString(i + 1, arguments[i]);
 		}
 		int rowcount = stmt.executeUpdate();
 		closeStatement(stmt);
