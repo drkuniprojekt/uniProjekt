@@ -23,8 +23,7 @@ public class ServletFilter implements Filter
 	{
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
-		HttpSession session = request.getSession(true);
-		
+//		HttpSession session = request.getSession(true);
 		System.out.println("Filter durchlaufen");
 		addCORSHeaders(request, response);
 		//String role	= checkToken(request.getHeader("Authorization")); //Verwenden?!?
@@ -41,7 +40,7 @@ public class ServletFilter implements Filter
 	
 	private static void addCORSHeaders(HttpServletRequest request, HttpServletResponse response)  
 	{  
-	     response.addHeader("Access-Control-Allow-Origin", "https://drkprojekt-p1941893014trial.dispatcher.hanatrial.ondemand.com");  
+	     response.addHeader("Access-Control-Allow-Origin", "*");  
 	     response.addHeader("Access-Control-Allow-Methods", "GET,POST, PUT, DELETE, OPTIONS");    
 	     String requestCORSHeaders = request.getHeader("Access-Control-Request-Headers");  
 	     if (requestCORSHeaders != null)  

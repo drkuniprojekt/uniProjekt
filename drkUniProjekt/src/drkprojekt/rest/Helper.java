@@ -35,7 +35,7 @@ public class Helper
 	
 	public static void setResponseJSON(HttpServletResponse response, JSONObject text) throws IOException
 	{
-		response.setContentType("application/json");
+		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter writer = response.getWriter();
 		writer.print(text);
 		writer.flush();
@@ -44,7 +44,7 @@ public class Helper
 	
 	public static void setResponseJSONArray(HttpServletResponse response, JSONArray json) throws IOException
 	{
-		response.setContentType("application/json");
+		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter writer = response.getWriter();
 		writer.print(json);
 		writer.flush();

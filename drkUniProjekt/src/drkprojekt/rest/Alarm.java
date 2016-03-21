@@ -40,7 +40,7 @@ public class Alarm
 			
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, starttime, ?)"
 				+ " VALUES(EVENT_ID.NEXTVAL, TRUE, CURRENT_TIMESTAMP, ?)", JSON);
-		//TODO: Push-Message
+		PushService.sendBroadCastMessage("Alarm!!!!111elf!");
 	}
 
 	public void change() throws SQLException, IllegalStateException
