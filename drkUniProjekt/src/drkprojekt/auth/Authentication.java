@@ -40,29 +40,34 @@ public class Authentication extends HttpServlet {
 		DatabaseHandler db	= DatabaseHandler.getdb();
 	    JSONObject json;
 	    JSONArray array;
-	    try {
-		json = Helper.getRequestJSON(request);	    
-		array = db.executeQuery(
-		    "Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = ?", (String)json.get("login_id"));
-		
-		if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) {
-		    JSONObject responseText = new JSONObject();
-		    responseText.put("successful", false);
-		    Helper.setResponseJSON(response, responseText);
-		    return;
-		}
-		String[] tmp	= {(String) json.get("login_id"), (String) json.get("device_id")};
-		db.executeUpdate("INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)", tmp);
-		
-		JSONObject responseText = new JSONObject();		
-		responseText.put("successful", true);
-		responseText.put("token", 
-			AuthHelper.createJsonWebToken((String)json.get("login_id"), (String) json.get("displayname"), 
-				Boolean.parseBoolean((String) json.get("adminrole")), (long) 10000));
-		
-		Helper.setResponseJSON(response, responseText);		
-	    } catch (SQLException | ParseException e) {
-		Helper.handleException(e, response);		
+	    try 
+	    {
+			json = Helper.getRequestJSON(request);	    
+			array = db.executeQuery(
+			    "Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = ?", (String)json.get("login_id"));
+			
+			if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) 
+			{
+				response.setStatus(403);
+			    JSONObject responseText = new JSONObject();
+			    responseText.put("successful", false);
+			    Helper.setResponseJSON(response, responseText);
+			    return;
+			}
+			String[] tmp	= {(String) json.get("login_id"), (String) json.get("device_id")};
+			db.executeUpdate("INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)", tmp);
+			
+			JSONObject responseText = new JSONObject();		
+			responseText.put("successful", true);
+			responseText.put("token", 
+				AuthHelper.createJsonWebToken((String)json.get("login_id"), (String) json.get("displayname"), 
+					Boolean.parseBoolean((String) json.get("adminrole")), (long) 10000));
+			
+			Helper.setResponseJSON(response, responseText);		
+	    } 
+	    catch (SQLException | ParseException e)
+	    {
+	    	Helper.handleException(e, response);		
 	    }
 	    
 	    JSONObject responseText = new JSONObject();
