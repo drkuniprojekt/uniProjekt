@@ -47,11 +47,10 @@ INSERT INTO "test" VALUES(
 #EVENTANSWER
 Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
-EVENTANSWER_ID|INT	|X |  |Use sequencer EVENTANSWER_ID.nextval  for insert
 ANSWER		|BOOLEAN	|  |  |IF true (1) then user takes part
 AVAILABLECAR|BOOLEAN	|  |  |IF true (1) then a car is available
-EVENT	|INT	|  |X|References to EVENT(EVENT_ID)
-ANSWERER     |VARCHAR(255)      |  |X |References to USER(USER_ID)
+EVENT	|INT	|X |X|References to EVENT(EVENT_ID)
+ANSWERER     |VARCHAR(255)      |X |X |References to USER(USER_ID)
 
 ----------------------------------------------
 
