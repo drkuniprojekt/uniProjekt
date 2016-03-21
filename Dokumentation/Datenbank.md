@@ -61,7 +61,7 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 DEVICE_ID|VARCHAR(255)	|X |  |
 REGISTERTIME|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
-REGISTREDUSER|VARCHAR(255)	|X |X |References to USER(USER_ID)
+REGISTEREDUSER|VARCHAR(255)	|X |X |References to USER(USER_ID)
 
 ----------------------------------------------
 
