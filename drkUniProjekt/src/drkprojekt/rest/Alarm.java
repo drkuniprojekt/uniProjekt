@@ -68,7 +68,7 @@ public class Alarm
 		if(JSON.isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
-		DatabaseHandler.getdb().executeUpdate("INSERT INTO eventanswer VALUES(EVENTANSWER_ID.NEXTVAL, " + accepted + ", "
+		DatabaseHandler.getdb().executeUpdate("INSERT INTO eventanswer VALUES(" + accepted + ", "
 				+ car + ", " + eventId + ", '" + user + "')");
 	}
 	
