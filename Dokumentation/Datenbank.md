@@ -52,6 +52,8 @@ AVAILABLECAR|BOOLEAN	|  |  |IF true (1) then a car is available
 EVENT	|INT	|X |X|References to EVENT(EVENT_ID)
 ANSWERER     |VARCHAR(255)      |X |X |References to USER(USER_ID)
 
+Just using foreign keys ensures that one user cannot habe multiple answers to one event.
+
 ----------------------------------------------
 
 #PHONEGAPID
