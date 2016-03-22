@@ -37,8 +37,11 @@ public class Authentication extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-
 	    System.out.println("Do Post");
+	    TokenInfo info = AuthHelper.verifyToken("eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEUktVbmlQcm9qZWt0IiwiYXVkIjoiQ2xpZW50Rm9yRFJLTWVtYmVyIiwiaWF0IjoxNDU4NjQwMjQyLCJleHAiOjIzMjI2NDAyNDIsImluZm8iOnsidXNlcklkIjoiVXNlcjEiLCJ1c2VyTmFtZSI6IlN1c2kgU29yZ2xvcyIsInVzZXJSb2xlIjoidGVhbU1lbWJlciJ9fQ.u9xZz-JIrOJeKWVKFz5J7WNA0GShvC57zy68KkoP28E");
+	    System.out.println(info.getUserId());
+	    System.out.println("AuthHelper aufgerufen");
+	    
 	    DatabaseHandler db = DatabaseHandler.getdb();
 	    JSONObject json;
 	    JSONArray array;
@@ -49,7 +52,6 @@ public class Authentication extends HttpServlet {
 			"Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = ?", (String)json.get("login_id"));
 		System.out.println("Get database array");
 		if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) {
-		    response.setStatus(403);
 		    System.out.println("Password or username wrong");
 		    JSONObject responseText = new JSONObject();
 		    responseText.put("successful", false);
@@ -64,6 +66,9 @@ public class Authentication extends HttpServlet {
 		String loginID = (String)json.get("login_id");
 		String displayName = (String) json.get("displayname");
 		boolean admin = Boolean.parseBoolean((String) json.get("adminrole"));
+		System.out.println("LoginID: " + loginID);
+		System.out.println("NAme: " + displayName);
+		System.out.println("Admin: " + admin);
 		String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);
 		responseText.put("token", tokenString);
 		System.out.println("creates web token");
