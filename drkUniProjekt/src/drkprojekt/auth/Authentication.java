@@ -37,7 +37,7 @@ public class Authentication extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-	    System.out.println("Do Post");
+	    System.out.println("Doing Post");
 	    TokenInfo info = AuthHelper.verifyToken("eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEUktVbmlQcm9qZWt0IiwiYXVkIjoiQ2xpZW50Rm9yRFJLTWVtYmVyIiwiaWF0IjoxNDU4NjQwMjQyLCJleHAiOjIzMjI2NDAyNDIsImluZm8iOnsidXNlcklkIjoiVXNlcjEiLCJ1c2VyTmFtZSI6IlN1c2kgU29yZ2xvcyIsInVzZXJSb2xlIjoidGVhbU1lbWJlciJ9fQ.u9xZz-JIrOJeKWVKFz5J7WNA0GShvC57zy68KkoP28E");
 	    System.out.println(info.getUserId());
 	    System.out.println("AuthHelper aufgerufen");
