@@ -61,9 +61,11 @@ public class Authentication extends HttpServlet {
 		System.out.println("executeupdate succesful");
 		JSONObject responseText = new JSONObject();		
 		responseText.put("successful", true);
-		responseText.put("token", 
-			AuthHelper.createJsonWebToken((String)json.get("login_id"), (String) json.get("displayname"), 
-				Boolean.parseBoolean((String) json.get("adminrole")), (long) 10000));
+		String loginID = (String)json.get("login_id");
+		String displayName = (String) json.get("displayname");
+		boolean admin = Boolean.parseBoolean((String) json.get("adminrole"));
+		String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);
+		responseText.put("token", tokenString);
 		System.out.println("creates web token");
 		Helper.setResponseJSON(response, responseText);		
 	    } catch (SQLException | ParseException e) {
