@@ -34,7 +34,7 @@ STREET	|VARCHAR(255)	|  |  |
 HOUSENUMBER     |VARCHAR(10)      |  |  |
 ZIP		|INT	|  |  |
 TOWN	|VARCHAR(255)	|  |  |
-CREATOR     |VARCHAR(255)    |  |X  |References to USER(USER_ID)
+CREATOR     |VARCHAR(255)    |  |X  |References to USER(LOGIN_ID)
 
 Example SQL statement, to insert a timestamp  
 ```
@@ -51,7 +51,7 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 ANSWER		|BOOLEAN	|  |  |IF true (1) then user takes part
 AVAILABLECAR|BOOLEAN	|  |  |IF true (1) then a car is available
 EVENT	|INT	|X |X|References to EVENT(EVENT_ID)
-ANSWERER     |VARCHAR(255)      |X |X |References to USER(USER_ID)
+ANSWERER     |VARCHAR(255)      |X |X |References to USER(LOGIN_ID)
 
 Using only foreign keys as primary key ensures that one user cannot make multiple answers for one event.
 
@@ -62,7 +62,7 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 DEVICE_ID|VARCHAR(255)	|X |  |
 REGISTERTIME|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
-REGISTEREDUSER|VARCHAR(255)	|X |X |References to USER(USER_ID)
+REGISTEREDUSER|VARCHAR(255)	|X |X |References to USER(LOGIN_ID)
 
 ----------------------------------------------
 
@@ -71,7 +71,7 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 SETTING|VARCHAR(255)	|X |  |
 SETTINGVALUE|BOOLEAN	|  |  |IF true (1) then setting is turned on
-USERACCOUNT|VARCHAR(255)	|X |X |References to USER(USER_ID)
+USERACCOUNT|VARCHAR(255)	|X |X |References to USER(LOGIN_ID)
 
 ###Name convention for settings:  
 * car >> Option if a car is general available (pre-checked box in EVENTANSWER etc.)
@@ -96,7 +96,7 @@ CHATROOM_ID|INT	|X |  |Use sequencer CHATROOM_ID.nextval for insert (auto_increm
 Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 CHATROOM|INT	|X |X |References to CHATROOM(CHATROOM_ID)
-USERACCOUNT|VARCHAR(255)	|X |X |References to USER(USER_ID)
+USERACCOUNT|VARCHAR(255)	|X |X |References to USER(LOGIN_ID)
 
 ###Use CHATROOM_ID 1 for group-chat!
 
@@ -108,5 +108,5 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 MESSAGE_ID|INT	|X |  |Use sequencer MESSAGE_ID.nextval for insert (auto_increment)
 CREATETIME|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
 MESSAGECONTENT |VARCHAR(5000)	|  |  |
-USERACCOUNT |VARCHAR(255)	|  |X |References to USER(USER_ID)
+USERACCOUNT |VARCHAR(255)	|  |X |References to USER(LOGIN_ID)
 CHATROOM |INT	|  |X |References to CHATROOM(CHATROOM_ID)
