@@ -2,6 +2,7 @@
 Nothing yet.
 
 ##Changelog
+`22.03.2016` Coming soon!  
 `21.03.2016` EVENTANSWER key changed | SETTING added (formerly known as option)  
 `20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER | Sequencer for EVENT_ID added   
 `18.03.2016` Initial version created   
@@ -79,3 +80,22 @@ USERACCOUNT|VARCHAR(255)	|X |X |References to USER(USER_ID)
 * notification_event >> Option if user wants to be notified when a new event (not alert) is created
 * notification_groupchat >> Option if user wants to be notified when a new groupmessage was written
 * notification_chat >> Option if user wants to be notified when a new chatmessage (one-to-one) was written
+
+----------------------------------------------
+
+#CHATROOM
+Attributname 		|Type    |Key     |Foreign Key  |Notes
+------|------|------|------|------|
+CHATROOM_ID|INT	|X |  |Use sequencer CHATROOM_ID.nextval for insert (auto_increment)
+
+###Use CHATROOM_ID [1] for group-chat!
+
+----------------------------------------------
+
+#CHATROOMMAPPING
+Attributname 		|Type    |Key     |Foreign Key  |Notes
+------|------|------|------|------|
+CHATROOM|INT	|X |X |References to CHATROOM(CHATROOM_ID)
+USERACCOUNT|VARCHAR(255)	|X |X |References to USER(USER_ID)
+
+###Use CHATROOM_ID [1] for group-chat!
