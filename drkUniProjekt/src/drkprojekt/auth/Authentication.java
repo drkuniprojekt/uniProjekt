@@ -37,7 +37,9 @@ public class Authentication extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
+
 	    System.out.println("Do Post");
+	    //DatabaseHandler db	= DatabaseHandler.getdb();
 	    JSONObject json;
 	    JSONArray array;
 	    try {
@@ -64,12 +66,45 @@ public class Authentication extends HttpServlet {
 		System.out.println("creates web token");
 		Helper.setResponseJSON(response, responseText);		
 	    } catch (SQLException | ParseException e) {
-		Helper.handleException(e, response);		
+		Helper.handleException(e, response);
 	    }
-	    
-	    JSONObject responseText = new JSONObject();
-		
-		Helper.setResponseJSON(response, responseText);
+
+	    /*
+	    try 
+	    {
+			json = Helper.getRequestJSON(request);	    
+			array = db.executeQuery(
+			    "Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = ?", (String)json.get("login_id"));
+			
+			if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) 
+			{
+				response.setStatus(403);
+				System.out.println("Invalid login attempt for User: " + (String)json.get("login_id"));
+			    JSONObject responseText = new JSONObject();
+			    responseText.put("successful", false);
+			    Helper.setResponseJSON(response, responseText);
+			    return;
+			}
+			String[] tmp	= {(String) json.get("login_id"), (String) json.get("device_id")};
+			db.executeUpdate("INSERT INTO phonegapid (registredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)", tmp);
+			
+			JSONObject responseText = new JSONObject();		
+			responseText.put("successful", true);
+			responseText.put("token", 
+				AuthHelper.createJsonWebToken((String)json.get("login_id"), (String) json.get("displayname"), 
+					Boolean.parseBoolean((String) json.get("adminrole")), (long) 10000));
+			
+			Helper.setResponseJSON(response, responseText);		
+	    } 
+	    catch (SQLException | ParseException e)
+	    {
+	    	Helper.handleException(e, response);		
+>>>>>>> branch 'master' of https://github.com/drkuniprojekt/uniProjekt
+	    }*/
+//	    
+//	    JSONObject responseText = new JSONObject();
+//		
+//		Helper.setResponseJSON(response, responseText);
 	}
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
