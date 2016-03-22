@@ -51,6 +51,7 @@ public class AuthHelper {
      */
     public static String createJsonWebToken(String userId, String userName, boolean isAdmin, Long durationDays)    {
         //Current time and signing algorithm
+	System.out.println("CreateJSONWebToken");
         Calendar cal = Calendar.getInstance();
         HmacSHA256Signer signer;
         try {
@@ -89,7 +90,7 @@ public class AuthHelper {
      * @throws SignatureException
      * @throws InvalidKeyException
      */
-    private static TokenInfo verifyToken(String token)  
+    public static TokenInfo verifyToken(String token)  
     {
         try {
             final Verifier hmacVerifier = new HmacSHA256Verifier(SIGNING_KEY.getBytes());
@@ -127,8 +128,8 @@ public class AuthHelper {
             String userNameString =  payload.getAsJsonObject("info").getAsJsonPrimitive("userName").getAsString();
             String userRoleString =  payload.getAsJsonObject("info").getAsJsonPrimitive("userRole").getAsString();
             if (issuer.equals(ISSUER) && !StringUtils.isBlank(userIdString))
-            {
-                t.setUserId(new ObjectId(userIdString));
+            {        	
+                t.setUserId(userIdString);
                 t.setUserRole(userRoleString);
                 t.setUserName(userNameString);
                 t.setIssued(new DateTime(payload.getAsJsonPrimitive("iat").getAsLong()));

@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 
 public class TokenInfo {
-    private ObjectId userId;
+    private String userId;
     private DateTime issued;
     private DateTime expires;
     private String userRole;
@@ -30,10 +30,10 @@ public class TokenInfo {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-    public ObjectId getUserId() {
+    public String getUserId() {
         return userId;
     }
-    public void setUserId(ObjectId userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
     public DateTime getIssued() {
