@@ -88,7 +88,7 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 CHATROOM_ID|INT	|X |  |Use sequencer CHATROOM_ID.nextval for insert (auto_increment)
 
-###Use CHATROOM_ID [1] for group-chat!
+###Use CHATROOM_ID 1 for group-chat!
 
 ----------------------------------------------
 
@@ -98,4 +98,4 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 CHATROOM|INT	|X |X |References to CHATROOM(CHATROOM_ID)
 USERACCOUNT|VARCHAR(255)	|X |X |References to USER(USER_ID)
 
-###Use CHATROOM_ID [1] for group-chat!
+###Use CHATROOM_ID 1 for group-chat!
