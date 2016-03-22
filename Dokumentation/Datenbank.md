@@ -2,7 +2,7 @@
 Nothing yet.
 
 ##Changelog
-`22.03.2016` Coming soon!  
+`22.03.2016` CHATROOM, CHATROOMMAPPING, MESSAGE created  
 `21.03.2016` EVENTANSWER key changed | SETTING added (formerly known as option)  
 `20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER | Sequencer for EVENT_ID added   
 `18.03.2016` Initial version created   
