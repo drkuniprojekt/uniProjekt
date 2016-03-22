@@ -99,3 +99,12 @@ CHATROOM|INT	|X |X |References to CHATROOM(CHATROOM_ID)
 USERACCOUNT|VARCHAR(255)	|X |X |References to USER(USER_ID)
 
 ###Use CHATROOM_ID 1 for group-chat!
+
+----------------------------------------------
+
+#MESSAGE
+Attributname 		|Type    |Key     |Foreign Key  |Notes
+------|------|------|------|------|
+MESSAGE_ID|INT	|X |  |Use sequencer MESSAGE_ID.nextval for insert (auto_increment)
+CREATETIME|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
+
