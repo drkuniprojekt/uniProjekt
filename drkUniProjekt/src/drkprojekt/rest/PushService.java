@@ -25,9 +25,15 @@ public class PushService
 		sendMessage(message, singleDevice);
 	}
 	
-	public static void sendBroadCastMessage(String message) throws SQLException
+	public static void sendMulticastMessage(String message, String userId) throws SQLException
 	{
-		JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT device_id FROM phonegapid");
+		JSONArray array = null;
+		
+		if(userId != null)
+			array = DatabaseHandler.getdb().executeQuery("SELECT device_id FROM phonegapid WHERE registereduser = " + userId);
+		else
+			array = DatabaseHandler.getdb().executeQuery("SELECT device_id FROM phonegapid");
+		
 		String[] allDevices = new String[array.size()];
 		JSONObject json;
 
@@ -39,8 +45,11 @@ public class PushService
 		}		
 		
 		sendMessage(message, allDevices);
-		
-		//sendUnicastMessage("Guden Taag", "APA91bHsJdpaOueOeVmXifChEGH0RPp35I3Qh_RNjvGTb3pqPBDWd3oinQXntIcT7CBXZkK0cESaEmadNya5CFFFOC6LQwo59KiTUcwqVTTrw22q4MUJ_3s");
+	}
+	
+	public static void sendBroadCastMessage(String message) throws SQLException
+	{
+		sendMulticastMessage(message, null);
 	}
 	
 	private static void sendMessage(String message, String[] deviceId) throws SQLException
@@ -119,8 +128,8 @@ public class PushService
 		}
 		request.put("data", data);
 		//TODO: Collapse-Key festlegen
-		request.put("collapse_key", "DRK-Alarm"); 
-		request.put("delay_while_idle", true);
+		//request.put("collapse_key", "DRK-Alarm"); 
+		//request.put("delay_while_idle", true);
 		
 		System.out.println("Request: " + request.toJSONString());
 		
