@@ -1,80 +1,129 @@
 package drkprojekt.rest;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.sql.SQLException;
 
-import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.MulticastResult;
-import com.google.android.gcm.server.Sender;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import drkprojekt.database.DatabaseHandler;
 
 public class PushService
 {
-	//Emanuel:  APA91bHfra32RNkNX7cjoqPC84lplF7m4Dl2yi1YeEwoGtIvQY6tAprUZWpPxg7hbgq0T0FKgbGceN4rQgRqwc2uvYxUDP24NJ_y0pTUL-erHgBHEj5liGxFjDTaHzWW07eUKlakJiMC
+	//Emanuel: APA91bHsJdpaOueOeVmXifChEGH0RPp35I3Qh_RNjvGTb3pqPBDWd3oinQXntIcT7CBXZkK0cESaEmadNya5CFFFOC6LQwo59KiTUcwqVTTrw22q4MUJ_3s
 	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
 	
-	public static void sendUnicastMessage(String message, String deviceId)
+	public static void sendUnicastMessage(String message, String deviceId) throws SQLException
 	{
-		List<String> androidTargets = new ArrayList<String>();
-        androidTargets.add(deviceId);
-        sendMessage(message, androidTargets);
+		String[] singleDevice = new String[1];
+		singleDevice[0] = deviceId;
+		sendMessage(message, singleDevice);
 	}
 	
-	public static void sendBroadCastMessage(String message)
+	public static void sendBroadCastMessage(String message) throws SQLException
 	{
-		List<String> androidTargets = new ArrayList<String>();
-		//TODO: Aus DB alle Geräte-IDs auslesen, folgende Code-Zeile entfernen
-		sendMessage(message, androidTargets);
+		JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT device_id FROM phonegapid");
+		String[] allDevices = new String[array.size()];
+		JSONObject json;
+
+		for (int i = 0; i < array.size(); i++)
+		{
+			json = (JSONObject) array.get(i);
+			allDevices[i] = (String) json.get("device_id");
+			System.out.println("Iteration " + i + ": " + allDevices[i]);
+		}		
+		
+		sendMessage(message, allDevices);
+		
+		//sendUnicastMessage("Guden Taag", "APA91bHsJdpaOueOeVmXifChEGH0RPp35I3Qh_RNjvGTb3pqPBDWd3oinQXntIcT7CBXZkK0cESaEmadNya5CFFFOC6LQwo59KiTUcwqVTTrw22q4MUJ_3s");
 	}
 	
-	private static void sendMessage(String message, List<String> androidTargets)
+	private static void sendMessage(String message, String[] deviceId) throws SQLException
 	{
-		String collapseKey = "Alarm-Nachricht";
-		 
-        // Instance of com.android.gcm.server.Sender, that does the
-        // transmission of a Message to the Google Cloud Messaging service.
-        Sender senderObject = new Sender(SENDERID);
-         
-        // This Message object will hold the data that is being transmitted
-        // to the Android client devices.  For this demo, it is a simple text
-        // string, but could certainly be a JSON object.
-        Message messageObject = new Message.Builder()
-        
-        // If multiple messages are sent using the same .collapseKey()
-        // the android target device, if it was offline during earlier message
-        // transmissions, will only receive the latest message for that key when
-        // it goes back on-line.
-        .collapseKey(collapseKey)
-        .timeToLive(30)
-        .delayWhileIdle(true)
-        .addData("message", message)
-        .build();
-        
-        try {
-            // use this for multicast messages.  The second parameter
-            // of senderObject.send() will need to be an array of register ids.
-            MulticastResult result = senderObject.send(messageObject, androidTargets, 3);
-             
-            if (result.getResults() != null) {
-                int canonicalRegId = result.getCanonicalIds();
-                if (canonicalRegId != 0) {
-                     
-                }
-            } else {
-                int error = result.getFailure();
-                System.out.println("Broadcast failure: " + error);
-            }
-             
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-// 
-//        // We'll pass the CollapseKey and Message values back to index.jsp, only so
-//        // we can display it in our form again.
-//        request.setAttribute("CollapseKey", collapseKey);
-//        request.setAttribute("Message", message);
-//         
-//        request.getRequestDispatcher("index.jsp").forward(request, response);
-                 
+		DataOutputStream out = null;
+		BufferedReader in = null;
+		
+		try
+		{
+			HttpURLConnection connection = connect();
+			
+			String data = prepareRequestJSON(message, deviceId);
+
+			out = new DataOutputStream (connection.getOutputStream());
+			out.writeBytes(data);
+			
+			//TODO: vermutlich ist die Antwort egal
+			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null)
+			{
+				response.append(inputLine);
+			}
+			
+			System.out.println("Response: " + response.toString());
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+			throw new SQLException("Invalid result for sending a message!");
+		}
+		finally
+		{
+			try	{ out.close(); } catch (Exception e) {}
+			try	{ in.close(); } catch (Exception e) {}
+		}
+	}
+	
+	private static HttpURLConnection connect() throws IOException
+	{
+		URL googleUrl = new URL("https://gcm-http.googleapis.com/gcm/send");
+		
+		HttpURLConnection connection = (HttpURLConnection) googleUrl.openConnection();
+	    connection.setRequestMethod("POST");
+	    connection.setRequestProperty("Content-Type", "application/json");
+	    connection.setRequestProperty("Authorization","key=" + SENDERID); 
+	    connection.setDoOutput(true);
+	    connection.setUseCaches(false);
+	    
+	    return connection;
+	}
+	
+	private static String prepareRequestJSON(String message, String[] deviceId)
+	{
+		JSONObject request = new JSONObject();
+		JSONObject data = new JSONObject();
+		
+		data.put("message", message);
+		data.put("title", message);
+		
+		if(deviceId.length == 1)
+			request.put("to", deviceId[0]);
+		else
+		{
+			StringBuffer sb = new StringBuffer();
+			sb.append("[");
+			for (int i = 0; i < deviceId.length; i++)
+			{
+				if(i != 0)
+					sb.append(",");
+				sb.append("\"" + deviceId[i] + "\"");
+			}
+			sb.append("]");
+			request.put("registration_ids", sb);
+		}
+		request.put("data", data);
+		//TODO: Collapse-Key festlegen
+		request.put("collapse_key", "DRK-Alarm"); 
+		request.put("delay_while_idle", true);
+		
+		System.out.println("Request: " + request.toJSONString());
+		
+		return request.toJSONString();
 	}
 }
