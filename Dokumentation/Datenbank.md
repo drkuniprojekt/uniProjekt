@@ -107,4 +107,6 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 MESSAGE_ID|INT	|X |  |Use sequencer MESSAGE_ID.nextval for insert (auto_increment)
 CREATETIME|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
-
+MESSAGECONTENT |VARCHAR(5000)	|  |  |
+USERACCOUNT |VARCHAR(255)	|  |X |References to USER(USER_ID)
+CHATROOM |INT	|  |X |References to CHATROOM(CHATROOM_ID)
