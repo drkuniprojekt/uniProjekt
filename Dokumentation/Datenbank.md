@@ -2,7 +2,7 @@
 Nothing yet.
 
 ##Changelog
-`22.03.2016` CHATROOM, CHATROOMMAPPING, MESSAGE created  
+`22.03.2016` CHATROOM, CHATROOMMAPPING, MESSAGE, MESSAGESUNREAD created  
 `21.03.2016` EVENTANSWER key changed | SETTING added (formerly known as option)  
 `20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER | Sequencer for EVENT_ID added   
 `18.03.2016` Initial version created   
@@ -110,3 +110,11 @@ CREATETIME|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
 MESSAGECONTENT |VARCHAR(5000)	|  |  |
 USERACCOUNT |VARCHAR(255)	|  |X |References to USER(LOGIN_ID)
 CHATROOM |INT	|  |X |References to CHATROOM(CHATROOM_ID)
+
+----------------------------------------------
+
+#MESSAGESUNREAD  
+Attributname 		|Type    |Key     |Foreign Key  |Notes
+------|------|------|------|------|
+MESSAGE |INT	|X  |X |References to MESSAGE(MESSAGE_ID)
+USERACCOUNT |VARCHAR(255)	|X |X |References to USER(LOGIN_ID)
