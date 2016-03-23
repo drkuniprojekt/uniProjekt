@@ -1,4 +1,4 @@
-package drkprojekt.rest;
+package Tests;
 
 
 import java.io.BufferedReader;
@@ -17,6 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
+
+import drkprojekt.rest.Helper;
 
 /**
  * Servlet implementation class backend
@@ -41,8 +44,25 @@ public class auth extends HttpServlet {
 	{
 		
 		JSONObject answer	= new JSONObject();
-		answer.put("token", "{bearer 12345678910}");
-		helper.setResponseJSON(response, answer);
+		try
+		{
+			JSONObject input	= helper.getRequestJSON(request);
+			if(answer.get("login_id").equals("User1") && answer.get("userpassword").equals("123456"))
+			{
+				answer.put("token", "{bearer 12345678910}");
+				answer.put("successfull", true);
+				answer.put("adminrole", false);
+			}else
+			{
+				answer.put("successfull", false);
+			}			
+			helper.setResponseJSON(response, answer);
+			
+		} catch (ParseException e)
+		{
+			response.setStatus(400);
+		}
+		
 	}
 
 }
