@@ -21,6 +21,8 @@ import javax.sql.DataSource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory;
 
 public class DatabaseHandler
 {
@@ -28,21 +30,21 @@ public class DatabaseHandler
 	
 	
 	private static DatabaseHandler db;
-
+	private static Logger log;
 	private DatabaseHandler()
 	{
 		try
 		{
-			InitialContext ctx = new InitialContext();
-			DataSource ds = (DataSource) ctx
-					.lookup("java:comp/env/jdbc/DefaultDB");
-			conn = ds.getConnection();
+			log					= LoggerFactory.getLogger(this.getClass());  
+			InitialContext ctx 	= new InitialContext();
+			DataSource ds 		= (DataSource) ctx.lookup("java:comp/env/jdbc/DefaultDB");
+			conn 				= ds.getConnection();
 
-			System.out.println("Databaseconnection successfull ");
+			log.info("Databaseconnection successfull ");
 
 		} catch (Exception e)
 		{
-			System.err.println("Databaseconnection failed " + e.getMessage());
+			log.error("Databaseconnection failed " + e.getMessage());
 		}
 	}
 	
@@ -62,7 +64,7 @@ public class DatabaseHandler
 			conn.close();
 		} catch (SQLException e)
 		{
-			System.err.println("Could not close connection");
+			log.error("Could not close connection");
 		}
 	}
 
@@ -170,7 +172,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query) throws SQLException
 	{
-		System.out.println("Executing " + query);
+		log.debug("Executing " + query);
 		Statement stmt = conn.createStatement();
 		int rowcount = stmt.executeUpdate(query);
 		closeStatement(stmt);
@@ -229,9 +231,9 @@ public class DatabaseHandler
 			}
 		}
 		
-		System.out.println("SQL-String: " + query);
-		System.out.println("First '?' replaced with: " + tmp1);
-		System.out.println("First '?' replaced with: " + tmp2);
+		log.debug("SQL-String: " + query);
+		log.debug("First '?' replaced with: " + tmp1);
+		log.debug("First '?' replaced with: " + tmp2);
 		
 		query = query.replace("?", "placeholder");
 		query = query.replaceFirst("placeholder", tmp1);
@@ -247,22 +249,22 @@ public class DatabaseHandler
 		
 		ResultSetMetaData rsmd 	= rs.getMetaData();
 	    int columnCount 		= rsmd.getColumnCount();
-	    System.out.println("Column Count: " + columnCount);
+	    log.debug("Column Count: " + columnCount);
 	    String column;    
 		while (rs.next())
 		{
 			JSONObject row	= new JSONObject();
 			for (int index = 1; index <= columnCount; index++) {
-				System.out.println("Iteration " + index);
+				log.debug("Iteration " + index);
 	            column 			= rsmd.getColumnName(index).toLowerCase();
 	            Object value 	= rs.getObject(column);
 	            row.put(column, value);
-	            System.out.println("Row changed: " + row);
+	            log.debug("Row changed: " + row);
 			}
 			
 			jsonarray.add(row);
 		}
-		System.out.println("Read from Dataabase" + jsonarray);			
+		log.debug("Read from Dataabase" + jsonarray);			
 		return jsonarray;
 	}
 	
