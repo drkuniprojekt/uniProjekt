@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +22,12 @@ public class PushService
 	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
 	private static Logger log = LoggerFactory.getLogger("PushService");
 	
+	/**
+	 * Sends a unicast message to one device, identified by its device ID
+	 * @param message Message to send
+	 * @param deviceId Phonegap-ID of the message receiver
+	 * @throws SQLException
+	 */
 	public static void sendUnicastMessage(String message, String deviceId) throws SQLException
 	{
 		String[] singleDevice = new String[1];
@@ -30,6 +35,13 @@ public class PushService
 		sendMessage(message, singleDevice);
 	}
 	
+	/**
+	 * Sends a multicast message to one special user, identified by his or her user ID
+	 * The message is send to all devices registered by the given user
+	 * @param message Message to send
+	 * @param userId User-Id ot the message receiver
+	 * @throws SQLException
+	 */
 	public static void sendMulticastMessage(String message, String userId) throws SQLException
 	{
 		JSONArray array = null;
@@ -52,6 +64,11 @@ public class PushService
 		sendMessage(message, allDevices);
 	}
 	
+	/**
+	 * Sends a broadcast message to all registered devices
+	 * @param message Message to send
+	 * @throws SQLException
+	 */
 	public static void sendBroadCastMessage(String message) throws SQLException
 	{
 		sendMulticastMessage(message, null);
