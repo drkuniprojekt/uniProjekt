@@ -16,6 +16,8 @@ import org.json.simple.parser.ParseException;
 @WebServlet("/response/*")
 public class AlarmResponseProcessor extends HttpServlet
 {
+	private static final long serialVersionUID = 1L;
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		try
@@ -44,6 +46,9 @@ public class AlarmResponseProcessor extends HttpServlet
 			alarm.accept(Boolean.parseBoolean(answer.get("answer").toString()),
 					     Boolean.parseBoolean(answer.get("availablecar").toString()), 
 					     answer.get("answerer").toString());			
+		} catch (NullPointerException e)
+		{
+			Helper.handleException(new SQLException("Argument must not be null!"), response);
 		} catch (IllegalStateException | SQLException | ParseException e)
 		{
 			Helper.handleException(e, response);
