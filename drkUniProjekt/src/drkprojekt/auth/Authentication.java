@@ -19,7 +19,7 @@ import drkprojekt.rest.Helper;
 /**
  * Servlet implementation class backend
  */
-@WebServlet("/authen/*")
+@WebServlet("/authentication/*")
 public class Authentication extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
@@ -34,42 +34,32 @@ public class Authentication extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
-	{
-	    System.out.println("Doingöö Post");
-	    TokenInfo info = AuthHelper.verifyToken("eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEUktVbmlQcm9qZWt0IiwiYXVkIjoiQ2xpZW50Rm9yRFJLTWVtYmVyIiwiaWF0IjoxNDU4NjQwMjQyLCJleHAiOjIzMjI2NDAyNDIsImluZm8iOnsidXNlcklkIjoiVXNlcjEiLCJ1c2VyTmFtZSI6IlN1c2kgU29yZ2xvcyIsInVzZXJSb2xlIjoidGVhbU1lbWJlciJ9fQ.u9xZz-JIrOJeKWVKFz5J7WNA0GShvC57zy68KkoP28E");
-	    System.out.println(info.getUserId());
-	    System.out.println("AuthHelper aufgerufen");
-	    
+	{    
 	    DatabaseHandler db = DatabaseHandler.getdb();
 	    JSONObject json;
 	    JSONArray array;
 	    try {
-		json = Helper.getRequestJSON(request);	 
-		System.out.println("Get Request JSON");
+		json = Helper.getRequestJSON(request);
+		String[] tmp1	= {(String) json.get("login_id"), (String) json.get("password")};
 		array = DatabaseHandler.getdb().executeQuery(
-			"Select login_id, userpassword, displayname, adminrole FROM user WHERE login_id = ?", (String)json.get("login_id"));
-		System.out.println("Get database array");
-		if(array.isEmpty() || !json.get("password").equals(((JSONObject)array.get(0)).get("userpassword"))) {
-		    System.out.println("Password or username wrong");
+			"Select login_id, displayname, adminrole FROM user WHERE login_id = ? AND userpassword = HASH_SHA256(TO_BINARY(?))", tmp1);
+		if(array.isEmpty()) {
 		    JSONObject responseText = new JSONObject();
 		    responseText.put("successful", false);
 		    Helper.setResponseJSON(response, responseText);
 		    return;
 		}
-		String[] tmp	= {(String) json.get("login_id"), (String) json.get("device_id")};
-		db.executeUpdate("INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)", tmp);
-		System.out.println("executeupdate succesful");
+		String[] tmp2	= {(String) json.get("login_id"), (String) json.get("device_id")};
+		db.executeUpdate("INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)", tmp2);
 		JSONObject responseText = new JSONObject();		
 		responseText.put("successful", true);
+		
 		String loginID = (String)json.get("login_id");
 		String displayName = (String) json.get("displayname");
 		boolean admin = Boolean.parseBoolean((String) json.get("adminrole"));
-		System.out.println("LoginID: " + loginID);
-		System.out.println("NAme: " + displayName);
-		System.out.println("Admin: " + admin);
 		String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);
 		responseText.put("token", tokenString);
-		System.out.println("creates web token");
+
 		Helper.setResponseJSON(response, responseText);		
 	    } catch (SQLException | ParseException e) {
 		Helper.handleException(e, response);		
