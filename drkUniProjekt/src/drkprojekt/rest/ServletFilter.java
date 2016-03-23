@@ -39,8 +39,8 @@ public class ServletFilter implements Filter
 		addCORSHeaders(request, response);
 		if(!AuthHelper.isRegistered(request) && !request.getRequestURL().toString().endsWith("authentication/")){
 		    log.error("Not authenticated!");
-		    //response.sendError(HttpServletResponse.SC_FORBIDDEN);
-		    //return;
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+		    return;
 		}
 		chain.doFilter(req, res);
 	}

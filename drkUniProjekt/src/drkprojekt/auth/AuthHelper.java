@@ -53,7 +53,7 @@ public class AuthHelper {
      */
     public static String createJsonWebToken(String userId, String userName, boolean isAdmin, Long durationDays)    {
         //Current time and signing algorithm
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance();        
         HmacSHA256Signer signer;
         try {
             signer = new HmacSHA256Signer(ISSUER, null, SIGNING_KEY.getBytes());
@@ -91,8 +91,9 @@ public class AuthHelper {
      * @throws SignatureException
      * @throws InvalidKeyException
      */
-    private static TokenInfo verifyToken(String token)  
+    public static TokenInfo verifyToken(String token)  
     {
+	log.debug("verifyToken");
         try {
             final Verifier hmacVerifier = new HmacSHA256Verifier(SIGNING_KEY.getBytes());
 
@@ -120,6 +121,7 @@ public class AuthHelper {
             try {
                 jt = parser.verifyAndDeserialize(token);
             } catch (SignatureException e) {
+        	log.info("Signatur falsch");
                 throw new RuntimeException(e);
             }
             JsonObject payload = jt.getPayloadAsJsonObject();
@@ -142,14 +144,17 @@ public class AuthHelper {
                 return null;
             }
         } catch (InvalidKeyException e1) {
+            log.info("Invalid Key");
             throw new RuntimeException(e1);
         }
     }
     
     public static boolean isAdmin(HttpServletRequest request){
+	log.debug("Proof if Admin");
 	if(AuthHelper.isRegistered(request)){
 	    return AuthHelper.getToken(request).isAdmin();
 	}
+	log.debug("Not registered");
 	return false;
     }
     public static boolean isRegistered(HttpServletRequest request){
@@ -157,7 +162,8 @@ public class AuthHelper {
 	    //User is not registered, if his token is expired
 	    log.debug("Proof of Registration");
 	    log.debug("Token: " + request.getHeader("Authorization"));
-	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().isBeforeNow()){
+	    
+	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().getMillis()<System.currentTimeMillis()/1000){
 		log.debug("Token is outdated");
 		return false;	    
 	    }
