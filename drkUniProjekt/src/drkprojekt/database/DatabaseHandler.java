@@ -104,7 +104,10 @@ public class DatabaseHandler
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
 		{
-		stmt.setString(i + 1, arguments[i]);
+			if(arguments[i] == null)
+				throw new SQLException("Argument must not be null!");
+				
+			stmt.setString(i + 1, arguments[i]);
 		}
 		ResultSet rs 	= stmt.executeQuery();	
 		JSONArray result = rsToJSON(rs);
@@ -142,6 +145,9 @@ public class DatabaseHandler
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
 		{
+			if(arguments[i] == null)
+				throw new SQLException("Argument must not be null!");
+			
 			stmt.setString(i + 1, arguments[i]);
 		}
 		int rowcount = stmt.executeUpdate();
