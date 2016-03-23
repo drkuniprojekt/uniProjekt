@@ -14,9 +14,7 @@ import drkprojekt.auth.AuthHelper;
 @WebFilter("/*")
 public class ServletFilter implements Filter
 {
-    private static Logger log;
-   
-    
+    private static Logger log; 
     
     public ServletFilter() {
 	super();
@@ -37,9 +35,11 @@ public class ServletFilter implements Filter
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 		addCORSHeaders(request, response);
-		if(!AuthHelper.isRegistered(request) && !request.getRequestURL().toString().endsWith("authentication/")){
+		if(!AuthHelper.isRegistered(request) && !(request.getRequestURL().toString().endsWith("authentication/")
+				||  !request.getRequestURL().toString().endsWith("authentication")))
+		{
 		    log.info("Not authenticated!");
-		    //response.sendError(HttpServletResponse.SC_FORBIDDEN);
+		    //response.sendError(HttpServletResponse.SC_FORBIDDEN);	
 		    //return;
 		}else{
 		    log.debug("Successful authenticated!");

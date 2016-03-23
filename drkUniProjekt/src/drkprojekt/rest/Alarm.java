@@ -34,7 +34,6 @@ public class Alarm
 	
 	public void create() throws SQLException, IllegalStateException
 	{
-		//checkAuthority();
 		if(!fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("An alertevent is already running!");
 			
@@ -45,7 +44,6 @@ public class Alarm
 
 	public void change() throws SQLException, IllegalStateException
 	{
-		//checkAuthority();
 		if(fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
@@ -56,7 +54,6 @@ public class Alarm
 
 	public void delete() throws SQLException, IllegalStateException
 	{
-		//checkAuthority();
 		if(JSON.isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		

@@ -3,7 +3,6 @@ package drkprojekt.auth;
 import java.io.IOException;
 import java.security.SignatureException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,13 +17,12 @@ import org.slf4j.LoggerFactory;
 
 import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.Helper;
-import drkprojekt.rest.PushService;
 
 /**
  * Servlet implementation class backend
  */
-@WebServlet("/authentication/")
-public class Authentication extends HttpServlet {
+@WebServlet("/authentication/*")
+public class AuthenticationProcessor extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static Logger log;
@@ -32,9 +30,10 @@ public class Authentication extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Authentication() {
-	super();
-	log = LoggerFactory.getLogger(this.getClass());
+    public AuthenticationProcessor()
+    {
+    	super();
+    	log = LoggerFactory.getLogger(this.getClass());
     }
 
     /**

@@ -3,12 +3,14 @@
  */
 package drkprojekt.auth;
 
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -172,5 +174,11 @@ public class AuthHelper {
     }
     public static TokenInfo getToken(HttpServletRequest request){
 	return AuthHelper.verifyToken(request.getHeader("Authorization"));
+    }
+    
+    public static void assertIsAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
+    	if(!isAdmin(request))
+    		response.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 }

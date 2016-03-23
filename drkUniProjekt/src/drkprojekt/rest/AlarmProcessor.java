@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
+import drkprojekt.auth.AuthHelper;
+
 @WebServlet("/alarm/*")
 public class AlarmProcessor extends HttpServlet
 {
@@ -36,6 +38,7 @@ public class AlarmProcessor extends HttpServlet
 	{
 		try
 		{
+			//AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 			alarm.create();
 		} catch (ParseException | IllegalStateException | SQLException e)
@@ -48,6 +51,7 @@ public class AlarmProcessor extends HttpServlet
 	{	
 		try
 		{
+			//AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 			alarm.change();
 		} catch (ParseException | IllegalStateException | SQLException e)
@@ -60,6 +64,7 @@ public class AlarmProcessor extends HttpServlet
 	{
 		try
 		{
+			//AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm();
 			alarm.delete();
 		} catch (IllegalStateException | SQLException e)
