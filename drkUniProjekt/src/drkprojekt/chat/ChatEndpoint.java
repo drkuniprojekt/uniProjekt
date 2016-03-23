@@ -17,15 +17,15 @@ import drkprojekt.rest.PushService;
 @ServerEndpoint("/chat/{name}")
 public class ChatEndpoint
 {
-	private static Set<Session> peers	= Collections.synchronizedSet(new HashSet<Session>());
+	private static Set<ChatClient> peers	= Collections.synchronizedSet(new HashSet<ChatClient>());
 	private static Logger log;
 	@OnOpen
-	public String onOpen(Session peer, @PathParam("name") String clientID)
+	public void onOpen(Session peer, @PathParam("name") String clientID)
 	{
-		peers.add(peer); 
+		peers.add(new ChatClient(peer, clientID));		
 		log	= LoggerFactory.getLogger(this.getClass());
-		log.info("New Client" + clientID);
-		return "Hi";
+		log.info("New Client " + clientID);
+		
 	}
 	
 	@OnMessage
