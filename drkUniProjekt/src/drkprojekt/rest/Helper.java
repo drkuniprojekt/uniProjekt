@@ -14,9 +14,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Helper 
 {
+	private static Logger log = LoggerFactory.getLogger(Helper.class);
+	
 	public static JSONObject getRequestJSON(HttpServletRequest request) throws IOException, ParseException
 	{
 		StringBuffer jb = new StringBuffer();
@@ -28,6 +32,7 @@ public class Helper
 		{
 			jb.append(line);
 		}
+		log.debug("Entire JSON-String: " + jb.toString());
 		json = (JSONObject) new JSONParser().parse(jb.toString());
 		
 		return json;
