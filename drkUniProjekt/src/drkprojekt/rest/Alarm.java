@@ -34,29 +34,29 @@ public class Alarm
 	
 	public void create() throws SQLException, IllegalStateException
 	{
-		checkAuthority();
+		//checkAuthority();
 		if(!fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("An alertevent is already running!");
 			
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, starttime, ?)"
 				+ " VALUES(EVENT_ID.NEXTVAL, TRUE, CURRENT_TIMESTAMP, ?)", JSON);
-		PushService.sendBroadCastMessage("Alarm!!!!111elf!");
+		PushService.sendBroadCastMessage("Neuer Alarm!");
 	}
 
 	public void change() throws SQLException, IllegalStateException
 	{
-		checkAuthority();
+		//checkAuthority();
 		if(fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
 		//TODO: Creator ändern zulassen?
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NULL", JSON);
-		//TODO: Push-Message neu generieren?
+		PushService.sendBroadCastMessage("Der aktuelle Alarm wurde bearbeitet!!");
 	}
 
 	public void delete() throws SQLException, IllegalStateException
 	{
-		checkAuthority();
+		//checkAuthority();
 		if(JSON.isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
@@ -78,15 +78,6 @@ public class Alarm
 			throw new IllegalStateException("No alertevent found!");
 		
 		return DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, answerer FROM eventanswer WHERE event = " + eventId);
-	}
-
-	private void checkAuthority() throws SecurityException
-	{
-		//TODO: Authority-Check
-		//if()
-		//{
-		//	throw new SecurityException("Authorization failed - You are not an organizer!");
-		//}
 	}
 	
 	private JSONObject fetchJSONFromDatabase() throws SQLException, IllegalStateException
