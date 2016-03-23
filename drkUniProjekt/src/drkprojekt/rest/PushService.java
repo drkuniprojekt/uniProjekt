@@ -20,7 +20,7 @@ public class PushService
 {
 	//Emanuel: APA91bHsJdpaOueOeVmXifChEGH0RPp35I3Qh_RNjvGTb3pqPBDWd3oinQXntIcT7CBXZkK0cESaEmadNya5CFFFOC6LQwo59KiTUcwqVTTrw22q4MUJ_3s
 	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
-	private static Logger log = LoggerFactory.getLogger("PushService");
+	private static Logger log = LoggerFactory.getLogger(PushService.class);
 	
 	/**
 	 * Sends a unicast message to one device, identified by its device ID
