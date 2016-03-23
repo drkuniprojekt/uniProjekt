@@ -21,7 +21,6 @@ public class ServletFilter implements Filter
     public ServletFilter() {
 	super();
 	 log = LoggerFactory.getLogger(this.getClass()); 
-	 System.out.println("constructor servlet filter");
     }
 
 	@Override
@@ -40,7 +39,6 @@ public class ServletFilter implements Filter
 		addCORSHeaders(request, response);
 		if(!AuthHelper.isRegistered(request) && !request.getRequestURL().toString().endsWith("authentication/")){
 		    log.error("Not authenticated!");
-		    System.out.println("Not Authenticated syso");
 		    //response.sendError(HttpServletResponse.SC_FORBIDDEN);
 		    //return;
 		}

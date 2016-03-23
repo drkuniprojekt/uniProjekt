@@ -19,11 +19,12 @@ public class ChatEndpoint
 	private static Set<Session> peers	= Collections.synchronizedSet(new HashSet<Session>());
 	private static Logger log;
 	@OnOpen
-	public void onOpen(Session peer)
+	public String onOpen(Session peer)
 	{
 		peers.add(peer);
 		log	= LoggerFactory.getLogger(this.getClass());
 		log.info("New Client");
+		return "Hi";
 	}
 	
 	@OnMessage

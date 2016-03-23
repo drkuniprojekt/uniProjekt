@@ -35,7 +35,7 @@ import net.oauth.jsontoken.discovery.VerifierProviders;
  */
 public class AuthHelper {
 
-    private static Logger log= LoggerFactory.getLogger("AuthHelper"); ;
+    private static Logger log= LoggerFactory.getLogger(AuthHelper.class);
      
     private static final String AUDIENCE = "ClientForDRKMember";
 
@@ -156,12 +156,11 @@ public class AuthHelper {
 	try{
 	    //User is not registered, if his token is expired
 	    log.debug("Proof of Registration");
-	    System.out.println("Proof of Registration syso");
+	    
 	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().isBeforeNow()) return false;	    
 	}catch(RuntimeException e){
 	    //User is not registered, if his token is not valid
-	    log.info("No valid Token");
-	    System.out.println("No valid Token syso");
+	    log.error("No valid Token. Error: " + e.getMessage());
 	    return false;
 	}
 	return true;
