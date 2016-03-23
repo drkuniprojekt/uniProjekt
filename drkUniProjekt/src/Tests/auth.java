@@ -47,7 +47,7 @@ public class auth extends HttpServlet {
 		try
 		{
 			JSONObject input	= helper.getRequestJSON(request);
-			if(answer.get("login_id").equals("User1") && answer.get("userpassword").equals("123456"))
+			if(input.get("login_id").equals("User1") && input.get("userpassword").equals("123456"))
 			{
 				answer.put("token", "{bearer 12345678910}");
 				answer.put("successfull", true);
@@ -55,12 +55,15 @@ public class auth extends HttpServlet {
 			}else
 			{
 				answer.put("successfull", false);
-			}			
-			helper.setResponseJSON(response, answer);
+			}						
 			
-		} catch (ParseException e)
+		} catch (Exception e)
 		{
 			response.setStatus(400);
+			answer.put("Error", e);			
+		}finally
+		{
+			helper.setResponseJSON(response, answer);
 		}
 		
 	}
