@@ -19,7 +19,7 @@ import drkprojekt.rest.Helper;
 /**
  * Servlet implementation class backend
  */
-@WebServlet("/authentication/*")
+@WebServlet("/authentication/")
 public class Authentication extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;

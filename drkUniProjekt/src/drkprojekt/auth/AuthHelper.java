@@ -49,7 +49,6 @@ public class AuthHelper {
      */
     public static String createJsonWebToken(String userId, String userName, boolean isAdmin, Long durationDays)    {
         //Current time and signing algorithm
-	System.out.println("CreateJSONWebToken");
         Calendar cal = Calendar.getInstance();
         HmacSHA256Signer signer;
         try {
@@ -88,10 +87,9 @@ public class AuthHelper {
      * @throws SignatureException
      * @throws InvalidKeyException
      */
-    public static TokenInfo verifyToken(String token)  
+    private static TokenInfo verifyToken(String token)  
     {
         try {
-        	System.out.println("verify Token...");
             final Verifier hmacVerifier = new HmacSHA256Verifier(SIGNING_KEY.getBytes());
 
             VerifierProvider hmacLocator = new VerifierProvider() {

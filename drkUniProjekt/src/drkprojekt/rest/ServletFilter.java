@@ -6,6 +6,8 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.*;
 
+import drkprojekt.auth.AuthHelper;
+
 @WebFilter("/*")
 public class ServletFilter implements Filter
 {
@@ -23,10 +25,13 @@ public class ServletFilter implements Filter
 	{
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
-//		HttpSession session = request.getSession(true);
 		System.out.println("Filter durchlaufen");
 		addCORSHeaders(request, response);
 		//String role	= checkToken(request.getHeader("Authorization")); //Verwenden?!?
+		if(!AuthHelper.isRegistered(request) && !request.getContextPath().endsWith("authentication/")){
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+		    return;
+		}
 		chain.doFilter(req, res);
 	}
 
