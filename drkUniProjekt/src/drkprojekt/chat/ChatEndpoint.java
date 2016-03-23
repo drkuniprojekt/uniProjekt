@@ -23,6 +23,7 @@ public class ChatEndpoint
 	{
 		peers.add(peer);
 		log	= LoggerFactory.getLogger(this.getClass());
+		log.info("New Client");
 	}
 	
 	@OnMessage
