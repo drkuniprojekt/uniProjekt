@@ -1,4 +1,4 @@
-package drkprojekt.rest;
+package Tests;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 
 import drkprojekt.database.DatabaseHandler;
+import drkprojekt.rest.Helper;
 
 /**
  * Servlet implementation class testServlet

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.websocket.*;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import org.slf4j.Logger; 
@@ -13,17 +14,17 @@ import org.slf4j.LoggerFactory;
 
 import drkprojekt.rest.PushService;
 
-@ServerEndpoint("/chat")
+@ServerEndpoint("/chat/{name}")
 public class ChatEndpoint
 {
 	private static Set<Session> peers	= Collections.synchronizedSet(new HashSet<Session>());
 	private static Logger log;
 	@OnOpen
-	public String onOpen(Session peer)
+	public String onOpen(Session peer, @PathParam("name") String clientID)
 	{
-		peers.add(peer);
+		peers.add(peer); 
 		log	= LoggerFactory.getLogger(this.getClass());
-		log.info("New Client");
+		log.info("New Client" + clientID);
 		return "Hi";
 	}
 	
