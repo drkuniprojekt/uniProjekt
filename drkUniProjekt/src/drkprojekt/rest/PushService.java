@@ -10,6 +10,9 @@ import java.sql.SQLException;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import drkprojekt.database.DatabaseHandler;
 
@@ -17,7 +20,14 @@ public class PushService
 {
 	//Emanuel: APA91bHsJdpaOueOeVmXifChEGH0RPp35I3Qh_RNjvGTb3pqPBDWd3oinQXntIcT7CBXZkK0cESaEmadNya5CFFFOC6LQwo59KiTUcwqVTTrw22q4MUJ_3s
 	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
+	private static Logger log = LoggerFactory.getLogger("PushService");
 	
+	/**
+	 * Sends a unicast message to one device, identified by its device ID
+	 * @param message Message to send
+	 * @param deviceId Phonegap-ID of the message receiver
+	 * @throws SQLException
+	 */
 	public static void sendUnicastMessage(String message, String deviceId) throws SQLException
 	{
 		String[] singleDevice = new String[1];
@@ -25,6 +35,13 @@ public class PushService
 		sendMessage(message, singleDevice);
 	}
 	
+	/**
+	 * Sends a multicast message to one special user, identified by his or her user ID
+	 * The message is send to all devices registered by the given user
+	 * @param message Message to send
+	 * @param userId User-Id ot the message receiver
+	 * @throws SQLException
+	 */
 	public static void sendMulticastMessage(String message, String userId) throws SQLException
 	{
 		JSONArray array = null;
@@ -47,6 +64,11 @@ public class PushService
 		sendMessage(message, allDevices);
 	}
 	
+	/**
+	 * Sends a broadcast message to all registered devices
+	 * @param message Message to send
+	 * @throws SQLException
+	 */
 	public static void sendBroadCastMessage(String message) throws SQLException
 	{
 		sendMulticastMessage(message, null);
@@ -65,6 +87,7 @@ public class PushService
 
 			out = new DataOutputStream (connection.getOutputStream());
 			out.writeBytes(data);
+			log.debug("PushService is sending a message to Google...");
 			
 			//TODO: vermutlich ist die Antwort egal
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -76,7 +99,15 @@ public class PushService
 				response.append(inputLine);
 			}
 			
-			System.out.println("Response: " + response.toString());
+			try
+			{
+				JSONObject responseJSON = (JSONObject) new JSONParser().parse(response.toString());
+				log.debug("Number of successful sent messages: " + responseJSON.get("success"));
+				log.debug("Number of failed messages: " + responseJSON.get("failure"));
+			}
+			catch (Exception e) {}
+			
+			
 		} catch (IOException e)
 		{
 			e.printStackTrace();
