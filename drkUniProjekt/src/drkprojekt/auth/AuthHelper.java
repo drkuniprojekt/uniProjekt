@@ -156,11 +156,14 @@ public class AuthHelper {
 	try{
 	    //User is not registered, if his token is expired
 	    log.debug("Proof of Registration");
-	    
-	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().isBeforeNow()) return false;	    
+	    log.debug("Token: " + request.getHeader("Authorization"));
+	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().isBeforeNow()){
+		log.debug("Token is outdated");
+		return false;	    
+	    }
 	}catch(RuntimeException e){
 	    //User is not registered, if his token is not valid
-	    log.error("No valid Token. Error: " + e.getMessage());
+	    log.info("No valid Token.");
 	    return false;
 	}
 	return true;
