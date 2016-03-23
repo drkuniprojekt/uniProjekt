@@ -11,7 +11,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 
 import com.google.common.collect.Lists;
@@ -23,7 +22,6 @@ import net.oauth.jsontoken.crypto.HmacSHA256Signer;
 import net.oauth.jsontoken.crypto.HmacSHA256Verifier;
 import net.oauth.jsontoken.crypto.SignatureAlgorithm;
 import net.oauth.jsontoken.crypto.Verifier;
-import net.oauth.jsontoken.crypto.Signer;
 import net.oauth.jsontoken.discovery.VerifierProvider;
 import net.oauth.jsontoken.discovery.VerifierProviders;
 
@@ -93,6 +91,7 @@ public class AuthHelper {
     public static TokenInfo verifyToken(String token)  
     {
         try {
+        	System.out.println("verify Token...");
             final Verifier hmacVerifier = new HmacSHA256Verifier(SIGNING_KEY.getBytes());
 
             VerifierProvider hmacLocator = new VerifierProvider() {
