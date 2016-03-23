@@ -6,11 +6,23 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import drkprojekt.auth.AuthHelper;
 
 @WebFilter("/*")
 public class ServletFilter implements Filter
 {
+    private static Logger log;
+   
+    
+    
+    public ServletFilter() {
+	super();
+	 log = LoggerFactory.getLogger(this.getClass()); 
+	 System.out.println("constructor servlet filter");
+    }
 
 	@Override
 	public void destroy()
@@ -25,12 +37,12 @@ public class ServletFilter implements Filter
 	{
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
-		System.out.println("Filter durchlaufen");
 		addCORSHeaders(request, response);
-		//String role	= checkToken(request.getHeader("Authorization")); //Verwenden?!?
-		if(!AuthHelper.isRegistered(request) && !request.getContextPath().endsWith("authentication/")){
-		    response.sendError(HttpServletResponse.SC_FORBIDDEN);
-		    return;
+		if(!AuthHelper.isRegistered(request) && !request.getRequestURL().toString().endsWith("authentication/")){
+		    log.error("Not authenticated!");
+		    System.out.println("Not Authenticated syso");
+		    //response.sendError(HttpServletResponse.SC_FORBIDDEN);
+		    //return;
 		}
 		chain.doFilter(req, res);
 	}

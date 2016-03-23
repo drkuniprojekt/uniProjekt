@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
@@ -33,6 +35,8 @@ import net.oauth.jsontoken.discovery.VerifierProviders;
  */
 public class AuthHelper {
 
+    private static Logger log= LoggerFactory.getLogger("AuthHelper"); ;
+     
     private static final String AUDIENCE = "ClientForDRKMember";
 
     private static final String ISSUER = "DRKUniProjekt";
@@ -151,9 +155,13 @@ public class AuthHelper {
     public static boolean isRegistered(HttpServletRequest request){
 	try{
 	    //User is not registered, if his token is expired
-	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().isBeforeNow()) return false;
+	    log.debug("Proof of Registration");
+	    System.out.println("Proof of Registration syso");
+	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().isBeforeNow()) return false;	    
 	}catch(RuntimeException e){
 	    //User is not registered, if his token is not valid
+	    log.info("No valid Token");
+	    System.out.println("No valid Token syso");
 	    return false;
 	}
 	return true;
