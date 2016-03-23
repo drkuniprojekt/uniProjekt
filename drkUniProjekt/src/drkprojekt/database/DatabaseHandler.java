@@ -1,27 +1,20 @@
 package drkprojekt.database;
 
-import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 
-import javax.naming.Binding;
 import javax.naming.InitialContext;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.slf4j.Logger; 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DatabaseHandler
@@ -124,7 +117,10 @@ public class DatabaseHandler
 	 */
 	public JSONArray executeQuery(String query, String argument) throws SQLException
 	{
-		PreparedStatement stmt 	= conn.prepareStatement(query);		
+	    if(argument == null)
+		throw new SQLException("Argument must not be null!");
+	    
+	    	PreparedStatement stmt 	= conn.prepareStatement(query);		
 		stmt.setString(1, argument);
 		
 		ResultSet rs 	= stmt.executeQuery();	
@@ -164,6 +160,9 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, String argument) throws SQLException
 	{
+	    if(argument == null)
+		throw new SQLException("Argument must not be null!");
+	    
 		PreparedStatement stmt 	= conn.prepareStatement(query);		
 		stmt.setString(1, argument);		
 		int rowcount = stmt.executeUpdate();
