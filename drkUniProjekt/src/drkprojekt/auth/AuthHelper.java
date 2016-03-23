@@ -51,7 +51,7 @@ public class AuthHelper {
      * @param durationDays
      * @return
      */
-    public static String createJsonWebToken(String userId, String userName, boolean isAdmin, Long durationDays)    {
+    public static String createJsonWebToken(String userId, String userName, boolean isAdmin, Long durationDays) throws SignatureException   {
         //Current time and signing algorithm
         Calendar cal = Calendar.getInstance();        
         HmacSHA256Signer signer;
@@ -76,12 +76,8 @@ public class AuthHelper {
         
         JsonObject payload = token.getPayloadAsJsonObject();
         payload.add("info", request);
-
-        try {
-            return token.serializeAndSign();
-        } catch (SignatureException e) {
-            throw new RuntimeException(e);
-        }
+        
+        return token.serializeAndSign();
     }
 
     /**

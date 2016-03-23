@@ -3,6 +3,7 @@ package drkprojekt.rest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.SignatureException;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -65,6 +66,11 @@ public class Helper
 		else if(e instanceof ParseException)
 		{
 			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		}else if(e instanceof SignatureException)
+		{
+		    	e.printStackTrace();
+		    	//TODO: which error code
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}

@@ -1,7 +1,9 @@
 package drkprojekt.auth;
 
 import java.io.IOException;
+import java.security.SignatureException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,9 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.Helper;
+import drkprojekt.rest.PushService;
 
 /**
  * Servlet implementation class backend
@@ -22,12 +27,14 @@ import drkprojekt.rest.Helper;
 public class Authentication extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private static Logger log;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
     public Authentication() {
 	super();
+	log = LoggerFactory.getLogger(this.getClass());
     }
 
     /**
@@ -61,16 +68,20 @@ public class Authentication extends HttpServlet {
 	    }
 
 	    JSONObject responseText = new JSONObject();
+	    JSONObject dbJSON = (JSONObject) array.get(0);
 	    responseText.put("successful", true);
 
 	    String loginID = (String) json.get("login_id");
-	    String displayName = (String) json.get("displayname");
-	    boolean admin = Boolean.parseBoolean((String) json.get("adminrole"));
-	    String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);
+	    String displayName = (String) dbJSON.get("displayname");
+	    boolean admin = false;
+	    if((byte)dbJSON.get("adminrole") == (byte)1) {
+		admin = true;
+	    }
+	    String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);	    
 	    responseText.put("token", tokenString);
 
 	    Helper.setResponseJSON(response, responseText);
-	} catch (SQLException | ParseException e) {
+	} catch (SQLException | ParseException | SignatureException e) {
 	    Helper.handleException(e, response);
 	}
 
