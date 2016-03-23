@@ -104,7 +104,7 @@ public class DatabaseHandler
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
 		{
-			stmt.setString(i + 1, arguments[i]);
+		stmt.setString(i + 1, arguments[i]);
 		}
 		ResultSet rs 	= stmt.executeQuery();	
 		JSONArray result = rsToJSON(rs);
