@@ -58,24 +58,20 @@ public class Helper
 	
 	public static void handleException(Exception e, HttpServletResponse response) throws IOException
 	{
+		log.warn("An exception was raised while executing the Request:\n " , e);
 		if(e instanceof IllegalStateException)
 		{
-			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_CONFLICT);
 		}
 		else if(e instanceof SQLException)
 		{
-			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else if(e instanceof ParseException)
 		{
-			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}else if(e instanceof SignatureException)
-		{
-		    	e.printStackTrace();
-		    	//TODO: which error code
+		{		    
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
