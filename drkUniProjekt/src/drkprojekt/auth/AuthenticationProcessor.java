@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.Helper;
@@ -26,15 +24,12 @@ public class AuthenticationProcessor extends HttpServlet {
 
 	//OINFDS
     private static final long serialVersionUID = 1L;
-    private static Logger log;
-
     /**
      * @see HttpServlet#HttpServlet()
      */
     public AuthenticationProcessor()
     {
     	super();
-    	log = LoggerFactory.getLogger(this.getClass());
     }
 
     /**

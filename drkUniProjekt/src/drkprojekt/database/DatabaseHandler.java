@@ -19,11 +19,13 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseHandler
 {
-	Connection conn;
+	public static final String[] SETTINGS = { "car", "gui_highcontrast", "gui_showexpirationdate", 
+		"notification_event", "notification_groupchat", "notification_chat" };
 	
-	
+	private Connection conn;
 	private static DatabaseHandler db;
 	private static Logger log;
+	
 	private DatabaseHandler()
 	{
 		try
@@ -201,7 +203,6 @@ public class DatabaseHandler
 		
 		Statement stmt 	= conn.createStatement();
 			
-		query = query.toUpperCase();
 		String tmp1 = "";
 		String tmp2 = "";
 		
@@ -209,7 +210,7 @@ public class DatabaseHandler
 		{
 			String column = (String) iterator.next();
 			String value = (String) json.get(column).toString();
-			if(query.startsWith("UPDATE"))
+			if(query.toUpperCase().startsWith("UPDATE"))
 			{
 				tmp1 = tmp1 + column + " = " + "'" + value + "', ";
 				
@@ -218,7 +219,7 @@ public class DatabaseHandler
 					tmp1 = tmp1.substring(0, (tmp1.length()-2));
 				}
 			}
-			else if(query.startsWith("INSERT"))
+			else if(query.toUpperCase().startsWith("INSERT"))
 			{
 				tmp1 = tmp1 + column + ", ";
 				tmp2 = tmp2 + "'" + value + "', ";

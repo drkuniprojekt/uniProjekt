@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SignatureException;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -65,7 +66,10 @@ public class Helper
 		}
 		else if(e instanceof SQLException)
 		{
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			if(e instanceof SQLIntegrityConstraintViolationException)
+				response.sendError(HttpServletResponse.SC_CONFLICT);
+			else
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		else if(e instanceof ParseException)
 		{

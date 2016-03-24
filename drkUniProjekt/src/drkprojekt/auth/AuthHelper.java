@@ -176,10 +176,10 @@ public class AuthHelper {
 	return AuthHelper.verifyToken(request.getHeader("Authorization"));
     }
     
-    public static void assertIsAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException
+    public static void assertIsAdmin(HttpServletRequest request, HttpServletResponse response) throws SignatureException
     {
     	//TODO: Scharf stellen
 //    	if(!isAdmin(request))
-//    		response.sendError(HttpServletResponse.SC_FORBIDDEN);
+//    		throw new SignatureException("Authorization failed - You are not an Admin!");
     }
 }
