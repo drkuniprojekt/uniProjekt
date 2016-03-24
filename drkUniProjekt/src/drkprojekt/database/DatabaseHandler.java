@@ -263,6 +263,10 @@ public class DatabaseHandler
 				log.debug("Iteration " + index);
 	            column 			= rsmd.getColumnName(index).toLowerCase();
 	            Object value 	= rs.getObject(column);
+	            if(column.length() == 0)
+	            {
+	            	column	= "column" + index;
+	            }
 	            row.put(column, value);
 	            log.debug("Row changed: " + row);
 			}

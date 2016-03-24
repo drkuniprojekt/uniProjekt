@@ -93,9 +93,9 @@ public class ChatEndpoint
 	{
 		try
 		{
-			JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT true FROM user WHERE login_id = ?", login_id);
+			JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT login_id FROM user WHERE login_id = ?", login_id);
 			log.debug("User exists DB-Result: ", array);
-			if(array.get(0).equals(true))
+			if(array.get(0).equals(login_id))
 			{
 				return true;
 			}
