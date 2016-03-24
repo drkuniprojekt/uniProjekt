@@ -268,8 +268,7 @@ public class DatabaseHandler
 	            	column	= "column" + index;
 	            }
 	            row.put(column, value);
-	            log.debug("Row changed: " + row);
-			}
+	          }
 			
 			jsonarray.add(row);
 		}
