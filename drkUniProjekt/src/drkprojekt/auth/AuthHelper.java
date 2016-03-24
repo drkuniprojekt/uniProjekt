@@ -178,7 +178,8 @@ public class AuthHelper {
     
     public static void assertIsAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-    	if(!isAdmin(request))
-    		response.sendError(HttpServletResponse.SC_FORBIDDEN);
+    	//TODO: Scharf stellen
+//    	if(!isAdmin(request))
+//    		response.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 }

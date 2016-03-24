@@ -70,9 +70,10 @@ public class Helper
 		else if(e instanceof ParseException)
 		{
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-		}else if(e instanceof SignatureException)
+		}
+		else if(e instanceof SignatureException)
 		{		    
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 		}
 	}
 }

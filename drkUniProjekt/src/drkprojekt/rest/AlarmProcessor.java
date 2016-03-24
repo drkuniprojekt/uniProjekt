@@ -38,7 +38,7 @@ public class AlarmProcessor extends HttpServlet
 	{
 		try
 		{
-			//AuthHelper.assertIsAdmin(request, response);
+			AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 			alarm.create();
 		} catch (ParseException | IllegalStateException | SQLException e)
@@ -51,7 +51,7 @@ public class AlarmProcessor extends HttpServlet
 	{	
 		try
 		{
-			//AuthHelper.assertIsAdmin(request, response);
+			AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 			alarm.change();
 		} catch (ParseException | IllegalStateException | SQLException e)
@@ -64,7 +64,7 @@ public class AlarmProcessor extends HttpServlet
 	{
 		try
 		{
-			//AuthHelper.assertIsAdmin(request, response);
+			AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm();
 			alarm.delete();
 		} catch (IllegalStateException | SQLException e)
