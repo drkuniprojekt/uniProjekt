@@ -93,14 +93,17 @@ public class ChatEndpoint
 	{
 		try
 		{
-		JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT true FROM user WHERE login_id = ?", login_id);
-		log.debug("User exists DB-Result: ", array.get(0));
-		
-		return (Boolean) array.get(0);
+			JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT true FROM user WHERE login_id = ?", login_id);
+			log.debug("User exists DB-Result: ", array);
+			if(array.get(0).equals(true))
+			{
+				return true;
+			}
+			return false;
 		}
 		catch(IndexOutOfBoundsException e)
 		{
-			log.debug("Test: User exists DB-Result: false");
+			log.debug("Test: User exists DB-Result: IndexoutofBounds");
 			return false;
 		}
 	}
