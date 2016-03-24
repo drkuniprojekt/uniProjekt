@@ -24,6 +24,7 @@ import drkprojekt.rest.Helper;
 @WebServlet("/authentication/*")
 public class AuthenticationProcessor extends HttpServlet {
 
+	//OINFDS
     private static final long serialVersionUID = 1L;
     private static Logger log;
 
