@@ -69,16 +69,17 @@ public class AuthenticationProcessor extends HttpServlet {
 
 	    JSONObject responseText = new JSONObject();
 	    JSONObject dbJSON = (JSONObject) array.get(0);
-	    responseText.put("successful", true);
-
+	    
 	    String loginID = (String) json.get("login_id");
 	    String displayName = (String) dbJSON.get("displayname");
 	    boolean admin = false;
 	    if((byte)dbJSON.get("adminrole") == (byte)1) {
 		admin = true;
 	    }
-	    String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);	    
+	    String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);
+	    responseText.put("successful", true);
 	    responseText.put("token", tokenString);
+	    responseText.put("adminrole", admin);
 
 	    Helper.setResponseJSON(response, responseText);
 	} catch (SQLException | ParseException | SignatureException e) {
