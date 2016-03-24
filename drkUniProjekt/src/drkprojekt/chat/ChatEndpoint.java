@@ -10,12 +10,14 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger; 
 import org.slf4j.LoggerFactory;
 
+import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.PushService;
 
 @ServerEndpoint("/chat/{name}")
@@ -40,7 +42,14 @@ public class ChatEndpoint
 			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(msg);
 			String recipient	= (String) msgJson.get("to");
 			RemoteEndpoint.Basic r			= null;
-			if(recipient.equals("Broadcast"))
+			
+		//-----------------------------------------------------------------
+			if(msgJson.get("test") != null)
+			{
+				return "Test result: " + userExists(recipient);
+			}
+		//-------------------------------------------------------------------	
+			if(recipient == null || recipient.equals("Broadcast"))
 			{
 				PushService.sendBroadCastMessage(msg);
 				for (ChatClient c: peers)
@@ -69,6 +78,7 @@ public class ChatEndpoint
 				throw new IllegalArgumentException("The given recipient was not found");
 			}
 			
+			
 		} catch (SQLException | IOException e)
 		{
 			e.printStackTrace();
@@ -78,5 +88,20 @@ public class ChatEndpoint
 			return "Bad Request";
 		}
 		return "Unknown Error";
+	}
+	private boolean userExists(String login_id) throws SQLException
+	{
+		try
+		{
+		JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT true FROM user WHERE login_id = ?", login_id);
+		log.debug("User exists DB-Result: ", array.get(0));
+		
+		return (Boolean) array.get(0);
+		}
+		catch(IndexOutOfBoundsException e)
+		{
+			log.debug("Test: User exists DB-Result: false");
+			return false;
+		}
 	}
 }
