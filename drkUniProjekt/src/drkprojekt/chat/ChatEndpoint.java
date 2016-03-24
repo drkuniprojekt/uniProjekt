@@ -1,5 +1,6 @@
 package drkprojekt.chat;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -9,6 +10,9 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger; 
 import org.slf4j.LoggerFactory;
 
@@ -29,15 +33,44 @@ public class ChatEndpoint
 	}
 	
 	@OnMessage
-	public void onMessage(String msg)
+	public String onMessage(String msg)
 	{
 		try
 		{
-			PushService.sendBroadCastMessage(msg);
-			log.info("Got new Message: " + msg);
-		} catch (SQLException e)
+			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(msg);
+			String recipient	= (String) msgJson.get("to");
+			RemoteEndpoint.Basic r			= null;
+			if(recipient.equals("Broadcast"))
+			{
+				PushService.sendBroadCastMessage(msg);
+				log.debug("Got new Broadcast-Message: " + msg);				
+			}else
+			{				
+				for (ChatClient c: peers)
+				{
+					if(c.getName().equals(recipient))
+					{
+						r	= c.getSession().getBasicRemote();
+					}
+				}
+			}
+			if(r!= null)
+			{
+				r.sendText(msg);
+				return "Message was send to " + recipient;
+			}else
+			{
+				throw new IllegalArgumentException("The given recipient was not found");
+			}
+			
+		} catch (SQLException | IOException e)
 		{
 			e.printStackTrace();
+		} catch (ParseException | IllegalArgumentException | NullPointerException e)
+		{
+			log.warn("Bad Request over Websocket", e);
+			return "Bad Request";
 		}
+		return "Unknown Error";
 	}
 }
