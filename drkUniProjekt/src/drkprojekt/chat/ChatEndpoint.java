@@ -43,6 +43,10 @@ public class ChatEndpoint
 			if(recipient.equals("Broadcast"))
 			{
 				PushService.sendBroadCastMessage(msg);
+				for (ChatClient c: peers)
+				{
+					r	= c.getSession().getBasicRemote();
+				}
 				log.debug("Got new Broadcast-Message: " + msg);				
 			}else
 			{				
@@ -51,12 +55,14 @@ public class ChatEndpoint
 					if(c.getName().equals(recipient))
 					{
 						r	= c.getSession().getBasicRemote();
+						break;
 					}
 				}
+				log.debug("Got new Message to " + recipient + ": "+ msg);
 			}
 			if(r!= null)
 			{
-				r.sendText(msg);
+				r.sendText((String)msgJson.get("message"));
 				return "Message was send to " + recipient;
 			}else
 			{
