@@ -80,6 +80,7 @@ public class DatabaseHandler
 	 */
 	public JSONArray executeQuery(String query) throws SQLException
 	{
+		log.debug("Executing query:\n {}", query);
 		Statement stmt 	= conn.createStatement();
 		ResultSet rs 	= stmt.executeQuery(query);
 		JSONArray result = rsToJSON(rs);
@@ -96,6 +97,7 @@ public class DatabaseHandler
 	 */
 	public JSONArray executeQuery(String query, String[] arguments) throws SQLException
 	{
+		log.debug("Executing query:\n {}", query);
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
 		{
@@ -119,6 +121,7 @@ public class DatabaseHandler
 	 */
 	public JSONArray executeQuery(String query, String argument) throws SQLException
 	{
+		log.debug("Executing query:\n {}", query);
 	    if(argument == null)
 		throw new SQLException("Argument must not be null!");
 	    
@@ -140,6 +143,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, String[] arguments) throws SQLException
 	{
+		log.debug("Executing query:\n {}", query);
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
 		{
@@ -162,6 +166,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, String argument) throws SQLException
 	{
+		log.debug("Executing query:\n {}", query);
 	    if(argument == null)
 		throw new SQLException("Argument must not be null!");
 	    
@@ -198,6 +203,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, JSONObject json) throws SQLException
 	{
+		log.debug("Executing query:\n {}", query);
 		if(json.size() == 0)
 			return 0;
 		

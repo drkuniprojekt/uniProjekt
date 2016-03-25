@@ -27,10 +27,28 @@ public class ChatEndpoint
 //	private static Set<ChatClient> peers	= Collections.synchronizedSet(new HashSet<ChatClient>());
 	private static Logger log	= LoggerFactory.getLogger(ChatEndpoint.class);
 	@OnOpen
-	public void onOpen(Session session, @PathParam("name") String clientID)
-	{
-		ClientFactory.getClient(clientID).addSession(session);		
-		log.info("New Client " + clientID);
+	public String onOpen(Session session, @PathParam("name") String clientID)
+	{		
+		ChatClient c	= ClientFactory.getClient(clientID);
+		
+		if(c != null)
+		{
+			c.addSession(session);	
+			log.info("New Chat Client " + clientID);
+			return "Registerd";
+		}
+		else
+		{
+			log.info("Client tried to connect with illegal Username", clientID);
+			try 
+			{
+				session.getBasicRemote().sendText("This is not a valid user");
+				session.close();
+			} catch (IOException e) 
+			{			
+			}
+			return "This is not a valid user";
+		}
 		
 	}
 	
@@ -51,7 +69,7 @@ public class ChatEndpoint
 			}
 			JSONObject outJSON	= new JSONObject();
 			outJSON.put("message", message);
-			outJSON.put("from", recipient);
+			outJSON.put("from", clientID);
 			
 			if(recipient == null || recipient.equals("Broadcast"))
 			{
@@ -62,6 +80,7 @@ public class ChatEndpoint
 				for (ChatClient c : clients) 
 				{
 					msgRead	= c.sendMessage(outJSON);
+					saveMessageToDB(message, msgRead, clientID, c.getName());
 				}								
 			}
 			else
@@ -69,38 +88,42 @@ public class ChatEndpoint
 				log.debug("Got new Message to " + recipient + ": "+ data);
 				boolean	msgRead;
 				msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
-				//saveMessageToDB(message, msgRead, clientID, recipient);
-				
-			}		
+				saveMessageToDB(message, msgRead, clientID, recipient);				
+			}	
+			return outJSON.toJSONString();
 			
 		} catch (ParseException | IllegalArgumentException | NullPointerException e)
 		{
 			log.warn("Bad Request over Websocket", e);
 			return "Bad Request";
+		} catch (Exception e)
+		{
+			return "Unknown Error";
 		}
-		return "Unknown Error";
+		
 	}
 	
 	private void saveMessageToDB(String message, boolean read, String from, String to)
 	{
+		log.debug("Trying to save message to Database: " + message);
 		try
 		{
 			DatabaseHandler db	= DatabaseHandler.getdb();
-			String chatroom		= (String) ((JSONObject)db.executeQuery("SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?" 
+			String chatroom		= "" + ((JSONObject)db.executeQuery("SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ? AND chatroom <> '1' " 
 												+ "AND chatroom IN (" 
-												+ "SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?",
-												new String[]{from, to}).get(0)).get("chatroom"); //Später sollte noch auf Chatraum != 1 (alle) getestet werden
+												+ "SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?)",
+												new String[]{from, to}).get(0)).get("chatroom"); 
 			
 			db.executeUpdate("INSERT INTO MESSAGE VALUES(MESSAGE_ID.NEXTVAL, CURRENT_TIMESTAMP, ?,?,?)", 
 								new String[]{message, from, chatroom});
 			
 			if(!read)
 			{
-				db.executeUpdate("INSERT INTO MESSAGEUNREAD VALUES(?, MESSAGE_ID.CURRVAL)", to);
+				db.executeUpdate("INSERT INTO MESSAGESUNREAD VALUES(MESSAGE_ID.CURRVAL, ?)", to);
 			}
 		} catch (SQLException e) 
 		{
-			log.error(""+ e);
+			log.error("SQL Error while SAving Message to DB:\n ",e);
 		}
 	}
 	

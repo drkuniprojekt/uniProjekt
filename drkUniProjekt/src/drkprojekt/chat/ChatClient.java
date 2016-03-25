@@ -16,9 +16,9 @@ import drkprojekt.rest.PushService;
 public class ChatClient
 {
 	private Logger log	= LoggerFactory.getLogger(ChatClient.class);
-	private ArrayList<Session>	sessionList;
+	private ArrayList<Session>	sessionList	= new ArrayList<Session>();
 	private String 				name;	
-	private ArrayList<String> 	phonegap_ids;
+	private ArrayList<String> 	phonegap_ids= new ArrayList<String>();
 	
 	public ChatClient(String name)
 	{

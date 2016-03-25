@@ -25,10 +25,12 @@ public class ClientFactory
 			JSONArray login_idJSON 	= DatabaseHandler.getdb().executeQuery("SELECT login_id FROM user");
 			
 			String login;
+			String logMsg	= "";
 			for (int i = 0; i < login_idJSON.size(); i++) 
 			{
 				login				= (String)((JSONObject)login_idJSON.get(i)).get("login_id");
 				ChatClient c		= new ChatClient(login);
+				logMsg				+= login + ", ";
 				JSONArray pgJSON 	= DatabaseHandler.getdb().executeQuery("SELECT device_id FROM PHONEGAPID WHERE REGISTEREDUSER = ?", login);
 				
 				for (int j = 0; j < pgJSON.size(); j++) 
@@ -37,6 +39,7 @@ public class ClientFactory
 				}
 				clients.add(c);
 			}
+			log.debug("Init of the ChatClients: {}", logMsg);
 		}else
 		{
 			log.debug("Ignoring init call, as the FActory has already been initialized");
@@ -57,7 +60,7 @@ public class ClientFactory
 				init();
 			} catch (SQLException e) 
 			{
-				log.error(""+ e);
+				log.error("Error while instantiating clients"+ e);
 			}
 		}
 			
