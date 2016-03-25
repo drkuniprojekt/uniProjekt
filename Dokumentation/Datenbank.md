@@ -2,7 +2,7 @@
 Nothing yet.
 
 ##Changelog
-`23.03.2016` ZIP is now VARCHAR(5) (formerly INT)  
+`24.03.2016` ZIP is now VARCHAR(5) (formerly INT)  
 `22.03.2016` CHATROOM, CHATROOMMAPPING, MESSAGE, MESSAGESUNREAD created  
 `21.03.2016` EVENTANSWER key changed | SETTING added (formerly known as option)  
 `20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER | Sequencer for EVENT_ID added   
@@ -33,7 +33,7 @@ STARTTIME     |TIMESTAMP      |  |  |YYYY-MM-DD HH:SS
 ENDTIME		|TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
 STREET	|VARCHAR(255)	|  |  |
 HOUSENUMBER     |VARCHAR(10)      |  |  |
-ZIP		|INT	|  |  |
+ZIP		|VARCHAR(5)	|  |  |
 TOWN	|VARCHAR(255)	|  |  |
 CREATOR     |VARCHAR(255)    |  |X  |References to USER(LOGIN_ID)
 
