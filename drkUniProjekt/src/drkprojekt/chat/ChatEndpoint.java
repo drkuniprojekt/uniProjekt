@@ -35,43 +35,53 @@ public class ChatEndpoint
 	}
 	
 	@OnMessage
-	public String onMessage(String msgBody, @PathParam("name") String clientID)
+	public String onMessage(String msg)
 	{
 		try
 		{
-			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(msgBody);
+			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(msg);
 			String recipient	= (String) msgJson.get("to");
-			String msg			= ((String)msgJson.get("message")).trim();
+			RemoteEndpoint.Basic r			= null;
 			
-			if(msg  == null || msg.length() == 0)
+		//-----------------------------------------------------------------
+			if(msgJson.get("test") != null)
 			{
-				throw new IllegalArgumentException("PLease specify a message body");
+				return "Test result: " + userExists(recipient);
 			}
-			
+		//-------------------------------------------------------------------	
 			if(recipient == null || recipient.equals("Broadcast"))
 			{
-				PushService.sendBroadCastMessage(msgBody);
+				PushService.sendBroadCastMessage(msg);
 				for (ChatClient c: peers)
 				{
-					c.sendMessage((String)msgJson.get("message"));
+					r	= c.getSession().getBasicRemote();
 				}
-				log.debug("Got new Broadcast-Message: " + msgBody);				
+				log.debug("Got new Broadcast-Message: " + msg);				
+			}else
+			{				
+				for (ChatClient c: peers)
+				{
+					if(c.getName().equals(recipient))
+					{
+						r	= c.getSession().getBasicRemote();
+						break;
+					}
+				}
+				log.debug("Got new Message to " + recipient + ": "+ msg);
+			}
+			if(r!= null)
+			{
+				r.sendText((String)msgJson.get("message"));
+				return "Message was send to " + recipient;
 			}else
 			{
-				sendMessageTo(clientID, recipient, msg);
-				
-				log.debug("Got new Message to " + recipient + ": "+ msgBody);				
-				
+				throw new IllegalArgumentException("The given recipient was not found");
 			}
-			
-			return "Message was send to " + recipient;
-				
-			
 			
 			
 		} catch (SQLException | IOException e)
 		{
-			log.error("" + e);
+			e.printStackTrace();
 		} catch (ParseException | IllegalArgumentException | NullPointerException e)
 		{
 			log.warn("Bad Request over Websocket", e);
@@ -79,77 +89,6 @@ public class ChatEndpoint
 		}
 		return "Unknown Error";
 	}
-	
-	private void sendMessageTo(String sender, String recipient, String msg) throws IOException, SQLException
-	{
-		if(!userExists(recipient))
-		{
-			throw new IllegalArgumentException("The given recipient was not found");
-		}
-		DatabaseHandler db	= DatabaseHandler.getdb();
-		for (ChatClient c: peers)
-		{
-			//Client is online
-			if(c.getName().equals(recipient))
-			{
-				saveMessageToDb(sender, recipient, msg, false, db);
-				c.sendMessage(msg);				
-				return;
-			}
-			else //Client is offline
-			{
-				saveMessageToDb(sender, recipient, msg, true, db);
-				String deviceId	= (String) ((JSONObject)db.executeQuery("SELECT deviceId FROM PHONEGAPID WHERE REGISTEREDUSER = ?", recipient).get(0)).get("deviceID");
-				PushService.sendUnicastMessage(msg, deviceId);
-			}
-			
-		}		
-	}
-	
-	private void sendBroadcast(String sender, String msg) throws IOException, SQLException
-	{		
-		DatabaseHandler db	= DatabaseHandler.getdb();
-		for (ChatClient c: peers)
-		{
-			//Client is online
-			if(c.getName().equals(recipient))
-			{
-				saveMessageToDb(sender, recipient, msg, false, db);
-				c.sendMessage(msg);				
-				return;
-			}
-			else //Client is offline
-			{
-				saveBroadcastToDb(sender, msg,  db);
-				String deviceId	= (String) ((JSONObject)db.executeQuery("SELECT deviceId FROM PHONEGAPID WHERE REGISTEREDUSER = ?", recipient).get(0)).get("deviceID");
-				PushService.sendUnicastMessage(msg, deviceId);
-			}
-			
-		}		
-	}
-
-	private void saveBroadcastToDb(String sender, String msg, DatabaseHandler db) 
-	{
-		//Wie in die DB schreiben?
-		
-	}
-
-	private void saveMessageToDb(String sender, String recipient, String msg, boolean unread, DatabaseHandler db) throws SQLException 
-	{
-		String[] args	= {sender, recipient};
-		String chat		= (String) ((JSONObject)db.executeQuery("SELECT CHATROOM FROM \"CHATROOMMAPPING\" WHERE  USERACCOUNT = ? AND CHATROOM in(" +
-												"SELECT CHATROOM FROM \"CHATROOMMAPPING\" WHERE USERACCOUNT = ?);", args)
-									.get(0)).get("chatroom");
-		
-		args	= new String[]{msg, sender, chat};		
-		db.executeUpdate("INSERT INTO TABLE message Values(MESSAGE_ID.nextval, CURRENT_TIMESTAMP, ?,?,?)", args);
-		
-		if (unread) //Tabelle muss geändert werden???????
-		{
-			db.executeUpdate("INSERT INTO TABLE MESSAGESUNREAD Values(?,?)", args);
-		}
-	}
-
 	private boolean userExists(String login_id) throws SQLException
 	{
 		try

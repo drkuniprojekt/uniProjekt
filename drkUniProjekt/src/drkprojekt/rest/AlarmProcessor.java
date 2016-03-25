@@ -1,6 +1,7 @@
 package drkprojekt.rest;
 
 import java.io.IOException;
+import java.security.SignatureException;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -41,7 +42,7 @@ public class AlarmProcessor extends HttpServlet
 			AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 			alarm.create();
-		} catch (ParseException | IllegalStateException | SQLException e)
+		} catch (ParseException | IllegalStateException | SQLException | SignatureException e)
 		{
 			Helper.handleException(e, response);
 		}
@@ -54,7 +55,7 @@ public class AlarmProcessor extends HttpServlet
 			AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm(Helper.getRequestJSON(request));
 			alarm.change();
-		} catch (ParseException | IllegalStateException | SQLException e)
+		} catch (ParseException | IllegalStateException | SQLException | SignatureException e)
 		{
 			Helper.handleException(e, response);
 		}
@@ -67,7 +68,7 @@ public class AlarmProcessor extends HttpServlet
 			AuthHelper.assertIsAdmin(request, response);
 			Alarm alarm = new Alarm();
 			alarm.delete();
-		} catch (IllegalStateException | SQLException e)
+		} catch (IllegalStateException | SQLException | SignatureException e)
 		{
 			Helper.handleException(e, response);
 		}

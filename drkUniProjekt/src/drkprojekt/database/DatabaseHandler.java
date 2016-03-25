@@ -1,6 +1,5 @@
 package drkprojekt.database;
 
-import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,6 +25,7 @@ public class DatabaseHandler
 	private Connection conn;
 	private static DatabaseHandler db;
 	private static Logger log;
+	
 	private DatabaseHandler()
 	{
 		try
@@ -132,43 +132,23 @@ public class DatabaseHandler
 	}
 	
 	/**
-	 * Executes a prepared UPDATE-Statement. If you give a 2-Dimensional array, there will be a BATCH Update
+	 * Executes a prepared UPDATE-Statement. WARNING im not sure, if this will only work for Strings. Has to be tested
 	 * @param query Query to execute ( Using ? as placeholder for Arguments)
-	 * @param arguments Array (One or two Dimensions) containing the Arguments
+	 * @param arguments String array containing the Arguments
 	 * @return Result int from the DB
 	 * @throws SQLException
 	 */
-	public int executeUpdate(String query, Object[] arguments) throws SQLException
+	public int executeUpdate(String query, String[] arguments) throws SQLException
 	{
-		boolean batch	= true;
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
 		{
 			if(arguments[i] == null)
 				throw new SQLException("Argument must not be null!");
 			
-			if(arguments[i] instanceof Object[]) //Batch update
-			{
-				for (int j = 0; j < Array.getLength(arguments[i]); j++) 
-				{
-					stmt.setObject(j + 1, Array.get(arguments[i], j));										
-				}
-				stmt.addBatch();
-			}else
-			{
-				batch	= false;
-				stmt.setObject(i + 1, arguments[i]);
-			}		
-			
+			stmt.setString(i + 1, arguments[i]);
 		}
-		int rowcount	= 0;
-		if(batch)
-		{
-			rowcount = stmt.executeBatch()[0]; //Warning: Only returns feedback for the first entry
-		}else
-		{
-			rowcount = stmt.executeUpdate();
-		}		
+		int rowcount = stmt.executeUpdate();
 		closeStatement(stmt);
 		return rowcount;
 	}
@@ -270,7 +250,6 @@ public class DatabaseHandler
 		return rowcount;
 	}
 
-	
 	private JSONArray rsToJSON(ResultSet rs) throws SQLException {
 		JSONArray jsonarray = new JSONArray();
 		

@@ -1,7 +1,5 @@
 package drkprojekt.chat;
 
-import java.io.IOException;
-
 import javax.websocket.Session;
 
 
@@ -23,11 +21,6 @@ public class ChatClient
 	public Session getSession()
 	{
 		return session;
-	}
-	
-	public void sendMessage(String msg) throws IOException
-	{
-		session.getBasicRemote().sendText(msg);
 	}
 	
 }
