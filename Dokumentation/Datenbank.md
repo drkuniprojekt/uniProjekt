@@ -2,6 +2,7 @@
 Nothing yet.
 
 ##Changelog
+`23.03.2016` ZIP is now VARCHAR(5) (formerly INT)  
 `22.03.2016` CHATROOM, CHATROOMMAPPING, MESSAGE, MESSAGESUNREAD created  
 `21.03.2016` EVENTANSWER key changed | SETTING added (formerly known as option)  
 `20.03.2016` AVIABLECAR changed to AVAILABLECAR in EVENTANSWER | Sequencer for EVENT_ID added   
