@@ -85,12 +85,22 @@ public class ChatEndpoint
 	{
 		try
 		{
-			DatabaseHandler.getdb().executeUpdate("");
+			DatabaseHandler db	= DatabaseHandler.getdb();
+			String chatroom		= (String) ((JSONObject)db.executeQuery("SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?" 
+												+ "AND chatroom IN (" 
+												+ "SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?",
+												new String[]{from, to}).get(0)).get("chatroom"); //Später sollte noch auf Chatraum != 1 (alle) getestet werden
 			
+			db.executeUpdate("INSERT INTO MESSAGE VALUES(MESSAGE_ID.NEXTVAL, CURRENT_TIMESTAMP, ?,?,?)", 
+								new String[]{message, from, chatroom});
+			
+			if(!read)
+			{
+				db.executeUpdate("INSERT INTO MESSAGEUNREAD VALUES(?, MESSAGE_ID.CURRVAL)", to);
+			}
 		} catch (SQLException e) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(""+ e);
 		}
 	}
 	
