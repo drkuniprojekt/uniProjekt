@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.websocket.*;
+import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
@@ -24,40 +25,37 @@ import drkprojekt.rest.PushService;
 @ServerEndpoint("/chat/{name}")
 public class ChatEndpoint
 {
-//	private static Set<ChatClient> peers	= Collections.synchronizedSet(new HashSet<ChatClient>());
 	private static Logger log	= LoggerFactory.getLogger(ChatEndpoint.class);
+	
 	@OnOpen
-	public String onOpen(Session session, @PathParam("name") String clientID)
+	public void onOpen(Session session, @PathParam("name") String clientID)
 	{		
 		ChatClient c	= ClientFactory.getClient(clientID);
-		
-		if(c != null)
+		try
 		{
-			c.addSession(session);	
-			log.info("New Chat Client " + clientID);
-			try 
+			if(c != null)
 			{
-				String tmp	= getMessagesFromDB(clientID).toJSONString();
-				log.debug("New Client got the following Rooms:\n {}", tmp);
-				return tmp;
-			} 
-			catch (Exception e) 
-			{
-				log.error(""+ e);
-				return "Unknown Error occured";
+				c.addSession(session);	
+				log.info("New Chat Client " + clientID);
+				try 
+				{
+					session.getBasicRemote().sendText(getMessagesFromDB(clientID).toJSONString());
+				} 
+				catch (Exception e) 
+				{
+					log.error(""+ e);
+					session.getBasicRemote().sendText("Unknown Error occured");
+				}
 			}
-		}
-		else
-		{
-			log.info("Client tried to connect with illegal Username", clientID);
-			try 
+			else
 			{
+				log.info("Client tried to connect with illegal Username", clientID);				
 				session.getBasicRemote().sendText("This is not a valid user");
 				session.close();
-			} catch (IOException e) 
-			{			
 			}
-			return "This is not a valid user";
+		}catch(IOException e)
+		{
+			log.error("Exception while opening Chat Connection: \n {}", e);
 		}
 		
 	}
@@ -80,6 +78,7 @@ public class ChatEndpoint
 			JSONObject outJSON	= new JSONObject();
 			outJSON.put("message", message);
 			outJSON.put("from", clientID);
+			outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
 			
 			if(recipient == null || recipient.equals("Broadcast"))
 			{
@@ -160,7 +159,7 @@ public class ChatEndpoint
 			int number			= (int) room.get("chatroom"); 
 					
 			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ?", "" + number);
-			JSONArray msg		= db.executeQuery("SELECT * FROM MESSAGE WHERE Chatroom = ?", "" + number);
+			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent AS message, chatroom, message_id, useraccount AS \"from\" FROM MESSAGE WHERE Chatroom = ?", "" + number);
 			
 			room.put("persons", persons);
 			room.put("messages", msg);

@@ -44,6 +44,15 @@ public class DatabaseHandler
 		}
 	}
 	
+	public static String getCurrentTimeStamp()
+	{
+		Date now = new Date();
+		java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(
+				now.getTime());
+	
+		return currentTimestamp.toString();
+	}
+
 	public static DatabaseHandler getdb()
 	{
 		if(db == null){
@@ -64,16 +73,7 @@ public class DatabaseHandler
 		}
 	}
 
-	
-	public String getTimeStamp()
-	{
-		Date now = new Date();
-		java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(
-				now.getTime());
-
-		return currentTimestamp.toString();
-	}
-	
+		
 	/**	 * 
 	 * @param query The Query to execute
 	 * @return An JSONObject containing the result
