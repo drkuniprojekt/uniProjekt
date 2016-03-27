@@ -103,6 +103,12 @@ public class ChatEndpoint
 		
 	}
 	
+	@OnClose
+	public void onClose(Session session, @PathParam("name") String clientID)
+	{
+		ClientFactory.getClient(clientID).deleteSession(session);
+	}
+	
 	private void saveMessageToDB(String message, boolean read, String from, String to)
 	{
 		log.debug("Trying to save message to Database: " + message);

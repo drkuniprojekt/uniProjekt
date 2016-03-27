@@ -26,7 +26,82 @@ public class ChatClient
 	}
 	
 	
-// Getter/ Setter -------------------------------------------------------------------	
+/**
+	 * Sends a message to this client. This class decides,  weather the Message is send through phonegap or websocket
+	 * @param msgJSON Message JSON containing the Parameter "from" and "message"
+	 * @return True, if the user read the Message, false if unread
+	 */
+	public boolean sendMessage(JSONObject msgJSON)
+	{
+		try 
+		{
+			if(sessionList.size() > 0) //User is online at minimum 1 device
+			{
+				for (Session s : sessionList) 
+				{
+					s.getBasicRemote().sendText(msgJSON.toJSONString());
+				}
+				return true;				
+			}else if (phonegap_ids.size() > 0) //User is offline, but at least one Device can get a phonegap push
+			{
+				for (String s : phonegap_ids) 
+				{
+					PushService.sendUnicastMessage("New Message from " + (String)msgJSON.get("from"), s);
+				}
+				return false;
+			}
+			//The user is neigher reachable through phonegap, nor through websocket -> Just save to DB
+			return false;
+		} catch (Exception e) 
+		{
+			log.error("Could not send message to " + name + ", because an Error occured:\n ", e);
+		}
+		return false;
+	}
+
+
+	/**
+ * Sends a message to this client. This class decides,  weather the Message is send through phonegap or websocket
+ * @param msg Message to send
+ * @return True, if the user read the Message, false if unread
+ */
+public boolean sendMessage(String msg)
+{
+	try 
+	{
+		if(sessionList.size() > 0) //User is online at minimum 1 device
+		{
+			for (Session s : sessionList) 
+			{
+				s.getBasicRemote().sendText(msg);
+			}
+			return true;				
+		}else if (phonegap_ids.size() > 0) //User is offline, but at least one Device can get a phonegap push
+		{
+			for (String s : phonegap_ids) 
+			{
+				PushService.sendUnicastMessage(msg, s);
+			}
+			return false;
+		}
+		//The user is neigher reachable through phonegap, nor through websocket -> Just save to DB
+		return false;
+	} catch (Exception e) 
+	{
+		log.error("Could not send message to " + name + ", because an Error occured:\n ", e);
+	}
+	return false;
+}
+
+public void deleteSession(Session s)
+{
+	sessionList.remove(s);
+	s	= null;
+	log.debug("User {} logged aout a device", name);
+}
+
+
+	// Getter/ Setter -------------------------------------------------------------------	
 	public String getName()
 	{
 		return name;
@@ -58,70 +133,5 @@ public class ChatClient
 	public void addPhonegap_id(String phonegap_id) 
 	{
 		phonegap_ids.add(phonegap_id);
-	}
-	/**
-	 * Sends a message to this client. This class decides,  weather the Message is send through phonegap or websocket
-	 * @param msg Message to send
-	 * @return True, if the user read the Message, false if unread
-	 */
-	public boolean sendMessage(String msg)
-	{
-		try 
-		{
-			if(sessionList.size() > 0) //User is online at minimum 1 device
-			{
-				for (Session s : sessionList) 
-				{
-					s.getBasicRemote().sendText(msg);
-				}
-				return true;				
-			}else if (phonegap_ids.size() > 0) //User is offline, but at least one Device can get a phonegap push
-			{
-				for (String s : phonegap_ids) 
-				{
-					PushService.sendUnicastMessage(msg, s);
-				}
-				return false;
-			}
-			//The user is neigher reachable through phonegap, nor through websocket -> Just save to DB
-			return false;
-		} catch (Exception e) 
-		{
-			log.error("Could not send message to " + name + ", because an Error occured:\n ", e);
-		}
-		return false;
-	}
-	
-	/**
-	 * Sends a message to this client. This class decides,  weather the Message is send through phonegap or websocket
-	 * @param msgJSON Message JSON containing the Parameter "from" and "message"
-	 * @return True, if the user read the Message, false if unread
-	 */
-	public boolean sendMessage(JSONObject msgJSON)
-	{
-		try 
-		{
-			if(sessionList.size() > 0) //User is online at minimum 1 device
-			{
-				for (Session s : sessionList) 
-				{
-					s.getBasicRemote().sendText(msgJSON.toJSONString());
-				}
-				return true;				
-			}else if (phonegap_ids.size() > 0) //User is offline, but at least one Device can get a phonegap push
-			{
-				for (String s : phonegap_ids) 
-				{
-					PushService.sendUnicastMessage("New Message from " + (String)msgJSON.get("from"), s);
-				}
-				return false;
-			}
-			//The user is neigher reachable through phonegap, nor through websocket -> Just save to DB
-			return false;
-		} catch (Exception e) 
-		{
-			log.error("Could not send message to " + name + ", because an Error occured:\n ", e);
-		}
-		return false;
 	}
 }
