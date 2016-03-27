@@ -35,7 +35,17 @@ public class ChatEndpoint
 		{
 			c.addSession(session);	
 			log.info("New Chat Client " + clientID);
-			return "Registerd";
+			try 
+			{
+				String tmp	= getMessagesFromDB(clientID).toJSONString();
+				log.debug("New Client got the following Rooms:\n {}", tmp);
+				return tmp;
+			} 
+			catch (Exception e) 
+			{
+				log.error(""+ e);
+				return "Unknown Error occured";
+			}
 		}
 		else
 		{
@@ -86,17 +96,22 @@ public class ChatEndpoint
 			else
 			{
 				log.debug("Got new Message to " + recipient + ": "+ data);
-				boolean	msgRead;
+				boolean	msgRead;				
 				msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
 				saveMessageToDB(message, msgRead, clientID, recipient);				
 			}	
 			return outJSON.toJSONString();
 			
-		} catch (ParseException | IllegalArgumentException | NullPointerException e)
+		} catch (ParseException | NullPointerException e)
 		{
 			log.warn("Bad Request over Websocket", e);
 			return "Bad Request";
-		} catch (Exception e)
+		} catch( IllegalArgumentException e)
+		{
+			log.warn("Bad Request over Websocket", e);
+			return e.getMessage();
+		}
+		catch (Exception e)
 		{
 			return "Unknown Error";
 		}
@@ -133,22 +148,25 @@ public class ChatEndpoint
 		}
 	}
 	
-//	private boolean userExists(String login_id) throws SQLException
-//	{
-//		try
-//		{
-//			JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT login_id FROM user WHERE login_id = ?", login_id);
-//			log.debug("User exists DB-Result: ", array.toJSONString());
-//			if(array.get(0) != null)
-//			{
-//				return true;
-//			}
-//			return false;
-//		}
-//		catch(IndexOutOfBoundsException e)
-//		{
-//			log.debug("Test: User exists DB-Result: IndexoutofBounds");
-//			return false;
-//		}
-//	}
+	private JSONArray getMessagesFromDB(String forUser) throws SQLException
+	{
+		JSONArray	res		= new JSONArray();
+		DatabaseHandler db	= DatabaseHandler.getdb();
+		JSONArray chatroom	= db.executeQuery("SELECT chatroom AS roomnumber FROM CHATROOMMAPPING WHERE USERACCOUNT = ?", forUser);
+		
+		for (int i = 0; i < chatroom.size(); i++)
+		{
+			JSONObject	room	= (JSONObject) chatroom.get(i);
+			int number			= (int) room.get("chatroom"); 
+					
+			JSONArray persons	= db.executeQuery("SELECT useraccount FROM CHATROOMMAPPING WHERE Chatroom = ?", "" + number);
+			JSONArray msg		= db.executeQuery("SELECT * FROM CHATROOMMAPPING WHERE Chatroom = ?", "" + number);
+			
+			room.put("persons", persons);
+			room.put("persons", msg);
+			res.add(room);
+			
+		}
+		return res;
+	}
 }

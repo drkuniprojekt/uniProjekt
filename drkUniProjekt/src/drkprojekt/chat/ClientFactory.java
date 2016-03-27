@@ -29,7 +29,7 @@ public class ClientFactory
 			for (int i = 0; i < login_idJSON.size(); i++) 
 			{
 				login				= (String)((JSONObject)login_idJSON.get(i)).get("login_id");
-				ChatClient c		= new ChatClient(login);
+				ChatClient c		= new RealClient(login);
 				logMsg				+= login + ", ";
 				JSONArray pgJSON 	= DatabaseHandler.getdb().executeQuery("SELECT device_id FROM PHONEGAPID WHERE REGISTEREDUSER = ?", login);
 				
@@ -71,7 +71,7 @@ public class ClientFactory
 				return clients.get(i);
 			}			
 		}
-		return null;
+		return new NullClient(login_id);
 	}
 	public static ArrayList<ChatClient> getAllClients()
 	{
