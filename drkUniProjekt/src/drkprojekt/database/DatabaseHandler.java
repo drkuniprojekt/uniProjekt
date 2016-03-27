@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -256,7 +257,8 @@ public class DatabaseHandler
 		return rowcount;
 	}
 
-	private JSONArray rsToJSON(ResultSet rs) throws SQLException {
+	private JSONArray rsToJSON(ResultSet rs) throws SQLException 
+	{
 		JSONArray jsonarray = new JSONArray();
 		
 		ResultSetMetaData rsmd 	= rs.getMetaData();
@@ -266,16 +268,17 @@ public class DatabaseHandler
 		while (rs.next())
 		{
 			JSONObject row	= new JSONObject();
-			for (int index = 1; index <= columnCount; index++) {
+			for (int index = 1; index <= columnCount; index++) 
+			{
 				log.debug("Iteration " + index);
 	            column 			= rsmd.getColumnName(index).toLowerCase();
-	            Object value 	= rs.getObject(column);
+	            Object value 	= cleanObject(rs.getObject(column));
 	            if(column.length() == 0)
 	            {
 	            	column	= "column" + index;
 	            }
 	            row.put(column, value);
-	          }
+	        }
 			
 			jsonarray.add(row);
 		}
@@ -309,5 +312,25 @@ public class DatabaseHandler
 				stmt.close();
 			} catch (SQLException e) {}
 		}
+	}
+	
+	/**
+	 * Use, if there is a SQL-Datatype, which can not be added as Object, because this would cause an invalid JSON (p.e. Datetime has missing double quotes)
+	 * @param in Object to clean
+	 * @return JSON-Clean object
+	 */
+	private Object cleanObject(Object in)
+	{		
+		if(in instanceof Timestamp)
+		{
+			Object out	= null;
+			log.debug("Found an Timestamp to convert");
+			out	= ((Timestamp)in).toLocalDateTime().toString();
+			return out;
+		}else
+		{
+			return in;
+		}
+		
 	}
 }

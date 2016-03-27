@@ -159,11 +159,11 @@ public class ChatEndpoint
 			JSONObject	room	= (JSONObject) chatroom.get(i);
 			int number			= (int) room.get("chatroom"); 
 					
-			JSONArray persons	= db.executeQuery("SELECT useraccount FROM CHATROOMMAPPING WHERE Chatroom = ?", "" + number);
-			JSONArray msg		= db.executeQuery("SELECT * FROM CHATROOMMAPPING WHERE Chatroom = ?", "" + number);
+			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ?", "" + number);
+			JSONArray msg		= db.executeQuery("SELECT * FROM MESSAGE WHERE Chatroom = ?", "" + number);
 			
 			room.put("persons", persons);
-			room.put("persons", msg);
+			room.put("messages", msg);
 			res.add(room);
 			
 		}
