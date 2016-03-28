@@ -100,6 +100,7 @@ public class User
 		//TODO: User darf sich nicht selbst löschen
 		String login_id = (String) JSON.get("login_id");
 		
+		//TODO: Löschweise besprechen...
 		int users = DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + login_id + "'");
 		DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = '" + login_id + "'");
 		
@@ -134,6 +135,7 @@ public class User
 		return array;
 	}
 	
+	//TODO: Anpassen...
 	private void fallback(String userId)
 	{
 		try

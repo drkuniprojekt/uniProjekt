@@ -54,14 +54,4 @@ public class AlarmResponseProcessor extends HttpServlet
 			Helper.handleException(e, response);
 		}
 	}
-	
-	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-	{	
-		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-	}
-
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-	{
-		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-	}
 }
