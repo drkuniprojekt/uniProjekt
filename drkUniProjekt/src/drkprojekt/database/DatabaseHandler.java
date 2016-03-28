@@ -122,7 +122,7 @@ public class DatabaseHandler
 	 */
 	public JSONArray executeQuery(String query, String argument) throws SQLException
 	{
-		log.debug("Executing query:\n {}", query);
+		log.debug("Executing query:\n {} with arguments\n {}", query, argument);
 	    if(argument == null)
 		throw new SQLException("Argument must not be null!");
 	    
@@ -269,8 +269,7 @@ public class DatabaseHandler
 		{
 			JSONObject row	= new JSONObject();
 			for (int index = 1; index <= columnCount; index++) 
-			{
-				log.debug("Iteration " + index);
+			{				
 	            column 			= rsmd.getColumnName(index).toLowerCase();
 	            Object value 	= cleanObject(rs.getObject(column));
 	            if(column.length() == 0)
@@ -324,7 +323,6 @@ public class DatabaseHandler
 		if(in instanceof Timestamp)
 		{
 			Object out	= null;
-			log.debug("Found an Timestamp to convert");
 			out	= ((Timestamp)in).toLocalDateTime().toString();
 			return out;
 		}else

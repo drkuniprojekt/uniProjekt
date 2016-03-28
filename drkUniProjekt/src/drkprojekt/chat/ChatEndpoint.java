@@ -76,7 +76,7 @@ public class ChatEndpoint
 				throw new IllegalArgumentException("Please Provide a non-empty Message");
 			}
 			JSONObject outJSON	= new JSONObject();
-			outJSON.put("message", message);
+			outJSON.put("messagecontent", message);
 			outJSON.put("from", clientID);
 			outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
 			
@@ -112,7 +112,8 @@ public class ChatEndpoint
 		}
 		catch (Exception e)
 		{
-			return "Unknown Error";
+			log.error("Unknown Error occured while executing Onmessage:\n {}", e);
+			return "{\"Error\": \"Unknown Error\"}";
 		}
 		
 	}
@@ -158,8 +159,18 @@ public class ChatEndpoint
 			JSONObject	room	= (JSONObject) chatroom.get(i);
 			int number			= (int) room.get("chatroom"); 
 					
-			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ?", "" + number);
+			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
+			
+			if(persons.size() < 2)
+			{
+				room.put("name", (String)((JSONObject)persons.get(0)).get("useraccount"));
+			}
+			else
+			{
+				room.put("name", "Gruppenchat");
+			}
 			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent AS message, chatroom, message_id, useraccount AS \"from\" FROM MESSAGE WHERE Chatroom = ?", "" + number);
+//			int unread			= db.executeQuery("SELECT count(*) FROM ", "" + number);
 			
 			room.put("persons", persons);
 			room.put("messages", msg);

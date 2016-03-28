@@ -9,9 +9,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.Helper;
@@ -21,6 +24,7 @@ import drkprojekt.rest.Helper;
  */
 @WebServlet("/authentication/*")
 public class AuthenticationProcessor extends HttpServlet {
+	private Logger log	= LoggerFactory.getLogger(AuthenticationProcessor.class);
 
 	//OINFDS
     private static final long serialVersionUID = 1L;
@@ -56,10 +60,18 @@ public class AuthenticationProcessor extends HttpServlet {
 	    String device_id = (String) json.get("device_id");
 	    //TODO: If phonegap. Else what?
 	    if (device_id != null) {
-		String[] tmp2 = { (String) json.get("login_id"), device_id };
-		db.executeUpdate(
-			"INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)",
-			tmp2);
+		
+		
+		int check_pid	= db.executeQuery("SELECT * FROM phonegapid WHERE device_id = ?", device_id).size();
+		log.debug("Check_pid" + check_pid);
+			if(check_pid < 1)
+			{
+				String[] tmp2 = { (String) json.get("login_id"), device_id };
+				db.executeUpdate(
+						"INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)",
+						tmp2);
+			}
+		
 	    }
 
 	    JSONObject responseText = new JSONObject();
