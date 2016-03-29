@@ -38,30 +38,87 @@ public class User
 	{
 		String login_id = (String) JSON.get("login_id");
 		String userpassword = (String) JSON.get("userpassword");
+		JSONObject tmp = (JSONObject) DatabaseHandler.getdb().executeQuery("SELECT COUNT(*) FROM user").get(0);
+		JSONArray allUsers = fetchJSONArrayFromDatabase(null);
 		boolean adminrole;
+		int userCount;
 		try
 		{
 			adminrole = Boolean.parseBoolean(JSON.get("adminrole").toString());
+			userCount = Integer.parseInt(tmp.get("count(*)").toString());
+			log.debug("userCount: " + userCount);
 		} catch (NullPointerException e)
 		{
 			throw new SQLException(e);
 		}
-		String[] tmp = { login_id, login_id, userpassword };
 		
-		DatabaseHandler.getdb().executeUpdate("INSERT INTO user VALUES(?, ?, HASH_SHA256(TO_BINARY(?)), " + adminrole + ")", tmp);
 		
-		for (int i = 0; i < DatabaseHandler.SETTINGS.length; i++)
+		
+		
+		
+		log.debug(userCount + " Users are existing. So, Array-Size is " + (DatabaseHandler.SETTINGS.length + 2 + (3 * allUsers.size())));
+		String[] statements = new String[DatabaseHandler.SETTINGS.length + 2 + (3 * allUsers.size())];
+		String[][] arguments = new String[DatabaseHandler.SETTINGS.length + 2 + (3 * allUsers.size())][];
+		
+		String insertUserStatement = "INSERT INTO user VALUES(?, ?, HASH_SHA256(TO_BINARY(?)), " + adminrole + ", false)";
+		String[] insertUserArguments = { login_id, login_id, userpassword };
+		statements[0] = insertUserStatement;
+		arguments[0] = insertUserArguments;
+		
+		String[] insertSettingStatement = new String[DatabaseHandler.SETTINGS.length];
+		
+		for(int i = 0; i < DatabaseHandler.SETTINGS.length; i++)
 		{
-			try
-			{
-				DatabaseHandler.getdb().executeUpdate("INSERT INTO setting VALUES('" + DatabaseHandler.SETTINGS[i] + "', "
-						+ User.DEFAULTSETTINGS[i] + ", '" + login_id + "')");
-			} catch (SQLException e)
-			{
-				fallback(login_id);
-				throw e;
-			}
+			insertSettingStatement[i] = "INSERT INTO setting VALUES('" + DatabaseHandler.SETTINGS[i] + "', "
+					+ User.DEFAULTSETTINGS[i] + ", '" + login_id + "')";
+			statements[i+2] = insertSettingStatement[i];
+			arguments[i+2] = new String[0];
 		}
+		
+		//Groupchat
+		String insertChatroommappingStatementGroupChat = "INSERT INTO chatroommapping VALUES(1, '" + login_id + "')";
+		statements[1] = insertChatroommappingStatementGroupChat;
+		arguments[1] = new String[0];
+		
+		for (int i = 0; i < (3 * allUsers.size()); i=i+3)
+		{
+			JSONObject tmpUser = (JSONObject) allUsers.get(i/3);
+			String tmpUserLoginId = tmpUser.get("login_id").toString();
+			log.debug("Now processing Chats between " + tmpUserLoginId + " and " + login_id);
+			
+			statements[i+2+DatabaseHandler.SETTINGS.length] =
+					"INSERT INTO chatroom VALUES(chatroom_id.NEXTVAL)";
+			arguments[i+2+DatabaseHandler.SETTINGS.length] = new String[0];
+			
+			statements[i+1+2+DatabaseHandler.SETTINGS.length] =
+					"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + login_id + "')";
+			arguments[i+1+2+DatabaseHandler.SETTINGS.length] = new String[0];
+			
+			statements[i+2+2+DatabaseHandler.SETTINGS.length] =
+					"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + tmpUserLoginId + "')";
+			arguments[i+2+2+DatabaseHandler.SETTINGS.length] = new String[0];
+			
+			//"INSERT INTO chatroom VALUES(chatroom_id.NEXTVAL)"; //Für jeden existenten Nutzer
+			//"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + login_id + "')";
+			//"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + tmpUserLoginId + "')";
+		}
+		
+		DatabaseHandler.getdb().executeTransactionUpdate(statements, arguments);
+		
+//		DatabaseHandler.getdb().executeUpdate("INSERT INTO user VALUES(?, ?, HASH_SHA256(TO_BINARY(?)), " + adminrole + ")", tmp);
+//		
+//		for (int i = 0; i < DatabaseHandler.SETTINGS.length; i++)
+//		{
+//			try
+//			{
+//				DatabaseHandler.getdb().executeUpdate("INSERT INTO setting VALUES('" + DatabaseHandler.SETTINGS[i] + "', "
+//						+ User.DEFAULTSETTINGS[i] + ", '" + login_id + "')");
+//			} catch (SQLException e)
+//			{
+//				fallback(login_id);
+//				throw e;
+//			}
+//		}
 	}
 	
 	public JSONObject change() throws SQLException
@@ -89,7 +146,7 @@ public class User
 				return null;
 			}
 			
-			returnJSON.put("token", tokenString);
+			Object put = returnJSON.put("token", tokenString);
 		}
 		
 		return returnJSON;
@@ -127,30 +184,30 @@ public class User
 		
 		if(userId == null)
 			array = DatabaseHandler.getdb().executeQuery(
-				"SELECT login_id, displayname, adminrole FROM user");
+				"SELECT login_id, displayname, adminrole FROM user WHERE deleted = false");
 		else
 			array = DatabaseHandler.getdb().executeQuery(
-				"SELECT login_id, displayname, adminrole FROM user WHERE login_id = '" + userId + "'");
+				"SELECT login_id, displayname, adminrole FROM user WHERE login_id = '" + userId + "' AND deleted = false");
 		
 		return array;
 	}
 	
-	//TODO: Anpassen...
-	private void fallback(String userId)
-	{
-		try
-		{
-			DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + userId + "'");
-		} catch (SQLException e) {}
-		
-		for (int i = 0; i < DatabaseHandler.SETTINGS.length; i++)
-		{
-			try
-			{
-				DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE WHERE login_id = '" + userId + "'");
-			} catch (SQLException e) {}
-		}
-	}
+//	//TODO: Anpassen...
+//	private void fallback(String userId)
+//	{
+//		try
+//		{
+//			DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + userId + "'");
+//		} catch (SQLException e) {}
+//		
+//		for (int i = 0; i < DatabaseHandler.SETTINGS.length; i++)
+//		{
+//			try
+//			{
+//				DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE WHERE login_id = '" + userId + "'");
+//			} catch (SQLException e) {}
+//		}
+//	}
 
 	public JSONObject getJSON()
 	{

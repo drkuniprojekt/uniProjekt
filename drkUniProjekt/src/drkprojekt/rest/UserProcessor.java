@@ -15,6 +15,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 import drkprojekt.auth.AuthHelper;
+import drkprojekt.database.DatabaseHandler;
 
 @WebServlet("/user/*")
 public class UserProcessor extends HttpServlet
@@ -93,7 +94,17 @@ public class UserProcessor extends HttpServlet
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		response.sendError(418);
+		try
+		{
+			JSONArray test = DatabaseHandler.getdb().executeQuery("SELECT COUNT(*) FROM user");
+			Helper.setResponseJSONArray(response, test);
+		} catch (SQLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
 //		String pathInfo = request.getPathInfo();
 //		
 //		if(pathInfo == null || pathInfo.equals("/"))
