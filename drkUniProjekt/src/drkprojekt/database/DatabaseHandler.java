@@ -169,7 +169,7 @@ public class DatabaseHandler
 	{
 		log.debug("Executing query:\n {}", query);
 	    if(argument == null)
-		throw new SQLException("Argument must not be null!");
+	    	throw new SQLException("Argument must not be null!");
 	    
 		PreparedStatement stmt 	= conn.prepareStatement(query);		
 		stmt.setString(1, argument);		
@@ -255,6 +255,46 @@ public class DatabaseHandler
 		int rowcount = stmt.executeUpdate(query);
 		closeStatement(stmt);
 		return rowcount;
+	}
+	
+	/**
+	 * Executes various SQL statements as a transaction that is executed entirely or not at all
+	 * @param statements Array of statements that shall be executed
+	 * @param arguments Array of arrays with the arguments - e.g. arguments[1] shall contain the arguments for statement[1]
+	 * @return Array of rows affected for each statement
+	 * @throws SQLException
+	 */
+	public int[] executeTransactionUpdate(String[] statements, String[][] arguments) throws SQLException
+	{
+		//Bsp:
+		//statements = { "INSERT INTO A VALUES(...)", "UPDATE B SET ...", "INSERT INTO C VALUES(...)" }
+		//arguments[1] = Values to be inserted into A { "Peter", "PeterPW" }
+		//arguments[2] = Values to be updated in B
+		//arguments[3] = Values to be inserted into C
+		PreparedStatement stmt = null;
+		int[] affectedValues = new int[arguments.length];
+		conn.setAutoCommit(false);
+		
+		for (int i = 0; i < statements.length; i++)
+		{
+			stmt = conn.prepareStatement(statements[i]);
+			
+			for (int j = 0; j < arguments[i].length; j++) 
+			{
+				if(arguments[i][j] == null)
+					throw new SQLException("Argument must not be null!");
+				
+				stmt.setString(j + 1, arguments[i][j]);
+			}
+			
+			log.debug("Statement added: " + statements[i]);
+			affectedValues[i] = stmt.executeUpdate();
+		}
+		
+		conn.commit();
+		conn.setAutoCommit(true);
+		closeStatement(stmt);
+		return affectedValues;
 	}
 
 	private JSONArray rsToJSON(ResultSet rs) throws SQLException 
