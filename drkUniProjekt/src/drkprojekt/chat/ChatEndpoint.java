@@ -80,7 +80,7 @@ public class ChatEndpoint
 			outJSON.put("from", clientID);
 			outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
 			
-			if(recipient == null || recipient.equals("Broadcast"))
+			if(recipient == null || recipient.equals("Gruppenchat"))
 			{
 				log.debug("Got new Broadcast-Message: " + data);
 				boolean	msgRead;
@@ -88,8 +88,15 @@ public class ChatEndpoint
 				
 				for (ChatClient c : clients) 
 				{
-					msgRead	= c.sendMessage(outJSON);
-					saveMessageToDB(message, msgRead, clientID, c.getName());
+					if(!c.getName().equals(clientID))
+					{
+						msgRead	= c.sendMessage(outJSON);	
+						saveMessageToDB(message, msgRead, clientID, c.getName(), true);
+					}else
+					{
+						saveMessageToDB(message, false, clientID, c.getName(), true);
+					}
+					
 				}								
 			}
 			else
@@ -97,7 +104,7 @@ public class ChatEndpoint
 				log.debug("Got new Message to " + recipient + ": "+ data);
 				boolean	msgRead;				
 				msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
-				saveMessageToDB(message, msgRead, clientID, recipient);				
+				saveMessageToDB(message, msgRead, clientID, recipient, false);				
 			}	
 			return outJSON.toJSONString();
 			
@@ -124,16 +131,24 @@ public class ChatEndpoint
 		ClientFactory.getClient(clientID).deleteSession(session);
 	}
 	
-	private void saveMessageToDB(String message, boolean read, String from, String to)
+	private void saveMessageToDB(String message, boolean read, String from, String to, boolean broadcast)
 	{
 		log.debug("Trying to save message to Database: " + message);
 		try
 		{
 			DatabaseHandler db	= DatabaseHandler.getdb();
-			String chatroom		= "" + ((JSONObject)db.executeQuery("SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ? AND chatroom <> '1' " 
-												+ "AND chatroom IN (" 
-												+ "SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?)",
-												new String[]{from, to}).get(0)).get("chatroom"); 
+			String chatroom;
+			if(broadcast)
+			{
+				chatroom = "1";
+			}
+			else
+			{
+				chatroom		= "" + ((JSONObject)db.executeQuery("SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ? AND chatroom <> '1' " 
+						+ "AND chatroom IN (" 
+						+ "SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?)",
+						new String[]{from, to}).get(0)).get("chatroom"); 
+			}		
 			
 			db.executeUpdate("INSERT INTO MESSAGE VALUES(MESSAGE_ID.NEXTVAL, CURRENT_TIMESTAMP, ?,?,?)", 
 								new String[]{message, from, chatroom});
@@ -170,13 +185,13 @@ public class ChatEndpoint
 				room.put("name", "Gruppenchat");
 			}
 			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent AS message, chatroom, message_id, useraccount AS \"from\" FROM MESSAGE WHERE Chatroom = ?", "" + number);
-//			int unread			= db.executeQuery("SELECT count(*) FROM ", "" + number);
-			
+			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
+						
 			room.put("persons", persons);
 			room.put("messages", msg);
-			res.add(room);
-			
+			res.add(room);			
 		}
+		db.executeUpdate("DELETE FROM MESSAGESUNREAD WHERE useraccount = ?", forUser);
 		return res;
 	}
 }
