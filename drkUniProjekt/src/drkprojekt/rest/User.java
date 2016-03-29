@@ -52,11 +52,6 @@ public class User
 			throw new SQLException(e);
 		}
 		
-		
-		
-		
-		
-		log.debug(userCount + " Users are existing. So, Array-Size is " + (DatabaseHandler.SETTINGS.length + 2 + (3 * allUsers.size())));
 		String[] statements = new String[DatabaseHandler.SETTINGS.length + 2 + (3 * allUsers.size())];
 		String[][] arguments = new String[DatabaseHandler.SETTINGS.length + 2 + (3 * allUsers.size())][];
 		
@@ -97,28 +92,9 @@ public class User
 			statements[i+2+2+DatabaseHandler.SETTINGS.length] =
 					"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + tmpUserLoginId + "')";
 			arguments[i+2+2+DatabaseHandler.SETTINGS.length] = new String[0];
-			
-			//"INSERT INTO chatroom VALUES(chatroom_id.NEXTVAL)"; //Für jeden existenten Nutzer
-			//"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + login_id + "')";
-			//"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + tmpUserLoginId + "')";
 		}
 		
 		DatabaseHandler.getdb().executeTransactionUpdate(statements, arguments);
-		
-//		DatabaseHandler.getdb().executeUpdate("INSERT INTO user VALUES(?, ?, HASH_SHA256(TO_BINARY(?)), " + adminrole + ")", tmp);
-//		
-//		for (int i = 0; i < DatabaseHandler.SETTINGS.length; i++)
-//		{
-//			try
-//			{
-//				DatabaseHandler.getdb().executeUpdate("INSERT INTO setting VALUES('" + DatabaseHandler.SETTINGS[i] + "', "
-//						+ User.DEFAULTSETTINGS[i] + ", '" + login_id + "')");
-//			} catch (SQLException e)
-//			{
-//				fallback(login_id);
-//				throw e;
-//			}
-//		}
 	}
 	
 	public JSONObject change() throws SQLException
@@ -152,17 +128,18 @@ public class User
 		return returnJSON;
 	}
 	
-	public void delete() throws SQLException
+	public void delete(String sender) throws SQLException, IllegalStateException, IllegalArgumentException
 	{
-		//TODO: User darf sich nicht selbst löschen
 		String login_id = (String) JSON.get("login_id");
 		
-		//TODO: Löschweise besprechen...
-		int users = DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + login_id + "'");
-		DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = '" + login_id + "'");
+		if(login_id.equals(sender))
+			throw new IllegalArgumentException("Users may not deleted themselves!");
 		
-		if(users != 1)
+		int users = DatabaseHandler.getdb().executeUpdate("UPDATE user SET userpassword = NULL, deleted = true WHERE login_id = '" + login_id + "'");
+		if(users < 1)
 			throw new IllegalStateException("User not found!");
+		
+		DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = '" + login_id + "'");
 	}
 	
 	private JSONObject fetchJSONFromDatabase(String userId) throws SQLException
@@ -191,23 +168,6 @@ public class User
 		
 		return array;
 	}
-	
-//	//TODO: Anpassen...
-//	private void fallback(String userId)
-//	{
-//		try
-//		{
-//			DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + userId + "'");
-//		} catch (SQLException e) {}
-//		
-//		for (int i = 0; i < DatabaseHandler.SETTINGS.length; i++)
-//		{
-//			try
-//			{
-//				DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE WHERE login_id = '" + userId + "'");
-//			} catch (SQLException e) {}
-//		}
-//	}
 
 	public JSONObject getJSON()
 	{

@@ -64,6 +64,10 @@ public class Helper
 		{
 			response.sendError(HttpServletResponse.SC_CONFLICT);
 		}
+		else if(e instanceof IllegalArgumentException)
+		{
+			response.sendError(422); //Unprocessible Entity
+		}
 		else if(e instanceof SQLException)
 		{
 			if(e instanceof SQLIntegrityConstraintViolationException)

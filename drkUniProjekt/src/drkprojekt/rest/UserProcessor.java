@@ -94,40 +94,29 @@ public class UserProcessor extends HttpServlet
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		try
-		{
-			JSONArray test = DatabaseHandler.getdb().executeQuery("SELECT COUNT(*) FROM user");
-			Helper.setResponseJSONArray(response, test);
-		} catch (SQLException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		String pathInfo = request.getPathInfo();
 		
-//		String pathInfo = request.getPathInfo();
-//		
-//		if(pathInfo == null || pathInfo.equals("/"))
-//		{
-//			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-//		}
-//		else
-//		{
-//			try
-//			{
-//				String userId;
-//				if(pathInfo.endsWith("/"))
-//					userId = pathInfo.substring(1,(pathInfo.length()-1));
-//				else
-//					userId = pathInfo.substring(1,(pathInfo.length()));
-//				
-//				AuthHelper.assertIsAdmin(request, response);
-//				User user = new User(userId);
-//				user.delete();
-//			} catch (IllegalStateException | SQLException | SignatureException e)
-//			{
-//				Helper.handleException(e, response);
-//			}
-//		}
+		if(pathInfo == null || pathInfo.equals("/"))
+		{
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+		else
+		{
+			try
+			{
+				String userId;
+				if(pathInfo.endsWith("/"))
+					userId = pathInfo.substring(1,(pathInfo.length()-1));
+				else
+					userId = pathInfo.substring(1,(pathInfo.length()));
+				
+				AuthHelper.assertIsAdmin(request, response);
+				User user = new User(userId);
+				user.delete(AuthHelper.getToken(request).getUserId());
+			} catch (IllegalStateException | IllegalArgumentException | SQLException | SignatureException e)
+			{
+				Helper.handleException(e, response);
+			}
+		}
 	}
 }

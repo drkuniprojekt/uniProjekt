@@ -55,7 +55,6 @@ public class SettingsProcessor extends HttpServlet
 		try
 		{
 			JSONObject requestJSON = Helper.getRequestJSON(request);
-			String[] queryArguments = new String[2];
 
 			for(Iterator iterator = requestJSON.keySet().iterator(); iterator.hasNext();)
 			{
