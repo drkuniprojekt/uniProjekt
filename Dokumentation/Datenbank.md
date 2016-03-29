@@ -2,6 +2,7 @@
 Nothing yet.
 
 ##Changelog
+`29.03.2016` DELETED flag in USER added  
 `24.03.2016` ZIP is now VARCHAR(5) (formerly INT)  
 `22.03.2016` CHATROOM, CHATROOMMAPPING, MESSAGE, MESSAGESUNREAD created  
 `21.03.2016` EVENTANSWER key changed | SETTING added (formerly known as option)  
@@ -16,7 +17,8 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 LOGIN_ID 		  |VARCHAR(255)	|X |  |Needed for Log-On
 DISPLAYNAME		|VARCHAR(255)	|  |  |
 USERPASSWORD	|VARCHAR(255)	|  |  |Needed for Log-On
-ADMINROLE     |BOOLEAN      |  |  |
+ADMINROLE     |BOOLEAN      |  |  |IF true (1) then the user is an admin
+DELETED     |BOOLEAN      |  |  |IF true (1) then the user is deleted
 
 ----------------------------------------------
 
