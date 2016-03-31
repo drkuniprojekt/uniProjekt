@@ -72,14 +72,18 @@ public class ChatEndpoint
 			String recipient	= (String) msgJson.get("to");
 			JSONObject outJSON;
 			
-			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
+			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))
 			{
-			    log.debug("loadData");
-			    log.debug("JSON TimeStamp: " + msgJson.get("lastMessageTimeStamp"));			    
-			    DateTime lastMessageTimeStamp = (DateTime) msgJson.get("lastMessageTimeStamp");
-			    log.debug("DateTime TimeStamp: " +lastMessageTimeStamp);
+			   // ClientFactory.getClient(clientID).sendText(getMessagesFromDB(clientID).toJSONString());
+			    //TODO: alle Nachrichten müssen bei start geschickt werden
+			    outJSON = new JSONObject();
+			}
+			else if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
+			{
+			    log.debug("loadData");			    
+			    int message_id = (int) msgJson.get("lastMessage_id");
 			    
-			    outJSON = getMessagesFromDB(clientID, recipient, lastMessageTimeStamp);
+			    outJSON = getMessagesFromDB(clientID, recipient, message_id);
 			    ClientFactory.getClient(clientID).sendMessage(outJSON);
 			    
 			}
@@ -191,7 +195,7 @@ public class ChatEndpoint
 	 * @param lastMessageTimeStamp
 	 * @return
 	 */
-	private JSONObject getMessagesFromDB(String forUser, String chatpartner, DateTime lastMessageTimeStamp) throws SQLException {
+	private JSONObject getMessagesFromDB(String forUser, String chatpartner, int message_id) throws SQLException {
 	    JSONObject out = new JSONObject();
 	    DatabaseHandler db	= DatabaseHandler.getdb();
 	    
@@ -214,7 +218,7 @@ public class ChatEndpoint
 	    }
 	    
 	    JSONArray msg = db.executeQuery("SELECT TOP 50 createtime, messagecontent AS message, chatroom, message_id, useraccount AS"
-	    	+ " \"from\" FROM MESSAGE WHERE Chatroom = ? AND createtime < ?", new String[]{"" + chatroomID, lastMessageTimeStamp.toString()});
+	    	+ " \"from\" FROM MESSAGE WHERE Chatroom = ? AND message_id < ?", new String[]{"" + chatroomID, ""+message_id});
 	    out.put("messages", msg);
 	    return out;
 	}
