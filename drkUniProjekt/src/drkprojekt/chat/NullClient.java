@@ -9,9 +9,9 @@ import org.json.simple.JSONObject;
 public class NullClient extends ChatClient
 {	
 	
-	public NullClient(String name)
+	public NullClient(String name, String displayName)
 	{
-		super(name);
+		super(name, displayName);
 	}
 	
 	@Override
@@ -31,6 +31,11 @@ public class NullClient extends ChatClient
 
 	@Override
 	public String getName() {
+		throw new IllegalArgumentException("The client " + name + " does not exist");
+	}
+	
+	@Override
+	public String getDisplayName() {
 		throw new IllegalArgumentException("The client " + name + " does not exist");
 	}
 

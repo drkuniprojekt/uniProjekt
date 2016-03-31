@@ -16,11 +16,12 @@ import drkprojekt.rest.PushService;
 public abstract class ChatClient
 {
 	protected Logger log	= LoggerFactory.getLogger(ChatClient.class);
-	protected String name;	
+	protected String name, displayName;	
 	
-	public ChatClient(String name)
+	public ChatClient(String name, String displayName)
 	{
 		this.name		= name;	
+		this.displayName = displayName;
 	}
 	
 	public ChatClient() 
@@ -35,6 +36,8 @@ public abstract class ChatClient
 	public abstract void deleteSession(Session session);
 	
 	public abstract String getName();
+	
+	public abstract String getDisplayName();
 	
 	public abstract void setSessionList(ArrayList<Session> sessionList);
 	

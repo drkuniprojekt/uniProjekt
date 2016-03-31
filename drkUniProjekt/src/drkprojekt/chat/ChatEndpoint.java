@@ -109,8 +109,8 @@ public class ChatEndpoint
         				throw new IllegalArgumentException("Please Provide a non-empty Message");
         			}
         			JSONObject outJSON = new JSONObject();
-        			outJSON.put("messagecontent", message);
-        			outJSON.put("from", clientID);
+        			outJSON.put("messagecontent", message);       			
+        			outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
         			outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
         			
         			if(recipient == null || recipient.equals("Gruppenchat"))

@@ -17,9 +17,9 @@ public class RealClient extends ChatClient
 	private ArrayList<Session>	sessionList	= new ArrayList<Session>();	
 	private ArrayList<String> 	phonegap_ids= new ArrayList<String>();
 	
-	public RealClient(String name)
+	public RealClient(String name, String displayName)
 	{
-		super(name);				
+		super(name, displayName);				
 	}
 	
 	
@@ -103,6 +103,10 @@ public void deleteSession(Session s)
 	{
 		return name;
 	}
+	public String getDisplayName() {
+	    // TODO Auto-generated method stub
+	    return displayName;
+	}
 	/* Please dont use this, if u want to send messages to the client. Use sendMessage instead
 	public ArrayList<Session> getSessions()
 	{
@@ -131,4 +135,7 @@ public void deleteSession(Session s)
 	{
 		phonegap_ids.add(phonegap_id);
 	}
+
+
+
 }

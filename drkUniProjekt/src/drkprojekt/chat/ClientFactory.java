@@ -22,14 +22,15 @@ public class ClientFactory
 	{
 		if(clients.size() == 0)
 		{
-			JSONArray login_idJSON 	= DatabaseHandler.getdb().executeQuery("SELECT login_id FROM user");
+			JSONArray login_idJSON 	= DatabaseHandler.getdb().executeQuery("SELECT login_id, displayname FROM user");
 			
-			String login;
+			String login, displayname;
 			String logMsg	= "";
 			for (int i = 0; i < login_idJSON.size(); i++) 
 			{
 				login				= (String)((JSONObject)login_idJSON.get(i)).get("login_id");
-				ChatClient c		= new RealClient(login);
+				displayname			= (String)((JSONObject)login_idJSON.get(i)).get("displayname");
+				ChatClient c		= new RealClient(login, displayname);
 				logMsg				+= login + ", ";
 				JSONArray pgJSON 	= DatabaseHandler.getdb().executeQuery("SELECT device_id FROM PHONEGAPID WHERE REGISTEREDUSER = ?", login);
 				
@@ -71,7 +72,7 @@ public class ClientFactory
 				return clients.get(i);
 			}			
 		}
-		return new NullClient(login_id);
+		return new NullClient(login_id, "NullClient");
 	}
 	public static ArrayList<ChatClient> getAllClients()
 	{
