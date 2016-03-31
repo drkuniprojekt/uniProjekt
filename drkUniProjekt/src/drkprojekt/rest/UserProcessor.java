@@ -72,7 +72,7 @@ public class UserProcessor extends HttpServlet
 	{	
 		try
 		{
-			User user = new User(Helper.getRequestJSON(request));
+			User user = new User(Helper.getRequestJSON(request), AuthHelper.getToken(request).getUserId());
 			JSONObject responseJSON = user.change();
 			if(responseJSON == null)
 			{
