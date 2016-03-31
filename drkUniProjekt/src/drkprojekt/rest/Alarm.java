@@ -1,14 +1,8 @@
 package drkprojekt.rest;
 
 import java.sql.SQLException;
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
-import com.google.gson.JsonArray;
 
 import drkprojekt.database.DatabaseHandler;
 

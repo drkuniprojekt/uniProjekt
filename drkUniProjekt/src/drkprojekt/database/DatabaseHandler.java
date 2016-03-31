@@ -207,7 +207,7 @@ public class DatabaseHandler
 	 * Use ? as placeholder for the data to be filled from the JSONObject
 	 * Example1: "UPDATE table_name SET ? WHERE where_condition"
 	 * Example2: "INSERT INTO table_name (?) VALUES (?)"
-	 * @param query Querty to execute
+	 * @param query Query to execute
 	 * @param json JSONObject with all relevant data for the new or changed entry
 	 * @return Number of rows affected
 	 * @throws SQLException
@@ -223,6 +223,7 @@ public class DatabaseHandler
 			
 		String tmp1 = "";
 		String tmp2 = "";
+		
 		
 		for(Iterator iterator = json.keySet().iterator(); iterator.hasNext();)
 		{
