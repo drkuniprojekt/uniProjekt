@@ -2,6 +2,7 @@
 Nothing yet.
 
 ##Changelog
+`31.03.2016` Further settings added (alert-groups)  
 `29.03.2016` DELETED flag in USER added  
 `24.03.2016` ZIP is now VARCHAR(5) (formerly INT)  
 `22.03.2016` CHATROOM, CHATROOMMAPPING, MESSAGE, MESSAGESUNREAD created  
@@ -83,6 +84,10 @@ USERACCOUNT|VARCHAR(255)	|X |X |References to USER(LOGIN_ID)
 * notification_event >> Option if user wants to be notified when a new event (not alert) is created
 * notification_groupchat >> Option if user wants to be notified when a new groupmessage was written
 * notification_chat >> Option if user wants to be notified when a new chatmessage (one-to-one) was written
+* notification_alert_segv >> Option to assign user into alert-group SEG-V (Verpflegung)
+* notification_alert_segs >> Option to assign user into alert-group SEG-S (Sanitäter)
+* notification_alert_sbf >> Option to assign user into alert-group SBF (Sanitätsbereitschaft Feuerwehr)
+* notification_alert_ov >> Option to assign user into alert-group OV (Ortsverein)
 
 ----------------------------------------------
 
