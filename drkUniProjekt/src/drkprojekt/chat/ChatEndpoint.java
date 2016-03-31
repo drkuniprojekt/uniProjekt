@@ -31,7 +31,7 @@ public class ChatEndpoint
 	@OnOpen
 	public void onOpen(Session session, @PathParam("name") String clientID)
 	{
-		//hier Token prüfen und Gegebenenfalls auf Bad Request umstellen
+
 		ChatClient c	= ClientFactory.getClient(clientID);
 		try
 		{
@@ -72,9 +72,9 @@ public class ChatEndpoint
 			String recipient	= (String) msgJson.get("to");
 			JSONObject outJSON;
 			
-			if(msgJson.get("loadData") != null)
+			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
 			{
-			    
+			    log.debug("loadData");
 			    log.debug("JSON TimeStamp: " + msgJson.get("lastMessageTimeStamp"));			    
 			    DateTime lastMessageTimeStamp = (DateTime) msgJson.get("lastMessageTimeStamp");
 			    log.debug("DateTime TimeStamp: " +lastMessageTimeStamp);
@@ -86,7 +86,7 @@ public class ChatEndpoint
 			else
 			{
         			    
-        			
+        			log.debug("sendMessage");
         			String message		= ((String) msgJson.get("message")).trim();
         			
         			
@@ -191,13 +191,34 @@ public class ChatEndpoint
 	 * @param lastMessageTimeStamp
 	 * @return
 	 */
-	private JSONObject getMessagesFromDB(String forUser, String Chatpartner, DateTime lastMessageTimeStamp) throws SQLException {
+	private JSONObject getMessagesFromDB(String forUser, String chatpartner, DateTime lastMessageTimeStamp) throws SQLException {
 	    JSONObject out = new JSONObject();
 	    DatabaseHandler db	= DatabaseHandler.getdb();
-	    JSONArray chatroom	= db.executeQuery("SELECT chatroom AS roomnumber FROM CHATROOMMAPPING WHERE USERACCOUNT = ?", forUser);
 	    
+	    int chatroomID;
+	    if(chatpartner == null || chatpartner.equals("Gruppenchat")){
+		chatroomID = 1;
+	    }
+	    else
+	    {
+		    JSONArray chatroom	= db.executeQuery("SELECT a.chatroom FROM chatroommapping a INNER JOIN chatroommapping b ON a.chatroom=b.chatroom WHERE a.useraccount = ? AND b.useraccount = ? AND a.chatroom != '1'", new String[]{"" + forUser, chatpartner});
+		    if(chatroom.size() != 1){
+			log.debug("Chatroom: " + chatroom);
+			log.error("More or less than one chatroom for selected users!");
+			throw new SQLException("More or less than one chatroom for selected users!");
+		    }
+		    else
+		    {
+			chatroomID = (int) ((JSONObject)chatroom.get(0)).get("chatroom");
+		    }
+	    }
+	    
+	    JSONArray msg = db.executeQuery("SELECT TOP 50 createtime, messagecontent AS message, chatroom, message_id, useraccount AS"
+	    	+ " \"from\" FROM MESSAGE WHERE Chatroom = ? AND createtime < ?", new String[]{"" + chatroomID, lastMessageTimeStamp.toString()});
+	    out.put("messages", msg);
 	    return out;
 	}
+	
 	
 	private JSONArray getMessagesFromDB(String forUser) throws SQLException
 	{
@@ -213,11 +234,11 @@ public class ChatEndpoint
 					
 			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
 			
-			if(persons.size() == 1)
+			if(persons.size() < 2)
 			{
 				room.put("name", (String)((JSONObject)persons.get(0)).get("useraccount"));
 			}
-			else if (persons.size() > 1) //Ignore the roo if there is no other person 
+			else
 			{
 				room.put("name", "Gruppenchat");
 			}
