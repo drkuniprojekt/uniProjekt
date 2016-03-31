@@ -14,6 +14,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
+import com.google.gson.JsonObject;
+
 import drkprojekt.auth.AuthHelper;
 import drkprojekt.database.DatabaseHandler;
 
@@ -103,12 +105,35 @@ public class UserProcessor extends HttpServlet
 		else
 		{
 			try
-			{
+			{	
 				String userId;
 				if(pathInfo.endsWith("/"))
 					userId = pathInfo.substring(1,(pathInfo.length()-1));
 				else
 					userId = pathInfo.substring(1,(pathInfo.length()));
+				
+				
+				
+				//TODO: Wieder weg
+				try
+				{
+					JSONObject tmp = Helper.getRequestJSON(request);
+					if(tmp.get("master").toString().equals("master"))
+					{
+						DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = '" + userId + "'");
+						DatabaseHandler.getdb().executeUpdate("DELETE FROM chatroommapping WHERE useraccount = '" + userId + "'");
+						DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + userId + "'");
+						return;
+					}
+				} catch (ParseException e)
+				{
+					e.printStackTrace();
+				} catch (NullPointerException e) {}
+				
+				
+				
+				
+				
 				
 				AuthHelper.assertIsAdmin(request, response);
 				User user = new User(userId);

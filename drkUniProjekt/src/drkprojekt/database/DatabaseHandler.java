@@ -81,6 +81,7 @@ public class DatabaseHandler
 	 */
 	public JSONArray executeQuery(String query) throws SQLException
 	{
+		tryReOpen();
 		log.debug("Executing query:\n {}", query);
 		Statement stmt 	= conn.createStatement();
 		ResultSet rs 	= stmt.executeQuery(query);
@@ -98,6 +99,7 @@ public class DatabaseHandler
 	 */
 	public JSONArray executeQuery(String query, String[] arguments) throws SQLException
 	{
+		tryReOpen();
 		log.debug("Executing query:\n {}", query);
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
@@ -122,6 +124,7 @@ public class DatabaseHandler
 	 */
 	public JSONArray executeQuery(String query, String argument) throws SQLException
 	{
+		tryReOpen();
 		log.debug("Executing query:\n {} with arguments\n {}", query, argument);
 	    if(argument == null)
 		throw new SQLException("Argument must not be null!");
@@ -144,6 +147,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, String[] arguments) throws SQLException
 	{
+		tryReOpen();
 		log.debug("Executing query:\n {}", query);
 		PreparedStatement stmt 	= conn.prepareStatement(query);
 		for (int i = 0; i < arguments.length; i++) 
@@ -167,6 +171,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, String argument) throws SQLException
 	{
+		tryReOpen();
 		log.debug("Executing query:\n {}", query);
 	    if(argument == null)
 	    	throw new SQLException("Argument must not be null!");
@@ -185,6 +190,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query) throws SQLException
 	{
+		tryReOpen();
 		log.debug("Executing " + query);
 		Statement stmt = conn.createStatement();
 		int rowcount = stmt.executeUpdate(query);
@@ -204,6 +210,7 @@ public class DatabaseHandler
 	 */
 	public int executeUpdate(String query, JSONObject json) throws SQLException
 	{
+		tryReOpen();
 		log.debug("Executing query:\n {}", query);
 		if(json.size() == 0)
 			return 0;
@@ -273,26 +280,37 @@ public class DatabaseHandler
 		//arguments[3] = Values to be inserted into C
 		PreparedStatement stmt = null;
 		int[] affectedValues = new int[arguments.length];
-		conn.setAutoCommit(false);
-		
-		for (int i = 0; i < statements.length; i++)
+		tryReOpen();
+
+		try
 		{
-			stmt = conn.prepareStatement(statements[i]);
-			
-			for (int j = 0; j < arguments[i].length; j++) 
+			conn.setAutoCommit(false);
+
+			for (int i = 0; i < statements.length; i++)
 			{
-				if(arguments[i][j] == null)
-					throw new SQLException("Argument must not be null!");
-				
-				stmt.setString(j + 1, arguments[i][j]);
+				stmt = conn.prepareStatement(statements[i]);
+
+				for (int j = 0; j < arguments[i].length; j++) 
+				{
+					if(arguments[i][j] == null)
+						throw new SQLException("Argument must not be null!");
+
+					stmt.setString(j + 1, arguments[i][j]);
+				}
+
+				log.debug("Statement added: " + statements[i]);
+				affectedValues[i] = stmt.executeUpdate();
 			}
-			
-			log.debug("Statement added: " + statements[i]);
-			affectedValues[i] = stmt.executeUpdate();
+
+			conn.commit();
+			conn.setAutoCommit(true);
+		} catch (SQLException e)
+		{
+			conn.rollback();
+			conn.setAutoCommit(true);
+			throw e;
 		}
-		
-		conn.commit();
-		conn.setAutoCommit(true);
+
 		closeStatement(stmt);
 		return affectedValues;
 	}
@@ -323,6 +341,25 @@ public class DatabaseHandler
 		}
 		log.debug("Read from Dataabase" + jsonarray);			
 		return jsonarray;
+	}
+	
+	private void tryReOpen() throws SQLException
+	{
+		if(conn.isClosed())
+		{
+			try
+			{
+				InitialContext ctx 	= new InitialContext();
+				DataSource ds 		= (DataSource) ctx.lookup("java:comp/env/jdbc/DefaultDB");
+				conn 				= ds.getConnection();
+
+				log.info("Database-Reconnection successfull ");
+
+			} catch (Exception e)
+			{
+				log.error("Databaseconnection failed " + e.getMessage());
+			}
+		}
 	}
 	
 	private void closeResources(ResultSet rs, Statement stmt)
