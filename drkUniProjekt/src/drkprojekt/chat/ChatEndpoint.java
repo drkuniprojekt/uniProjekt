@@ -228,8 +228,8 @@ public class ChatEndpoint
 		    }
 	    }
 	    
-	    JSONArray msg = db.executeQuery("SELECT TOP 50 createtime, messagecontent AS message, chatroom, message_id, useraccount AS"
-	    	+ " \"from\" FROM MESSAGE WHERE Chatroom = ? AND message_id < ?", new String[]{"" + chatroomID, ""+message_id});
+	    JSONArray msg = db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
+	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ?", new String[]{"" + chatroomID, ""+message_id});
 	    out.put("messages", msg);
 	    return out;
 	}
@@ -239,7 +239,7 @@ public class ChatEndpoint
 	{
 		JSONArray	res		= new JSONArray();
 		DatabaseHandler db	= DatabaseHandler.getdb();
-		JSONArray chatroom	= db.executeQuery("SELECT chatroom AS roomnumber FROM CHATROOMMAPPING WHERE USERACCOUNT = ?", forUser);
+		JSONArray chatroom	= db.executeQuery("SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?", forUser);
 		
 		log.debug("Chatroom size: " +chatroom.size());
 		
@@ -248,7 +248,7 @@ public class ChatEndpoint
 		    	
 			JSONObject	room	= (JSONObject) chatroom.get(i);
 			int number			= (int) room.get("chatroom"); 	
-			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name, u.displayname FROM CHATROOMMAPPING INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
+			JSONArray persons	= db.executeQuery("SELECT useraccount , u.displayname FROM CHATROOMMAPPING INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
 
 			if(persons.size() == 1)
 			{
