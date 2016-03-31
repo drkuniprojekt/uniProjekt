@@ -45,7 +45,7 @@ public class ChatEndpoint
 				} 
 				catch (Exception e) 
 				{
-					log.error(""+ e);
+					log.error("Unkown Error occured while Opening Socket:\n {} ", e);
 					session.getBasicRemote().sendText("Unknown Error occured");
 				}
 			}
@@ -238,11 +238,11 @@ public class ChatEndpoint
 					
 			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
 			
-			if(persons.size() < 2)
+			if(persons.size() == 1)
 			{
 				room.put("name", (String)((JSONObject)persons.get(0)).get("useraccount"));
 			}
-			else
+			else if( persons.size() > 1) // Ignore room if theres less than 1 other person
 			{
 				room.put("name", "Gruppenchat");
 			}
