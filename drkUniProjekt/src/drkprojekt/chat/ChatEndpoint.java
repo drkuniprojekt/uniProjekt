@@ -213,7 +213,7 @@ public class ChatEndpoint
 					
 			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
 			
-			if(persons.size() < 2)
+			if(persons.size() == 1)
 			{
 				room.put("name", (String)((JSONObject)persons.get(0)).get("useraccount"));
 			}
