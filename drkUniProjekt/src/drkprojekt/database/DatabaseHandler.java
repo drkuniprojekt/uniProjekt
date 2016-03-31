@@ -28,7 +28,7 @@ public class DatabaseHandler
 	private Connection conn;
 	private static DatabaseHandler db;
 	private static Logger log;
-	private static SimpleDateFormat fmt = new SimpleDateFormat("'dd. MMMM yyyy hh:mm");	
+	private static SimpleDateFormat fmt = new SimpleDateFormat("dd. MMMM yyyy hh:mm");	
 	
 	private DatabaseHandler()
 	{
