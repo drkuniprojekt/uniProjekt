@@ -230,14 +230,17 @@ public class ChatEndpoint
 		DatabaseHandler db	= DatabaseHandler.getdb();
 		JSONArray chatroom	= db.executeQuery("SELECT chatroom AS roomnumber FROM CHATROOMMAPPING WHERE USERACCOUNT = ?", forUser);
 		
+		log.debug("Chatroom size: " +chatroom.size());
 		
 		for (int i = 0; i < chatroom.size(); i++)
 		{
+		    	
+		    log.debug("Chatroom iteration: " +i);
 			JSONObject	room	= (JSONObject) chatroom.get(i);
 			int number			= (int) room.get("chatroom"); 
-					
+			log.debug("Number: " + number);		
 			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
-			
+			log.debug("Persons: " + persons.toJSONString());
 			if(persons.size() == 1)
 			{
 				room.put("name", (String)((JSONObject)persons.get(0)).get("useraccount"));
