@@ -334,6 +334,7 @@ public class DatabaseHandler
 			{				
 	            column 			= rsmd.getColumnLabel(index).toLowerCase();
 	            Object value 	= cleanObject(rs.getObject(column));
+	            log.debug("Class of Column " + column + ": {}" , value.getClass());
 	            if(column.length() == 0)
 	            {
 	            	column	= "column" + index;
@@ -409,7 +410,13 @@ public class DatabaseHandler
 			Object out	= null;
 			out			= fmt.format(in);
 			return out;
-		}else
+		} else if(in instanceof Byte)
+		{
+			if((byte) in == (byte) 1)
+				return true;
+			else
+				return false;
+		}
 		{
 			return in;
 		}

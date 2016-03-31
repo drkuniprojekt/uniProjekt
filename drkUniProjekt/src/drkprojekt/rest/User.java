@@ -61,19 +61,23 @@ public class User
 		String[] statements = new String[DatabaseHandler.SETTINGS.length + 2 + (3 * allUsers.size())];
 		String[][] arguments = new String[DatabaseHandler.SETTINGS.length + 2 + (3 * allUsers.size())][];
 		
-		String insertUserStatement = "INSERT INTO user VALUES(?, ?, HASH_SHA256(TO_BINARY(?)), " + adminrole + ", false)";
-		String[] insertUserArguments = { login_id, login_id, userpassword };
+		String insertUserStatement = "INSERT INTO user VALUES(?, ?, HASH_SHA256(TO_BINARY(?)), ?, false)";//"INSERT INTO user VALUES(?, ?, HASH_SHA256(TO_BINARY(?)), " + adminrole + ", false)";
+		String[] insertUserArguments = { login_id, login_id, userpassword, adminrole + "" };
 		statements[0] = insertUserStatement;
 		arguments[0] = insertUserArguments;
 		
 		String[] insertSettingStatement = new String[DatabaseHandler.SETTINGS.length];
+		String[] insertSettingArguments;
 		
 		for(int i = 0; i < DatabaseHandler.SETTINGS.length; i++)
-		{
-			insertSettingStatement[i] = "INSERT INTO setting VALUES('" + DatabaseHandler.SETTINGS[i] + "', "
-					+ User.DEFAULTSETTINGS[i] + ", '" + login_id + "')";
+		{		
+			insertSettingStatement[i] = "INSERT INTO setting VALUES(?,?,?)";//"INSERT INTO setting VALUES('" + DatabaseHandler.SETTINGS[i] + "', " + User.DEFAULTSETTINGS[i] + ", '" + login_id + "')";
+			insertSettingArguments = new String[3];
+			insertSettingArguments[0] = DatabaseHandler.SETTINGS[i];
+			insertSettingArguments[1] = User.DEFAULTSETTINGS[i] + "";
+			insertSettingArguments[2] = login_id;
 			statements[i+2] = insertSettingStatement[i];
-			arguments[i+2] = new String[0];
+			arguments[i+2] = insertSettingArguments;
 		}
 		
 		//Groupchat

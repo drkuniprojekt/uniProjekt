@@ -81,10 +81,8 @@ public class AuthenticationProcessor extends HttpServlet {
 	    
 	    String loginID = (String) json.get("login_id");
 	    String displayName = (String) dbJSON.get("displayname");
-	    boolean admin = false;
-	    if((byte)dbJSON.get("adminrole") == (byte)1) {
-		admin = true;
-	    }
+	    boolean admin = Boolean.parseBoolean(dbJSON.get("adminrole").toString());
+
 	    String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);
 	    responseText.put("successful", true);
 	    responseText.put("token", tokenString);
