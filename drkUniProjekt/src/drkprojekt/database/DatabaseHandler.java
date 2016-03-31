@@ -28,6 +28,7 @@ public class DatabaseHandler
 	private Connection conn;
 	private static DatabaseHandler db;
 	private static Logger log;
+	private static SimpleDateFormat fmt = new SimpleDateFormat("'dd. MMMM yyyy hh:mm");	
 	
 	private DatabaseHandler()
 	{
@@ -39,6 +40,7 @@ public class DatabaseHandler
 			conn 				= ds.getConnection();
 
 			log.info("Databaseconnection successfull ");
+			fmt.setTimeZone(TimeZone.getTimeZone("CET"));
 
 		} catch (Exception e)
 		{
@@ -401,12 +403,11 @@ public class DatabaseHandler
 	{		
 		if(in instanceof Timestamp)
 		{
-			SimpleDateFormat fmt = new SimpleDateFormat();
+			SimpleDateFormat fmt = new SimpleDateFormat("dd. MMMM yyyy hh:mm");
 			fmt.setTimeZone(TimeZone.getTimeZone("CET"));
-			log.debug("Converting TS from " + ((Timestamp)in).toLocalDateTime().toString() + " to " + fmt.format(in));
 			
 			Object out	= null;
-			out	= ((Timestamp)in).toLocalDateTime().toString();
+			out			= fmt.format(in);
 			return out;
 		}else
 		{
