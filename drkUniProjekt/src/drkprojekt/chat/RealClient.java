@@ -43,7 +43,7 @@ public class RealClient extends ChatClient
 			{
 				for (String s : phonegap_ids) 
 				{
-					PushService.sendUnicastMessage("New Message from " + (String)msgJSON.get("from"), s);
+					PushService.sendUnicastMessage("New Message from " + (String)msgJSON.get("from"), s, PushService.NOTIFICATION_CHAT);
 				}
 				return false;
 			}
@@ -77,7 +77,7 @@ public boolean sendMessage(String msg)
 		{
 			for (String s : phonegap_ids) 
 			{
-				PushService.sendUnicastMessage(msg, s);
+				PushService.sendUnicastMessage(msg, s, PushService.NOTIFICATION_CHAT);
 			}
 			return false;
 		}
