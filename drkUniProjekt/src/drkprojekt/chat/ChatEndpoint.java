@@ -32,7 +32,7 @@ public class ChatEndpoint
 	public void onOpen(Session session, @PathParam("name") String clientID)
 	{
 
-		ChatClient c	= ClientFactory.getClient(clientID);
+		ChatClient c = ClientFactory.getClient(clientID);
 		try
 		{
 			if(c != null)
@@ -64,28 +64,25 @@ public class ChatEndpoint
 	
 	@SuppressWarnings("unchecked")
 	@OnMessage
-	public String onMessage(String data, @PathParam("name") String clientID)
+	public String onMessage(String data, Session session, @PathParam("name") String clientID)
 	{
 		try
 		{
 			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(data);
 			String recipient	= (String) msgJson.get("to");
-			JSONObject outJSON;
 			
 			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))
 			{
-			   // ClientFactory.getClient(clientID).sendText(getMessagesFromDB(clientID).toJSONString());
-			    //TODO: alle Nachrichten müssen bei start geschickt werden
-			    outJSON = new JSONObject();
+			   log.debug("init");
+			   return getMessagesFromDB(clientID).toJSONString();
 			}
 			else if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
 			{
 			    log.debug("loadData");			    
 			    int message_id = (int) msgJson.get("lastMessage_id");
 			    
-			    outJSON = getMessagesFromDB(clientID, recipient, message_id);
-			    ClientFactory.getClient(clientID).sendMessage(outJSON);
-			    
+			    return getMessagesFromDB(clientID, recipient, message_id).toJSONString();
+			    //ClientFactory.getClient(clientID).sendMessage(outJSON);
 			}
 			else
 			{
@@ -98,7 +95,7 @@ public class ChatEndpoint
         			{
         				throw new IllegalArgumentException("Please Provide a non-empty Message");
         			}
-        			outJSON	= new JSONObject();
+        			JSONObject outJSON = new JSONObject();
         			outJSON.put("messagecontent", message);
         			outJSON.put("from", clientID);
         			outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
@@ -129,8 +126,9 @@ public class ChatEndpoint
         				msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
         				saveMessageToDB(message, msgRead, clientID, recipient, false);				
         			}
+        			return outJSON.toJSONString();
         		}
-			return outJSON.toJSONString();
+			
 			
 		} catch (ParseException | NullPointerException e)
 		{
@@ -235,12 +233,10 @@ public class ChatEndpoint
 		for (int i = 0; i < chatroom.size(); i++)
 		{
 		    	
-		    log.debug("Chatroom iteration: " +i);
 			JSONObject	room	= (JSONObject) chatroom.get(i);
-			int number			= (int) room.get("chatroom"); 
-			log.debug("Number: " + number);		
+			int number			= (int) room.get("chatroom"); 	
 			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
-			log.debug("Persons: " + persons.toJSONString());
+
 			if(persons.size() == 1)
 			{
 				room.put("name", (String)((JSONObject)persons.get(0)).get("useraccount"));
