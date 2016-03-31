@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,17 +23,22 @@ public class PushService
 	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
 	private static Logger log = LoggerFactory.getLogger(PushService.class);
 	
+	public static final int NOTIFICATION_EVENT = 3;
+	public static final int NOTIFICATION_GROUPCHAT = 4;
+	public static final int NOTIFICATION_CHAT = 5;
+	
 	/**
 	 * Sends a unicast message to one device, identified by its device ID
 	 * @param message Message to send
 	 * @param deviceId Phonegap-ID of the message receiver
+	 * @param notificationType Type of notification (Use constants of this class!)
 	 * @throws SQLException
 	 */
-	public static void sendUnicastMessage(String message, String deviceId) throws SQLException
+	public static void sendUnicastMessage(String message, String deviceId, int notificationType) throws SQLException
 	{
 		String[] singleDevice = new String[1];
 		singleDevice[0] = deviceId;
-		sendMessage(message, singleDevice);
+		sendMessage(message, singleDevice, notificationType);
 	}
 	
 	/**
@@ -40,9 +46,10 @@ public class PushService
 	 * The message is send to all devices registered by the given user
 	 * @param message Message to send
 	 * @param userId User-Id ot the message receiver
+	 * @param notificationType Type of notification (Use constants of this class!)
 	 * @throws SQLException
 	 */
-	public static void sendMulticastMessage(String message, String userId) throws SQLException
+	public static void sendMulticastMessage(String message, String userId, int notificationType) throws SQLException
 	{
 		JSONArray array = null;
 		
@@ -61,29 +68,32 @@ public class PushService
 			System.out.println("Iteration " + i + ": " + allDevices[i]);
 		}		
 		
-		sendMessage(message, allDevices);
+		sendMessage(message, allDevices, notificationType);
 	}
 	
 	/**
 	 * Sends a broadcast message to all registered devices
 	 * @param message Message to send
+	 * @param notificationType Type of notification (Use constants of this class!)
 	 * @throws SQLException
 	 */
-	public static void sendBroadCastMessage(String message) throws SQLException
+	public static void sendBroadCastMessage(String message, int notificationType) throws SQLException
 	{
-		sendMulticastMessage(message, null);
+		sendMulticastMessage(message, null, notificationType);
 	}
 	
-	private static void sendMessage(String message, String[] deviceId) throws SQLException
+	private static void sendMessage(String message, String[] deviceId, int notificationType) throws SQLException
 	{
 		DataOutputStream out = null;
 		BufferedReader in = null;
+		
+		String[] targetDeviceId = sortOut(deviceId, notificationType);
 		
 		try
 		{
 			HttpURLConnection connection = connect();
 			
-			String data = prepareRequestJSON(message, deviceId);
+			String data = prepareRequestJSON(message, targetDeviceId);
 
 			out = new DataOutputStream (connection.getOutputStream());
 			out.writeBytes(data);
@@ -118,6 +128,39 @@ public class PushService
 			try	{ out.close(); } catch (Exception e) {}
 			try	{ in.close(); } catch (Exception e) {}
 		}
+	}
+	
+	private static String[] sortOut(String[] devicesBefore, int notificationType) throws SQLException, IllegalStateException
+	{
+		ArrayList<String> devicesAfter = new ArrayList<String>();
+		
+		for (int i = 0; i < devicesBefore.length; i++)
+		{
+			JSONArray tmpArray = DatabaseHandler.getdb().executeQuery("SELECT registereduser FROM phonegapid WHERE device_id = '" + devicesBefore[i] + "'");
+			JSONObject tmpObject = (JSONObject) tmpArray.get(0);
+			
+			try
+			{
+				tmpArray.get(1);
+				throw new IllegalStateException("Inconsistent data in database - More than one user fore given device_id found!");
+			} catch(IndexOutOfBoundsException e)
+			{
+				String correspondingUser = (String) tmpObject.get("registereduser");
+				
+				JSONArray tmpArray2 = DatabaseHandler.getdb().executeQuery("SELECT settingvalue FROM setting WHERE useraccount = '" + correspondingUser + "' AND setting = '" + DatabaseHandler.SETTINGS[notificationType] + "'");
+				JSONObject tmpObject2 = (JSONObject) tmpArray2.get(0);
+				
+				int settingvalue = Integer.parseInt((String) tmpObject2.get("settingvalue"));
+				if(settingvalue == 1)
+				{
+					devicesAfter.add(devicesBefore[i]);
+				}
+			}
+		}
+		
+		String[] returnDevices = devicesAfter.toArray(new String[devicesAfter.size()]);
+
+		return returnDevices;
 	}
 	
 	private static HttpURLConnection connect() throws IOException

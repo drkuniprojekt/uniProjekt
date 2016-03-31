@@ -39,7 +39,7 @@ public class Alarm
 			
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, starttime, ?)"
 				+ " VALUES(EVENT_ID.NEXTVAL, TRUE, CURRENT_TIMESTAMP, ?)", JSON);
-		PushService.sendBroadCastMessage("Neuer Alarm!");
+		PushService.sendBroadCastMessage("Neuer Alarm!", PushService.NOTIFICATION_EVENT);
 	}
 
 	public void change() throws SQLException, IllegalStateException
@@ -49,7 +49,7 @@ public class Alarm
 		
 		//TODO: Creator ändern zulassen?
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NULL", JSON);
-		PushService.sendBroadCastMessage("Der aktuelle Alarm wurde bearbeitet!!");
+		PushService.sendBroadCastMessage("Der aktuelle Alarm wurde bearbeitet!!", PushService.NOTIFICATION_EVENT);
 	}
 
 	public void delete() throws SQLException, IllegalStateException
