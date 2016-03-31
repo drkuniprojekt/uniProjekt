@@ -334,7 +334,7 @@ public class DatabaseHandler
 			{				
 	            column 			= rsmd.getColumnLabel(index).toLowerCase();
 	            Object value 	= cleanObject(rs.getObject(column));
-	            log.debug("Class of Column " + column + ": {}" , value.getClass());
+	            //log.debug("Class of Column " + column + ": {}" , value.getClass());
 	            if(column.length() == 0)
 	            {
 	            	column	= "column" + index;

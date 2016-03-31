@@ -81,27 +81,32 @@ public class User
 		}
 		
 		//Groupchat
-		String insertChatroommappingStatementGroupChat = "INSERT INTO chatroommapping VALUES(1, '" + login_id + "')";
+		String insertChatroommappingStatementGroupChat = "INSERT INTO chatroommapping VALUES(1, ?)";
+		String[] insertChatroommappingArgumentsGroupChat = new String[1];
+		insertChatroommappingArgumentsGroupChat[0] = login_id;
+		
 		statements[1] = insertChatroommappingStatementGroupChat;
-		arguments[1] = new String[0];
+		arguments[1] = insertChatroommappingArgumentsGroupChat;
 		
 		for (int i = 0; i < (3 * allUsers.size()); i=i+3)
 		{
 			JSONObject tmpUser = (JSONObject) allUsers.get(i/3);
 			String tmpUserLoginId = tmpUser.get("login_id").toString();
-			log.debug("Now processing Chats between " + tmpUserLoginId + " AND " + login_id);
+			//log.debug("Now processing Chats between " + tmpUserLoginId + " AND " + login_id);
 			
 			statements[i+2+DatabaseHandler.SETTINGS.length] =
 					"INSERT INTO chatroom VALUES(chatroom_id.NEXTVAL)";
 			arguments[i+2+DatabaseHandler.SETTINGS.length] = new String[0];
 			
 			statements[i+1+2+DatabaseHandler.SETTINGS.length] =
-					"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + login_id + "')";
-			arguments[i+1+2+DatabaseHandler.SETTINGS.length] = new String[0];
+					"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, ?)";
+			arguments[i+1+2+DatabaseHandler.SETTINGS.length] = new String[1];
+			arguments[i+1+2+DatabaseHandler.SETTINGS.length][0] = login_id;
 			
 			statements[i+2+2+DatabaseHandler.SETTINGS.length] =
-					"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, '" + tmpUserLoginId + "')";
-			arguments[i+2+2+DatabaseHandler.SETTINGS.length] = new String[0];
+					"INSERT INTO chatroommapping VALUES(chatroom_id.CURRVAL, ?)";
+			arguments[i+2+2+DatabaseHandler.SETTINGS.length] = new String[1];
+			arguments[i+2+2+DatabaseHandler.SETTINGS.length][0] = tmpUserLoginId;
 		}
 		
 		DatabaseHandler.getdb().executeTransactionUpdate(statements, arguments);
@@ -164,7 +169,7 @@ public class User
 		if(users < 1)
 			throw new IllegalStateException("User not found!");
 		
-		DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = '" + login_id + "'");
+		DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = ?", login_id);
 	}
 	
 	private JSONObject fetchJSONFromDatabase(String userId) throws SQLException
@@ -189,7 +194,7 @@ public class User
 				"SELECT login_id, displayname, adminrole FROM user WHERE deleted = false");
 		else
 			array = DatabaseHandler.getdb().executeQuery(
-				"SELECT login_id, displayname, adminrole FROM user WHERE login_id = '" + userId + "' AND deleted = false");
+				"SELECT login_id, displayname, adminrole FROM user WHERE login_id = ? AND deleted = false", userId);
 		
 		return array;
 	}

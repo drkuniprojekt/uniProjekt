@@ -27,7 +27,7 @@ public class SettingsProcessor extends HttpServlet
 		String userId = AuthHelper.getToken(request).getUserId();
 		try
 		{
-			JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT setting, settingvalue FROM setting WHERE useraccount = '" + userId + "'");
+			JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT setting, settingvalue FROM setting WHERE useraccount = ?", userId);
 			JSONObject responseJSON = new JSONObject();
 			
 			if(array.size() != DatabaseHandler.SETTINGS.length)
@@ -61,9 +61,9 @@ public class SettingsProcessor extends HttpServlet
 				String key = (String) iterator.next();
 				String value = (String) requestJSON.get(key).toString();
 				boolean settingsvalue = Boolean.parseBoolean(value);
+				String[] arguments = { settingsvalue + "", userId, key };
 				int rows = 
-				DatabaseHandler.getdb().executeUpdate("UPDATE setting SET settingvalue = " + settingsvalue + 
-						" WHERE useraccount = '" + userId + "' AND setting = '" + key + "'");
+				DatabaseHandler.getdb().executeUpdate("UPDATE setting SET settingvalue = ? WHERE useraccount = ? AND setting = ?", arguments);
 				
 				if(rows < 1)
 				{
