@@ -78,7 +78,9 @@ public class ChatEndpoint
 				//TODO: return error bzw. if raus nehmen
 			    }else{
 				log.debug("Usertoken not registered");
-				return (String) new JSONObject().put("Error", "Nutzer nicht authentifiziert");
+				JSONObject out = new JSONObject();
+				out.put("Error", "Nutzer nicht authentifiziert");
+				return  out.toJSONString();
 			    }
 			}
 			
