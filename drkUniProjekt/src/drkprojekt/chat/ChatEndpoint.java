@@ -217,7 +217,7 @@ public class ChatEndpoint
 			{
 				room.put("name", (String)((JSONObject)persons.get(0)).get("useraccount"));
 			}
-			else
+			else if (persons.size() > 1) //Ignore the roo if there is no other person 
 			{
 				room.put("name", "Gruppenchat");
 			}
