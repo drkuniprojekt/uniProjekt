@@ -3,6 +3,7 @@ package drkprojekt.rest;
 import java.io.IOException;
 import java.security.SignatureException;
 import java.sql.SQLException;
+import java.util.NoSuchElementException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,9 +29,9 @@ public class UserProcessor extends HttpServlet
 	{
 		try
 		{
-			String pathInfo = request.getPathInfo();
+			String userId = Helper.getSubResource(request, true);
 			
-			if(pathInfo == null || pathInfo.equals("/"))
+			if(userId == null)
 			{
 				AuthHelper.assertIsAdmin(request, response);
 				User user = new User();
@@ -41,12 +42,6 @@ public class UserProcessor extends HttpServlet
 			}
 			else
 			{
-				String userId;
-				if(pathInfo.endsWith("/"))
-					userId = pathInfo.substring(1,(pathInfo.length()-1));
-				else
-					userId = pathInfo.substring(1,(pathInfo.length()));
-					
 				User user = new User(userId);
 				JSONObject responseJSON = user.getJSON();
 				if(responseJSON.isEmpty())
@@ -96,52 +91,39 @@ public class UserProcessor extends HttpServlet
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		String pathInfo = request.getPathInfo();
-		
-		if(pathInfo == null || pathInfo.equals("/"))
-		{
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
-		else
-		{
+		try
+		{	
+			String userId = Helper.getSubResource(request, false);				
+
+
+			//TODO: Wieder weg
 			try
-			{	
-				String userId;
-				if(pathInfo.endsWith("/"))
-					userId = pathInfo.substring(1,(pathInfo.length()-1));
-				else
-					userId = pathInfo.substring(1,(pathInfo.length()));
-				
-				
-				
-				//TODO: Wieder weg
-				try
-				{
-					JSONObject tmp = Helper.getRequestJSON(request);
-					if(tmp.get("master").toString().equals("master"))
-					{
-						DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = '" + userId + "'");
-						DatabaseHandler.getdb().executeUpdate("DELETE FROM chatroommapping WHERE useraccount = '" + userId + "'");
-						DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + userId + "'");
-						return;
-					}
-				} catch (ParseException e)
-				{
-					e.printStackTrace();
-				} catch (NullPointerException e) {}
-				
-				
-				
-				
-				
-				
-				AuthHelper.assertIsAdmin(request, response);
-				User user = new User(userId);
-				user.delete(AuthHelper.getToken(request).getUserId());
-			} catch (IllegalStateException | IllegalArgumentException | SQLException | SignatureException e)
 			{
-				Helper.handleException(e, response);
-			}
+				JSONObject tmp = Helper.getRequestJSON(request);
+				if(tmp.get("master").toString().equals("master"))
+				{
+					DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = '" + userId + "'");
+					DatabaseHandler.getdb().executeUpdate("DELETE FROM chatroommapping WHERE useraccount = '" + userId + "'");
+					DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + userId + "'");
+					return;
+				}
+			} catch (ParseException e)
+			{
+				e.printStackTrace();
+			} catch (NullPointerException e) {}
+
+
+
+
+
+
+			AuthHelper.assertIsAdmin(request, response);
+			User user = new User(userId);
+			user.delete(AuthHelper.getToken(request).getUserId());
+		} catch (IllegalStateException | IllegalArgumentException | SQLException | SignatureException | NoSuchElementException e)
+		{
+			Helper.handleException(e, response);
 		}
 	}
+
 }

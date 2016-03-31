@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.security.SignatureException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.NoSuchElementException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -83,5 +84,34 @@ public class Helper
 		{		    
 			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 		}
+		else if (e instanceof NoSuchElementException)
+		{
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+	}
+	
+	public static String getSubResource(HttpServletRequest request, boolean allowMainResource) throws NoSuchElementException
+	{
+		String pathInfo = request.getPathInfo();
+		
+		if(pathInfo == null || pathInfo.equals("/"))
+		{
+			if(allowMainResource)
+				return null;
+			else
+				throw new NoSuchElementException("Main Resource not allowed!");
+		}
+		else
+		{
+			String subResource = null;
+			
+			if(pathInfo.endsWith("/"))
+				subResource = pathInfo.substring(1,(pathInfo.length()-1));
+			else
+				subResource = pathInfo.substring(1,(pathInfo.length()));
+			
+			return subResource;
+		}
+		
 	}
 }
