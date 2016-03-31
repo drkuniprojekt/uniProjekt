@@ -156,7 +156,7 @@ public class User
 		if(login_id.equals(sender))
 			throw new IllegalArgumentException("Users may not deleted themselves!");
 		
-		int users = DatabaseHandler.getdb().executeUpdate("UPDATE user SET userpassword = NULL, deleted = true, displayname = CONCAT(displayname, ' (gel�scht)') WHERE login_id = ?", login_id);
+		int users = DatabaseHandler.getdb().executeUpdate("UPDATE user SET userpassword = NULL, deleted = true, displayname = CONCAT(displayname, ' (gelöscht)') WHERE login_id = ?", login_id);
 		if(users < 1)
 			throw new IllegalStateException("User not found!");
 		
