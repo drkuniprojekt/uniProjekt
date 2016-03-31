@@ -45,7 +45,7 @@ public class ChatEndpoint
 				} 
 				catch (Exception e) 
 				{
-					log.error(""+ e);
+					log.error("Unkown Error occured while Opening Socket:\n {} ", e);
 					session.getBasicRemote().sendText("Unknown Error occured");
 				}
 			}
