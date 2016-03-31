@@ -22,14 +22,15 @@ import org.slf4j.LoggerFactory;
 import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.PushService;
 
-@ServerEndpoint("/chat/{name}")
+@ServerEndpoint("/chat/{name}/{token}")
 public class ChatEndpoint
 {
 	private static Logger log	= LoggerFactory.getLogger(ChatEndpoint.class);
 	
 	@OnOpen
-	public void onOpen(Session session, @PathParam("name") String clientID)
-	{		
+	public void onOpen(Session session, @PathParam("name") String clientID, @PathParam("token") String token)
+	{
+		//hier Token prüfen und Gegebenenfalls auf Bad Request umstellen
 		ChatClient c	= ClientFactory.getClient(clientID);
 		try
 		{
