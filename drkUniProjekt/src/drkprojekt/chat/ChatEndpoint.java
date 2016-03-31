@@ -64,28 +64,25 @@ public class ChatEndpoint
 	
 	@SuppressWarnings("unchecked")
 	@OnMessage
-	public String onMessage(String data, @PathParam("name") String clientID)
+	public String onMessage(String data, Session session, @PathParam("name") String clientID)
 	{
 		try
 		{
 			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(data);
 			String recipient	= (String) msgJson.get("to");
-			JSONObject outJSON;
 			
 			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))
 			{
-			   // ClientFactory.getClient(clientID).sendText(getMessagesFromDB(clientID).toJSONString());
-			    //TODO: alle Nachrichten müssen bei start geschickt werden
-			    outJSON = new JSONObject();
+			   log.debug("init");
+			   return getMessagesFromDB(clientID).toJSONString();
 			}
 			else if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
 			{
 			    log.debug("loadData");			    
-			    int message_id = (int) msgJson.get("lastMessage_id");
+			    int message_id = Integer.parseInt((String)msgJson.get("lastMessage_id"));
 			    
-			    outJSON = getMessagesFromDB(clientID, recipient, message_id);
-			    ClientFactory.getClient(clientID).sendMessage(outJSON);
-			    
+			    return getMessagesFromDB(clientID, recipient, message_id).toJSONString();
+			    //ClientFactory.getClient(clientID).sendMessage(outJSON);
 			}
 			else
 			{
@@ -98,7 +95,7 @@ public class ChatEndpoint
         			{
         				throw new IllegalArgumentException("Please Provide a non-empty Message");
         			}
-        			outJSON	= new JSONObject();
+        			JSONObject outJSON = new JSONObject();
         			outJSON.put("messagecontent", message);
         			outJSON.put("from", clientID);
         			outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
@@ -129,8 +126,9 @@ public class ChatEndpoint
         				msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
         				saveMessageToDB(message, msgRead, clientID, recipient, false);				
         			}
+        			return outJSON.toJSONString();
         		}
-			return outJSON.toJSONString();
+			
 			
 		} catch (ParseException | NullPointerException e)
 		{
