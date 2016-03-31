@@ -29,6 +29,12 @@ public class User
 		this.JSON = json;
 	}
 	
+	public User(JSONObject json, String userId)
+	{
+		this.JSON = json;
+		this.JSON.put("login_id", userId);
+	}
+	
 	public User() throws SQLException
 	{
 		JSONArray = fetchJSONArrayFromDatabase(null);
@@ -100,7 +106,7 @@ public class User
 	public JSONObject change() throws SQLException
 	{
 		String login_id = (String) JSON.get("login_id");
-		JSON.remove("login_id");
+		//JSON.remove("login_id");
 
 		Object tmpPw = JSON.get("userpassword");
 		Object tmpDn = JSON.get("displayname");
@@ -150,7 +156,7 @@ public class User
 		if(login_id.equals(sender))
 			throw new IllegalArgumentException("Users may not deleted themselves!");
 		
-		int users = DatabaseHandler.getdb().executeUpdate("UPDATE user SET userpassword = NULL, deleted = true, displayname = CONCAT(displayname, ' (gelöscht)') WHERE login_id = ?", login_id);
+		int users = DatabaseHandler.getdb().executeUpdate("UPDATE user SET userpassword = NULL, deleted = true, displayname = CONCAT(displayname, ' (gelï¿½scht)') WHERE login_id = ?", login_id);
 		if(users < 1)
 			throw new IllegalStateException("User not found!");
 		
