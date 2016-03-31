@@ -101,18 +101,33 @@ public class User
 	{
 		String login_id = (String) JSON.get("login_id");
 		JSON.remove("login_id");
+
+		Object tmpPw = JSON.get("userpassword");
+		Object tmpDn = JSON.get("displayname");
 		
-		DatabaseHandler.getdb().executeUpdate("UPDATE user SET ? WHERE login_id = '" + login_id + "'", JSON);
+		if(tmpDn != null && tmpPw != null)
+			throw new SQLException("This is a Bad Request!");
 		
 		JSONObject returnJSON = new JSONObject();
 		
-		//User has changed Password - New Token!
-		if(JSON.get("userpassword") != null)
+		if(tmpDn != null)
 		{
+			String newDisplayname = (String) tmpDn;
+			String[] arguments = { newDisplayname, login_id };
+			DatabaseHandler.getdb().executeUpdate("UPDATE user SET displayname = ? WHERE login_id = ?", arguments);
+		}
+		else if (tmpPw != null)
+		{
+			String newPassword = (String) tmpDn;
+			String[] arguments = { newPassword, login_id };
+			DatabaseHandler.getdb().executeUpdate("UPDATE user SET userpassword = HASH_SHA256(TO_BINARY(?)) WHERE login_id = ?", arguments);
+		
+			//User has changed Password - New Token!
 			JSONObject currentJSON = fetchJSONFromDatabase(login_id);
 			String displayname = (String) currentJSON.get("displayname");
 			boolean admin = Boolean.parseBoolean(currentJSON.get("adminrole").toString());
 			String tokenString;
+			
 			try
 			{
 				tokenString = AuthHelper.createJsonWebToken(login_id, displayname, admin, (long) 10000);
@@ -122,7 +137,7 @@ public class User
 				return null;
 			}
 			
-			Object put = returnJSON.put("token", tokenString);
+			returnJSON.put("token", tokenString);
 		}
 		
 		return returnJSON;
