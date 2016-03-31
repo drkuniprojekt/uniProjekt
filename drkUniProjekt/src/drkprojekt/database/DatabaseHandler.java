@@ -332,7 +332,7 @@ public class DatabaseHandler
 			JSONObject row	= new JSONObject();
 			for (int index = 1; index <= columnCount; index++) 
 			{				
-	            column 			= rsmd.getColumnName(index).toLowerCase();
+	            column 			= rsmd.getColumnLabel(index).toLowerCase();
 	            Object value 	= cleanObject(rs.getObject(column));
 	            if(column.length() == 0)
 	            {
