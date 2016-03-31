@@ -123,7 +123,9 @@ public class ChatEndpoint
         				{
         					if(!c.getName().equals(clientID))
         					{
-        						msgRead	= c.sendMessage(outJSON);	
+        						msgRead	= c.sendMessage(outJSON);
+        						//TODO: savemessageLogik entwirren
+        						//      message darf nur EINMAL insgesamt abgespeichert werden, unread jedoch pro user
         						saveMessageToDB(message, msgRead, clientID, c.getName(), true);
         					}else
         					{
@@ -167,7 +169,7 @@ public class ChatEndpoint
 	{
 		ClientFactory.getClient(clientID).deleteSession(session);
 	}
-	
+	//TODO: anpassen siehe 127
 	private void saveMessageToDB(String message, boolean read, String from, String to, boolean broadcast)
 	{
 		log.debug("Trying to save message to Database: " + message);
@@ -199,7 +201,8 @@ public class ChatEndpoint
 			log.error("SQL Error while Saving Message to DB:\n ",e);
 		}
 	}
-	
+	//TODO: getmessages ändern, sodass wirklich die letzten 50 nachrichten kommen
+	// inner select mit order by und top 50, äußeres select order by entgegengesetzt?
 	/**
 	 * @param clientID
 	 * @param recipient
@@ -229,12 +232,12 @@ public class ChatEndpoint
 	    }
 	    
 	    JSONArray msg = db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
-	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ?", new String[]{"" + chatroomID, ""+message_id});
+	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ? ORDER BY createtime ASC", new String[]{"" + chatroomID, ""+message_id});
 	    out.put("messages", msg);
 	    return out;
 	}
 	
-	
+	//TODO: siehe 204 anpassen dementsprechend
 	private JSONArray getMessagesFromDB(String forUser) throws SQLException
 	{
 		JSONArray	res		= new JSONArray();
@@ -262,7 +265,7 @@ public class ChatEndpoint
         			{
         				room.put("name", "Gruppenchat");
         			}
-        			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ?", "" + number);
+        			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? ORDER BY createtime ASC", "" + number);
         			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
         						
         			room.put("persons", persons);
