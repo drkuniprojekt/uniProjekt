@@ -133,11 +133,11 @@ public class ChatEndpoint
 		} catch (ParseException | NullPointerException e)
 		{
 			log.warn("Bad Request over Websocket", e);
-			return "Bad Request";
+			return "{\"Error\": \"Bad Request\"}";
 		} catch( IllegalArgumentException e)
 		{
 			log.warn("Bad Request over Websocket", e);
-			return e.getMessage();
+			return "{\"Error\": \""+e.getMessage()+"\"}";
 		}
 		catch (Exception e)
 		{
@@ -205,7 +205,7 @@ public class ChatEndpoint
 	    {
 		    JSONArray chatroom	= db.executeQuery("SELECT a.chatroom FROM chatroommapping a INNER JOIN chatroommapping b ON a.chatroom=b.chatroom WHERE a.useraccount = ? AND b.useraccount = ? AND a.chatroom != '1'", new String[]{"" + forUser, chatpartner});
 		    if(chatroom.size() != 1){
-			log.debug("Chatroom: " + chatroom);
+			log.debug("Chatroom: " + chatroom.toJSONString());
 			log.error("More or less than one chatroom for selected users!");
 			throw new SQLException("More or less than one chatroom for selected users!");
 		    }
