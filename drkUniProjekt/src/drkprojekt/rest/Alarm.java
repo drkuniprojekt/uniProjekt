@@ -1,9 +1,14 @@
 package drkprojekt.rest;
 
 import java.sql.SQLException;
+import java.util.Iterator;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import com.google.gson.JsonArray;
 
 import drkprojekt.database.DatabaseHandler;
 
@@ -65,8 +70,8 @@ public class Alarm
 		if(JSON.isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
-		DatabaseHandler.getdb().executeUpdate("INSERT INTO eventanswer VALUES(" + accepted + ", "
-				+ car + ", " + eventId + ", '" + user + "')");
+		String[] arguments = { accepted + "", car + "", user + "" };
+		DatabaseHandler.getdb().executeUpdate("INSERT INTO eventanswer VALUES(?,?, " + eventId + ", ?)", arguments);
 	}
 	
 	public JSONArray getAllAnswers() throws SQLException, IllegalStateException
@@ -74,7 +79,16 @@ public class Alarm
 		if(JSON.isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
-		return DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, answerer FROM eventanswer WHERE event = " + eventId);
+//		JSONArray result = DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, answerer FROM eventanswer WHERE event = ?", eventId + "");
+//		JSONArray displaynames = DatabaseHandler.getdb().executeQuery("SELECT displayname FROM user");
+//		
+//		for (int i = 0; i < result.size(); i++)
+//		{
+//			JSONObject data = (JSONObject) result.get(i);
+//			
+//		}
+		
+		return DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, displayname AS answerer FROM user, eventanswer WHERE event = ? AND login_id = eventanswer.answerer", eventId + "");
 	}
 	
 	private JSONObject fetchJSONFromDatabase() throws SQLException, IllegalStateException
