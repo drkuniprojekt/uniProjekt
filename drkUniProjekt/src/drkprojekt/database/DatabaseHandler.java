@@ -7,8 +7,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.TimeZone;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -399,6 +401,10 @@ public class DatabaseHandler
 	{		
 		if(in instanceof Timestamp)
 		{
+			SimpleDateFormat fmt = new SimpleDateFormat();
+			fmt.setTimeZone(TimeZone.getTimeZone("CET"));
+			log.debug("Converting TS from " + ((Timestamp)in).toLocalDateTime().toString() + " to " + fmt.format(in));
+			
 			Object out	= null;
 			out	= ((Timestamp)in).toLocalDateTime().toString();
 			return out;
