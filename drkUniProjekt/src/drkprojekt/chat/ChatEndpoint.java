@@ -32,7 +32,7 @@ public class ChatEndpoint
 	public void onOpen(Session session, @PathParam("name") String clientID)
 	{
 
-		ChatClient c	= ClientFactory.getClient(clientID);
+		ChatClient c = ClientFactory.getClient(clientID);
 		try
 		{
 			if(c != null)
@@ -235,12 +235,10 @@ public class ChatEndpoint
 		for (int i = 0; i < chatroom.size(); i++)
 		{
 		    	
-		    log.debug("Chatroom iteration: " +i);
 			JSONObject	room	= (JSONObject) chatroom.get(i);
-			int number			= (int) room.get("chatroom"); 
-			log.debug("Number: " + number);		
+			int number			= (int) room.get("chatroom"); 	
 			JSONArray persons	= db.executeQuery("SELECT useraccount AS login_name FROM CHATROOMMAPPING WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
-			log.debug("Persons: " + persons.toJSONString());
+
 			if(persons.size() == 1)
 			{
 				room.put("name", (String)((JSONObject)persons.get(0)).get("useraccount"));
@@ -249,7 +247,7 @@ public class ChatEndpoint
 			{
 				room.put("name", "Gruppenchat");
 			}
-			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent AS message, chatroom, message_id, useraccount AS \"from\" FROM MESSAGE WHERE Chatroom = ?", "" + number);
+			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount FROM MESSAGE WHERE Chatroom = ?", "" + number);
 			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
 						
 			room.put("persons", persons);
