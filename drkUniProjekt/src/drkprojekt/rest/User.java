@@ -79,7 +79,7 @@ public class User
 		{
 			JSONObject tmpUser = (JSONObject) allUsers.get(i/3);
 			String tmpUserLoginId = tmpUser.get("login_id").toString();
-			log.debug("Now processing Chats between " + tmpUserLoginId + " and " + login_id);
+			log.debug("Now processing Chats between " + tmpUserLoginId + " AND " + login_id);
 			
 			statements[i+2+DatabaseHandler.SETTINGS.length] =
 					"INSERT INTO chatroom VALUES(chatroom_id.NEXTVAL)";
