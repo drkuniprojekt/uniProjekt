@@ -79,7 +79,7 @@ public class ChatEndpoint
 			else if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
 			{
 			    log.debug("loadData");			    
-			    int message_id = (int) msgJson.get("lastMessage_id");
+			    int message_id = Integer.parseInt((String)msgJson.get("lastMessage_id"));
 			    
 			    return getMessagesFromDB(clientID, recipient, message_id).toJSONString();
 			    //ClientFactory.getClient(clientID).sendMessage(outJSON);
