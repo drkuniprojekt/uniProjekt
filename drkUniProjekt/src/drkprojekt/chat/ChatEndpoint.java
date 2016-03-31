@@ -20,6 +20,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger; 
 import org.slf4j.LoggerFactory;
 
+import drkprojekt.auth.AuthHelper;
 import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.PushService;
 
@@ -70,6 +71,16 @@ public class ChatEndpoint
 		{
 			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(data);
 			String recipient	= (String) msgJson.get("to");
+			String token 		= (String) msgJson.get("token");
+			if(!AuthHelper.isRegistered(token)){
+			    if(token == null){
+				log.info("Token is null");
+				//TODO: return error bzw. if raus nehmen
+			    }else{
+				log.debug("Usertoken not registered");
+				return (String) new JSONObject().put("Error", "Nutzer nicht authentifiziert");
+			    }
+			}
 			
 			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))
 			{

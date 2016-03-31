@@ -89,7 +89,7 @@ public class AuthHelper {
      * @throws SignatureException
      * @throws InvalidKeyException
      */
-    public static TokenInfo verifyToken(String token)  
+    private static TokenInfo verifyToken(String token)  
     {
 	log.debug("verifyToken");
         try {
@@ -156,12 +156,15 @@ public class AuthHelper {
 	return false;
     }
     public static boolean isRegistered(HttpServletRequest request){
+	return isRegistered(request.getHeader("Authorization"));
+    }
+    public static boolean isRegistered(String token){
 	try{
 	    //User is not registered, if his token is expired
 	    log.debug("Proof of Registration");
-	    log.debug("Token: " + request.getHeader("Authorization"));
+	    log.debug("Token: " + token);
 	    
-	    if(AuthHelper.verifyToken(request.getHeader("Authorization")).getExpires().getMillis()<System.currentTimeMillis()/1000){
+	    if(AuthHelper.verifyToken(token).getExpires().getMillis()<System.currentTimeMillis()/1000){
 		log.debug("Token is outdated");
 		return false;	    
 	    }
