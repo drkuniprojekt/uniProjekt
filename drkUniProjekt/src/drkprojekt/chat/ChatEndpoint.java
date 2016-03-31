@@ -249,22 +249,27 @@ public class ChatEndpoint
 			JSONObject	room	= (JSONObject) chatroom.get(i);
 			int number			= (int) room.get("chatroom"); 	
 			JSONArray persons	= db.executeQuery("SELECT useraccount , u.displayname FROM CHATROOMMAPPING INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
-
-			if(persons.size() == 1)
-			{
-				room.put("name", (String)((JSONObject)persons.get(0)).get("displayname"));
+			if(persons.size() == 0){
+			    log.debug("Persons is empty");
 			}
-			else if( persons.size() > 1) // Ignore room if theres less than 1 other person
+			else
 			{
-				room.put("name", "Gruppenchat");
+        			if(persons.size() == 1)
+        			{
+        				room.put("name", (String)((JSONObject)persons.get(0)).get("displayname"));
+        			}
+        			else if( persons.size() > 1) // Ignore room if theres less than 1 other person
+        			{
+        				room.put("name", "Gruppenchat");
+        			}
+        			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ?", "" + number);
+        			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
+        						
+        			room.put("persons", persons);
+        			room.put("messages", msg);
+        			room.put("unreadMessages", unread);
+        			res.add(room);	
 			}
-			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ?", "" + number);
-			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
-						
-			room.put("persons", persons);
-			room.put("messages", msg);
-			room.put("unreadMessages", unread);
-			res.add(room);			
 		}
 		db.executeUpdate("DELETE FROM MESSAGESUNREAD WHERE useraccount = ?", forUser);
 		return res;
