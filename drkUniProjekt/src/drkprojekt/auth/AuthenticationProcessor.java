@@ -60,7 +60,7 @@ public class AuthenticationProcessor extends HttpServlet {
 	    String device_id = (String) json.get("device_id");
 	    //TODO: If phonegap. Else what?
 	    if (device_id != null) {
-		
+		log.debug("device_id: " + device_id);
 		
 		int check_pid	= db.executeQuery("SELECT * FROM phonegapid WHERE device_id = ?", device_id).size();
 		log.debug("Check_pid" + check_pid);
@@ -72,6 +72,8 @@ public class AuthenticationProcessor extends HttpServlet {
 						tmp2);
 			}
 		
+	    }else{
+		log.debug("device_id is null");
 	    }
 
 	    JSONObject responseText = new JSONObject();
