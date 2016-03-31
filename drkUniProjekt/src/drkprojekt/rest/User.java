@@ -118,7 +118,7 @@ public class User
 		}
 		else if (tmpPw != null)
 		{
-			String newPassword = (String) tmpDn;
+			String newPassword = (String) tmpPw;
 			String[] arguments = { newPassword, login_id };
 			DatabaseHandler.getdb().executeUpdate("UPDATE user SET userpassword = HASH_SHA256(TO_BINARY(?)) WHERE login_id = ?", arguments);
 		

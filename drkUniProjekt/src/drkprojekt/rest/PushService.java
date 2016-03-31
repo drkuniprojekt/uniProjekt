@@ -150,8 +150,13 @@ public class PushService
 				JSONArray tmpArray2 = DatabaseHandler.getdb().executeQuery("SELECT settingvalue FROM setting WHERE useraccount = '" + correspondingUser + "' AND setting = '" + DatabaseHandler.SETTINGS[notificationType] + "'");
 				JSONObject tmpObject2 = (JSONObject) tmpArray2.get(0);
 				
-				int settingvalue = Integer.parseInt((String) tmpObject2.get("settingvalue"));
-				if(settingvalue == 1)
+				boolean settingvalue = false;
+			    if((byte)tmpObject2.get("settingvalue") == (byte)1)
+			    {
+			    	settingvalue = true;
+			    }
+				
+				if(settingvalue)
 				{
 					devicesAfter.add(devicesBefore[i]);
 				}
