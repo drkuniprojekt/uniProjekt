@@ -8,6 +8,8 @@ import drkprojekt.database.DatabaseHandler;
 
 public class Alarm
 {
+	private static final String[] ALERT_GROUPS = { "SEGV", "SEGS", "SBF", "OV" };
+	
 	private JSONObject JSON;
 	private int eventId;
 	
@@ -35,10 +37,12 @@ public class Alarm
 	{
 		if(!fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("An alertevent is already running!");
+		
+		int notificationType = getNotificationType();
 			
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, starttime, ?)"
 				+ " VALUES(EVENT_ID.NEXTVAL, TRUE, CURRENT_TIMESTAMP, ?)", JSON);
-		PushService.sendBroadCastMessage("Neuer Alarm!", PushService.NOTIFICATION_EVENT);
+		PushService.sendBroadCastMessage("Neuer Alarm!", notificationType);
 	}
 
 	public void change() throws SQLException, IllegalStateException
@@ -118,6 +122,22 @@ public class Alarm
 		JSONObject json = (JSONObject) array.get(0);
 
 		return (int) json.get("event_id");
+	}
+	
+	private int getNotificationType() throws SQLException
+	{
+		String shortDescr = (String) JSON.get("targetgroup");
+		JSON.remove("targetgroup");
+		
+		for (int i = 0; i < ALERT_GROUPS.length; i++)
+		{
+			if(shortDescr.equals(ALERT_GROUPS[i]))
+			{
+				return (i+6); 
+			}
+		}
+		
+		throw new SQLException("Group not found!");
 	}
 	
 	public JSONObject getJSON()

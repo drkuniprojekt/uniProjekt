@@ -26,6 +26,10 @@ public class PushService
 	public static final int NOTIFICATION_EVENT = 3;
 	public static final int NOTIFICATION_GROUPCHAT = 4;
 	public static final int NOTIFICATION_CHAT = 5;
+	public static final int NOTIFICATION_ALERT_SEGV = 6;
+	public static final int NOTIFICATION_ALERT_SEGS = 7;
+	public static final int NOTIFICATION_ALERT_SBF = 8;
+	public static final int NOTIFICATION_ALERT_OV = 9;
 	
 	/**
 	 * Sends a unicast message to one device, identified by its device ID
@@ -136,7 +140,7 @@ public class PushService
 		
 		for (int i = 0; i < devicesBefore.length; i++)
 		{
-			JSONArray tmpArray = DatabaseHandler.getdb().executeQuery("SELECT registereduser FROM phonegapid WHERE device_id = '" + devicesBefore[i] + "'");
+			JSONArray tmpArray = DatabaseHandler.getdb().executeQuery("SELECT registereduser FROM phonegapid WHERE device_id = ?", devicesBefore[i] + "");
 			JSONObject tmpObject = (JSONObject) tmpArray.get(0);
 			
 			try
@@ -146,8 +150,8 @@ public class PushService
 			} catch(IndexOutOfBoundsException e)
 			{
 				String correspondingUser = (String) tmpObject.get("registereduser");
-				
-				JSONArray tmpArray2 = DatabaseHandler.getdb().executeQuery("SELECT settingvalue FROM setting WHERE useraccount = '" + correspondingUser + "' AND setting = '" + DatabaseHandler.SETTINGS[notificationType] + "'");
+				String[] arguments = { correspondingUser, DatabaseHandler.SETTINGS[notificationType] };
+				JSONArray tmpArray2 = DatabaseHandler.getdb().executeQuery("SELECT settingvalue FROM setting WHERE useraccount = ? AND setting = ?", arguments);
 				JSONObject tmpObject2 = (JSONObject) tmpArray2.get(0);
 				
 				boolean settingvalue = Boolean.parseBoolean(tmpObject2.get("settingvalue").toString());

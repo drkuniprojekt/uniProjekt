@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
 public class DatabaseHandler
 {
 	public static final String[] SETTINGS = { "car", "gui_highcontrast", "gui_showexpirationdate", 
-		"notification_event", "notification_groupchat", "notification_chat" };
+		"notification_event", "notification_groupchat", "notification_chat", "notification_alert_segv",
+		"notification_alert_segs", "notification_alert_sbf", "notification_alert_ov" };
 	
 	private Connection conn;
 	private static DatabaseHandler db;

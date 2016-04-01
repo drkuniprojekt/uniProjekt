@@ -14,8 +14,8 @@ import drkprojekt.database.DatabaseHandler;
 public class User
 {
 	private static Logger log = LoggerFactory.getLogger(User.class);
-	private static final boolean[] DEFAULTSETTINGS = { false, false, true, false, true, true };
-	
+	private static final boolean[] DEFAULTSETTINGS = { false, false, true, false, true, true, false, false, false, false };
+
 	private JSONObject JSON;
 	private JSONArray JSONArray;
 	
