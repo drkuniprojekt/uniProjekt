@@ -93,6 +93,13 @@ public class PushService
 		
 		String[] targetDeviceId = sortOut(deviceId, notificationType);
 		
+		if(targetDeviceId.length == 0)
+		{
+			log.warn("There is no active device registered for Push-Messages for the given type! No one will receive a message!");
+			return;
+		}
+			
+		
 		try
 		{
 			HttpURLConnection connection = connect();

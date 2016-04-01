@@ -93,7 +93,7 @@ public class UserProcessor extends HttpServlet
 	{
 		try
 		{	
-			String userId = Helper.getSubResource(request, false);				
+			String userId = Helper.getSubResource(request, false);
 
 
 			//TODO: Wieder weg

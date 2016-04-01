@@ -50,9 +50,10 @@ public class Alarm
 		if(fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
-		//TODO: Creator ändern zulassen?
+		int notificationType = getNotificationType();
+		
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NULL", JSON);
-		PushService.sendBroadCastMessage("Der aktuelle Alarm wurde bearbeitet!!", PushService.NOTIFICATION_EVENT);
+		PushService.sendBroadCastMessage("Der aktuelle Alarm wurde bearbeitet!", notificationType);
 	}
 
 	public void delete() throws SQLException, IllegalStateException
@@ -77,22 +78,13 @@ public class Alarm
 		if(JSON.isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
-//		JSONArray result = DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, answerer FROM eventanswer WHERE event = ?", eventId + "");
-//		JSONArray displaynames = DatabaseHandler.getdb().executeQuery("SELECT displayname FROM user");
-//		
-//		for (int i = 0; i < result.size(); i++)
-//		{
-//			JSONObject data = (JSONObject) result.get(i);
-//			
-//		}
-		
-		return DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, displayname AS answerer FROM user, eventanswer WHERE event = ? AND login_id = eventanswer.answerer", eventId + "");
+		return DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, answerer, displayname FROM user, eventanswer WHERE event = ? AND login_id = eventanswer.answerer", eventId + "");
 	}
 	
 	private JSONObject fetchJSONFromDatabase() throws SQLException, IllegalStateException
 	{
 		JSONArray array = DatabaseHandler.getdb().executeQuery(
-				"SELECT description, requiredthings, quantitymembers, street, housenumber, zip, town "
+				"SELECT description, requiredthings, quantitymembers, street, housenumber, zip, town, usergroup "
 				+ "FROM event WHERE alertevent = TRUE AND endtime IS NULL");
 		
 		if(array.isEmpty())
@@ -126,8 +118,9 @@ public class Alarm
 	
 	private int getNotificationType() throws SQLException
 	{
-		String shortDescr = (String) JSON.get("targetgroup");
-		JSON.remove("targetgroup");
+		String shortDescr = (String) JSON.get("usergroup");
+		if(shortDescr == null)
+			throw new SQLException("Group not found!");
 		
 		for (int i = 0; i < ALERT_GROUPS.length; i++)
 		{

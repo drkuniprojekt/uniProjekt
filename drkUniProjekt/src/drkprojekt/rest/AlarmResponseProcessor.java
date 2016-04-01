@@ -38,14 +38,11 @@ public class AlarmResponseProcessor extends HttpServlet
 		try
 		{
 			Alarm alarm = new Alarm();
-			JSONObject answer = Helper.getRequestJSON(request);
-			System.out.println("answer: '" + answer.get("answer") + "'");
-			System.out.println("answer.toString(): '" + answer.get("answer").toString() + "'");
-			System.out.println("Boolean: " + Boolean.parseBoolean(answer.get("answer").toString()));
+			JSONObject alarmResponse = Helper.getRequestJSON(request);
 			
-			alarm.accept(Boolean.parseBoolean(answer.get("answer").toString()),
-					     Boolean.parseBoolean(answer.get("availablecar").toString()), 
-					     answer.get("answerer").toString());			
+			alarm.accept(Boolean.parseBoolean(alarmResponse.get("answer").toString()),
+					     Boolean.parseBoolean(alarmResponse.get("availablecar").toString()), 
+					     alarmResponse.get("answerer").toString());			
 		} catch (NullPointerException e)
 		{
 			Helper.handleException(new SQLException("Argument must not be null!"), response);
