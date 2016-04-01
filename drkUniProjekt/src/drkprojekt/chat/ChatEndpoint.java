@@ -3,16 +3,10 @@ package drkprojekt.chat;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.websocket.*;
-import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import drkprojekt.auth.AuthHelper;
 import drkprojekt.database.DatabaseHandler;
-import drkprojekt.rest.PushService;
 
 @ServerEndpoint("/chat/{name}")
 public class ChatEndpoint

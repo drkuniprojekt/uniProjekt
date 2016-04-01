@@ -22,15 +22,26 @@ public class ClientFactory
 	{
 		if(clients.size() == 0)
 		{
-			JSONArray login_idJSON 	= DatabaseHandler.getdb().executeQuery("SELECT login_id, displayname FROM user");
+			JSONArray login_idJSON 	= DatabaseHandler.getdb().executeQuery("SELECT login_id, displayname, deleted FROM user");
 			
 			String login, displayname;
+			boolean deleted;
 			String logMsg	= "";
 			for (int i = 0; i < login_idJSON.size(); i++) 
 			{
 				login				= (String)((JSONObject)login_idJSON.get(i)).get("login_id");
 				displayname			= (String)((JSONObject)login_idJSON.get(i)).get("displayname");
-				ChatClient c		= new RealClient(login, displayname);
+				deleted 			= (boolean)((JSONObject)login_idJSON.get(i)).get("deleted");
+				ChatClient c;
+				
+				if(deleted)
+				{
+					c	= new DeletedClient(login, displayname);
+				}else
+				{
+					c	= new RealClient(login, displayname);
+				}
+				
 				logMsg				+= login + ", ";
 				JSONArray pgJSON 	= DatabaseHandler.getdb().executeQuery("SELECT device_id FROM PHONEGAPID WHERE REGISTEREDUSER = ?", login);
 				
