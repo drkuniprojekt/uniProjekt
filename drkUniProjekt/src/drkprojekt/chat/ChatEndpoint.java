@@ -194,8 +194,7 @@ public class ChatEndpoint
 			log.error("SQL Error while Saving Message to DB:\n ",e);
 		}
 	}
-	//TODO: getmessages ändern, sodass wirklich die letzten 50 nachrichten kommen
-	// inner select mit order by und top 50, äußeres select order by entgegengesetzt?
+
 	/**
 	 * @param clientID
 	 * @param recipient
@@ -224,13 +223,12 @@ public class ChatEndpoint
 		    }
 	    }
 	    
-	    JSONArray msg = db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
-	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ? ORDER BY createtime ASC", new String[]{"" + chatroomID, ""+message_id});
+	    JSONArray msg = db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
+	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ? ORDER BY createtime DESC) ORDER BY createtime ASC", new String[]{"" + chatroomID, ""+message_id});
 	    out.put("messages", msg);
 	    return out;
 	}
 	
-	//TODO: siehe 204 anpassen dementsprechend
 	private JSONArray getMessagesFromDB(String forUser) throws SQLException
 	{
 		JSONArray	res		= new JSONArray();
@@ -258,7 +256,7 @@ public class ChatEndpoint
         			{
         				room.put("name", "Gruppenchat");
         			}
-        			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? ORDER BY createtime ASC", "" + number);
+        			JSONArray msg		= db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? ORDER BY createtime DESC) ORDER BY createtime ASC", "" + number);
         			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
         						
         			room.put("persons", persons);
