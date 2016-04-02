@@ -67,16 +67,16 @@ public class DatabaseHandler
 	}
 	
 	
-	public void closeConnection()
-	{
-		try
-		{
-			conn.close();
-		} catch (SQLException e)
-		{
-			log.error("Could not close connection");
-		}
-	}
+//	public void closeConnection()
+//	{
+//		try
+//		{
+//			conn.close();
+//		} catch (SQLException e)
+//		{
+//			log.error("Could not close connection");
+//		}
+//	}
 
 		
 	/**	 * 
