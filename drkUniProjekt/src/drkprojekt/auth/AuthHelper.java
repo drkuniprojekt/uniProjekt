@@ -179,7 +179,7 @@ public class AuthHelper {
 	return AuthHelper.verifyToken(request.getHeader("Authorization"));
     }
     
-    public static void assertIsAdmin(HttpServletRequest request, HttpServletResponse response) throws SignatureException
+    public static void assertIsAdmin(HttpServletRequest request) throws SignatureException
     {
     	//TODO: Scharf stellen
 //    	if(!isAdmin(request))

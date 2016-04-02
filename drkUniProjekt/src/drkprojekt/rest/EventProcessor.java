@@ -49,7 +49,7 @@ public class EventProcessor extends HttpServlet
 	{
 		try
 		{
-			AuthHelper.assertIsAdmin(request, response);
+			AuthHelper.assertIsAdmin(request);
 			Event event = new Event(Helper.getRequestJSON(request));
 			event.create();
 		} catch (ParseException | SQLException | SignatureException e)
@@ -62,7 +62,7 @@ public class EventProcessor extends HttpServlet
 	{	
 		try
 		{
-			AuthHelper.assertIsAdmin(request, response);
+			AuthHelper.assertIsAdmin(request);
 			int eventId = Helper.getSubResourceID(request, false);
 			
 			Event event = new Event(Helper.getRequestJSON(request));
@@ -77,7 +77,7 @@ public class EventProcessor extends HttpServlet
 	{
 		try
 		{
-			AuthHelper.assertIsAdmin(request, response);
+			AuthHelper.assertIsAdmin(request);
 			int eventId = Helper.getSubResourceID(request, false);
 			
 			Event event = new Event();
