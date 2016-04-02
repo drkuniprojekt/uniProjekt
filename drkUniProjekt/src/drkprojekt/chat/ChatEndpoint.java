@@ -109,31 +109,18 @@ public class ChatEndpoint
         			if(recipient == null || recipient.equals("Gruppenchat"))
         			{
         				log.debug("Got new Broadcast-Message: " + data);
-        				boolean	msgRead;
-        				ArrayList<ChatClient>	clients = ClientFactory.getAllClients();
-        				
-        				for (ChatClient c : clients) 
-        				{
-        					if(!c.getName().equals(clientID))
-        					{
-        						msgRead	= c.sendMessage(outJSON);
-        						//TODO: savemessageLogik entwirren
-        						//      message darf nur EINMAL insgesamt abgespeichert werden, unread jedoch pro user
-        						saveMessageToDB(message, msgRead, clientID, c.getName(), true);
-        					}else
-        					{
-        						saveMessageToDB(message, false, clientID, c.getName(), true);
-        					}
-        					
-        				}								
+        				saveBroadcastMessageToDB(message, clientID);
+        				processBroadcastMessage(outJSON, clientID);        												
         			}
         			else
         			{
         				log.debug("Got new Message to " + recipient + ": "+ data);
         				boolean	msgRead;				
         				msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
-        				saveMessageToDB(message, msgRead, clientID, recipient, false);				
+        				saveMessageToDB(message, msgRead, clientID, recipient, false);	
+        				
         			}
+        			//messages are duplicated for Groupchat
         			return outJSON.toJSONString();
         		}
 			
@@ -157,12 +144,47 @@ public class ChatEndpoint
 	
 
 
+
+
+	/**
+	 * @param outJSON
+	 * @param clientID
+	 */
+	private void processBroadcastMessage(JSONObject outJSON, String clientID) {
+		boolean	msgRead;
+		ArrayList<ChatClient>	clients = ClientFactory.getAllClients();
+		for (ChatClient c : clients) 
+		{
+		    	if (c instanceof RealClient && !c.getName().equals(clientID))
+		    	{
+		    	    	msgRead	= c.sendMessage(outJSON);
+		    	
+        			if(!msgRead)
+        			{
+        			    	try
+        			    	{
+        			    	    	DatabaseHandler.getdb().executeUpdate("INSERT INTO MESSAGESUNREAD VALUES(MESSAGE_ID.CURRVAL, ?)", c.getName());
+            			
+        			    	} catch (SQLException e) 
+        			    	{
+        			    	    	log.error("SQL Error while saving unread message to DB:\n ",e);
+        			    	}
+        			}
+		    	}
+    		}
+	    
+	}
+
 	@OnClose
 	public void onClose(Session session, @PathParam("name") String clientID)
 	{
 		ClientFactory.getClient(clientID).deleteSession(session);
 	}
-	//TODO: anpassen siehe 127
+	
+	private void saveBroadcastMessageToDB(String message, String clientID) {
+	    saveMessageToDB(message, true, clientID, "", true);
+ 	}
+	
 	private void saveMessageToDB(String message, boolean read, String from, String to, boolean broadcast)
 	{
 		log.debug("Trying to save message to Database: " + message);
