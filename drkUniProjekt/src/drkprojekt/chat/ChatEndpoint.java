@@ -277,7 +277,8 @@ public class ChatEndpoint
 			{
         			if(persons.size() == 1)
         			{
-        				room.put("name", (String)((JSONObject)persons.get(0)).get("displayname"));
+        				room.put("loginId", (String)((JSONObject)persons.get(0)).get("login_id"));
+        				room.put("displayName", (String)((JSONObject)persons.get(0)).get("displayname"));
         			}
         			else if( persons.size() > 1) // Ignore room if theres less than 1 other person
         			{
