@@ -277,12 +277,13 @@ public class ChatEndpoint
 			{
         			if(persons.size() == 1)
         			{
-        				room.put("loginId", (String)((JSONObject)persons.get(0)).get("login_id"));
-        				room.put("displayName", (String)((JSONObject)persons.get(0)).get("displayname"));
+        				room.put("loginid", (String)((JSONObject)persons.get(0)).get("login_id"));
+        				room.put("displayname", (String)((JSONObject)persons.get(0)).get("displayname"));
         			}
         			else if( persons.size() > 1) // Ignore room if theres less than 1 other person
         			{
-        				room.put("name", "Gruppenchat");
+        				room.put("loginid", "Gruppenchat");
+        				room.put("displayname", "Gruppenchat");
         			}
         			JSONArray msg		= db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? ORDER BY createtime DESC) ORDER BY createtime ASC", "" + number);
         			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
