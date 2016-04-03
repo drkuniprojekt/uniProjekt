@@ -33,15 +33,15 @@ public class ChatEndpoint
 			{
 				c.addSession(session);	
 				log.info("New Chat Client " + clientID);
-				try 
-				{
-					session.getBasicRemote().sendText(getMessagesFromDB(clientID).toJSONString());
-				} 
-				catch (Exception e) 
-				{
-					log.error("Unkown Error occured while Opening Socket:\n {} ", e);
-					session.getBasicRemote().sendText("Unknown Error occured");
-				}
+//				try 
+//				{
+//					session.getBasicRemote().sendText(getMessagesFromDB(clientID).toJSONString());
+//				} 
+//				catch (Exception e) 
+//				{
+//					log.error("Unkown Error occured while Opening Socket:\n {} ", e);
+//					session.getBasicRemote().sendText("Unknown Error occured");
+//				}
 			}
 			else
 			{
@@ -81,20 +81,20 @@ public class ChatEndpoint
 			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))
 			{
 			   log.debug("init");
-			   answer.put("data", getMessagesFromDB(clientID).toJSONString());			   
+			   answer.put("data", getMessagesFromDB(clientID));			   
 			}
 			else if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
 			{
 			    log.debug("loadData");			    
 			    int message_id = Integer.parseInt((String)msgJson.get("lastMessage_id"));
 			    
-			    answer.put("data", getMessagesFromDB(clientID, recipient, message_id).toJSONString());
+			    answer.put("data", getMessagesFromDB(clientID, recipient, message_id));
 			    //ClientFactory.getClient(clientID).sendMessage(outJSON);
 			}
 			else
 			{        			    
         		log.debug("sendMessage");
-        		answer.put("data", handleMessage(data, clientID, msgJson, recipient).toJSONString());
+        		answer.put("data", handleMessage(data, clientID, msgJson, recipient));
         	}
 			answer.put("requestType", msgJson.get("requestType"));
 			return answer.toJSONString();

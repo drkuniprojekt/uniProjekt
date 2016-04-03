@@ -30,7 +30,7 @@ public class DatabaseHandler
 	private static DatabaseHandler db;
 	private static Logger log;
 	private static SimpleDateFormat fmt = new SimpleDateFormat("dd. MMMM yyyy hh:mm");	
-	
+
 	private DatabaseHandler()
 	{
 		try
@@ -55,7 +55,7 @@ public class DatabaseHandler
 		java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(
 				now.getTime());
 	
-		return currentTimestamp.toString();
+		return fmt.format(currentTimestamp);
 	}
 
 	public static DatabaseHandler getdb()
@@ -405,10 +405,7 @@ public class DatabaseHandler
 	private Object cleanObject(Object in)
 	{		
 		if(in instanceof Timestamp)
-		{
-			SimpleDateFormat fmt = new SimpleDateFormat("dd. MMMM yyyy hh:mm");
-			fmt.setTimeZone(TimeZone.getTimeZone("CET"));
-			
+		{	
 			Object out	= null;
 			out			= fmt.format(in);
 			return out;
