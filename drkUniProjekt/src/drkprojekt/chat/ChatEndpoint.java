@@ -63,6 +63,7 @@ public class ChatEndpoint
 		try
 		{
 			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(data);
+			JSONObject answer	= new JSONObject();
 			String recipient	= (String) msgJson.get("to");
 			String token 		= (String) msgJson.get("token");
 			if(!AuthHelper.isRegistered(token)){
@@ -80,50 +81,23 @@ public class ChatEndpoint
 			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))
 			{
 			   log.debug("init");
-			   return getMessagesFromDB(clientID).toJSONString();
+			   answer.put("data", getMessagesFromDB(clientID).toJSONString());			   
 			}
 			else if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
 			{
 			    log.debug("loadData");			    
 			    int message_id = Integer.parseInt((String)msgJson.get("lastMessage_id"));
 			    
-			    return getMessagesFromDB(clientID, recipient, message_id).toJSONString();
+			    answer.put("data", getMessagesFromDB(clientID, recipient, message_id).toJSONString());
 			    //ClientFactory.getClient(clientID).sendMessage(outJSON);
 			}
 			else
-			{
-        			    
-        			log.debug("sendMessage");
-        			String message		= ((String) msgJson.get("message")).trim();
-        			
-        			
-        			if(message.length() == 0)
-        			{
-        				throw new IllegalArgumentException("Please Provide a non-empty Message");
-        			}
-        			JSONObject outJSON = new JSONObject();
-        			outJSON.put("messagecontent", message);       			
-        			outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
-        			outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
-        			
-        			if(recipient == null || recipient.equals("Gruppenchat"))
-        			{
-        				log.debug("Got new Broadcast-Message: " + data);
-        				saveBroadcastMessageToDB(message, clientID);
-        				processBroadcastMessage(outJSON, clientID);        												
-        			}
-        			else
-        			{
-        				log.debug("Got new Message to " + recipient + ": "+ data);
-        				boolean	msgRead;				
-        				msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
-        				saveMessageToDB(message, msgRead, clientID, recipient, false);	
-        				
-        			}
-        			//messages are duplicated for Groupchat
-        			return outJSON.toJSONString();
-        		}
-			
+			{        			    
+        		log.debug("sendMessage");
+        		answer.put("data", handleMessage(data, clientID, msgJson, recipient).toJSONString());
+        	}
+			answer.put("requestType", msgJson.get("requestType"));
+			return answer.toJSONString();
 			
 		} catch (ParseException | NullPointerException e)
 		{
@@ -140,6 +114,37 @@ public class ChatEndpoint
 			return "{\"Error\": \"Unknown Error\"}";
 		}
 		
+	}
+
+	private JSONObject handleMessage(String data, String clientID,
+			JSONObject msgJson, String recipient) {
+		String message		= ((String) msgJson.get("message")).trim();
+		
+		
+		if(message.length() == 0)
+		{
+			throw new IllegalArgumentException("Please Provide a non-empty Message");
+		}
+		JSONObject outJSON = new JSONObject();
+		outJSON.put("messagecontent", message);       			
+		outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
+		outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
+		
+		if(recipient == null || recipient.equals("Gruppenchat"))
+		{
+			log.debug("Got new Broadcast-Message: " + data);
+			saveBroadcastMessageToDB(message, clientID);
+			processBroadcastMessage(outJSON, clientID);        												
+		}
+		else
+		{
+			log.debug("Got new Message to " + recipient + ": "+ data);
+			boolean	msgRead;				
+			msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
+			saveMessageToDB(message, msgRead, clientID, recipient, false);	
+			
+		}
+		return outJSON;
 	}
 	
 
