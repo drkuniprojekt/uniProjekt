@@ -89,13 +89,13 @@ public class ChatEndpoint
 			    int message_id = Integer.parseInt((String)msgJson.get("lastMessage_id"));
 			    
 			    answer.put("data", getMessagesFromDB(clientID, recipient, message_id));
-			    //ClientFactory.getClient(clientID).sendMessage(outJSON);
 			}
 			else
 			{        			    
-        		log.debug("sendMessage");
-        		answer.put("data", handleMessage(data, clientID, msgJson, recipient));
-        	}
+			    log.debug("sendMessage");
+			    answer.put("data", handleMessage(data, clientID, msgJson, recipient));
+			}
+			
 			answer.put("requestType", msgJson.get("requestType"));
 			return answer.toJSONString();
 			

@@ -16,6 +16,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import drkprojekt.chat.ClientFactory;
 import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.Helper;
 
@@ -47,7 +48,8 @@ public class AuthenticationProcessor extends HttpServlet {
 	JSONArray array;
 	try {
 	    json = Helper.getRequestJSON(request);
-	    String[] tmp1 = { (String) json.get("login_id"), (String) json.get("password") };
+	    String login_id = (String) json.get("login_id");
+	    String[] tmp1 = { login_id , (String) json.get("password") };
 	    array = DatabaseHandler.getdb().executeQuery(
 		    "Select login_id, displayname, adminrole FROM user WHERE login_id = ? AND userpassword = HASH_SHA256(TO_BINARY(?))",
 		    tmp1);
@@ -62,11 +64,13 @@ public class AuthenticationProcessor extends HttpServlet {
 	    if (device_id != null) {
 		log.debug("device_id: " + device_id);
 		
+		
 		int check_pid	= db.executeQuery("SELECT * FROM phonegapid WHERE device_id = ?", device_id).size();
 		log.debug("Check_pid" + check_pid);
 			if(check_pid < 1)
 			{
-				String[] tmp2 = { (String) json.get("login_id"), device_id };
+				String[] tmp2 = { login_id, device_id };
+				ClientFactory.getClient(login_id).addPhonegap_id(device_id);
 				db.executeUpdate(
 						"INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)",
 						tmp2);
@@ -79,11 +83,10 @@ public class AuthenticationProcessor extends HttpServlet {
 	    JSONObject responseText = new JSONObject();
 	    JSONObject dbJSON = (JSONObject) array.get(0);
 	    
-	    String loginID = (String) json.get("login_id");
 	    String displayName = (String) dbJSON.get("displayname");
 	    boolean admin = Boolean.parseBoolean(dbJSON.get("adminrole").toString());
 
-	    String tokenString = AuthHelper.createJsonWebToken(loginID, displayName, admin, (long) 10000);
+	    String tokenString = AuthHelper.createJsonWebToken(login_id, displayName, admin, (long) 10000);
 	    responseText.put("successful", true);
 	    responseText.put("token", tokenString);
 	    responseText.put("adminrole", admin);
