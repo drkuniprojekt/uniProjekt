@@ -42,7 +42,9 @@ public class PushService
 	{
 		String[] singleDevice = new String[1];
 		singleDevice[0] = deviceId;
-		sendMessage(message, singleDevice, notificationType);
+		int[] singleNotificationType = new int[1];
+		singleNotificationType[0] = notificationType;
+		sendMessage(message, singleDevice, singleNotificationType);
 	}
 	
 	/**
@@ -69,10 +71,11 @@ public class PushService
 		{
 			json = (JSONObject) array.get(i);
 			allDevices[i] = (String) json.get("device_id");
-			System.out.println("Iteration " + i + ": " + allDevices[i]);
 		}		
 		
-		sendMessage(message, allDevices, notificationType);
+		int[] singleNotificationType = new int[1];
+		singleNotificationType[0] = notificationType;
+		sendMessage(message, allDevices, singleNotificationType);
 	}
 	
 	/**
@@ -86,19 +89,34 @@ public class PushService
 		sendMulticastMessage(message, null, notificationType);
 	}
 	
-	private static void sendMessage(String message, String[] deviceId, int notificationType) throws SQLException
+	public static void sendMulticastAlert(String message, int[] notificationTypes) throws SQLException
 	{
-		DataOutputStream out = null;
-		BufferedReader in = null;
+		JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT device_id FROM phonegapid");
 		
-		String[] targetDeviceId = sortOut(deviceId, notificationType);
+		String[] allDevices = new String[array.size()];
+		JSONObject json;
+
+		for (int i = 0; i < array.size(); i++)
+		{
+			json = (JSONObject) array.get(i);
+			allDevices[i] = (String) json.get("device_id");
+		}		
+		
+		sendMessage(message, allDevices, notificationTypes);
+	}
+	
+	private static void sendMessage(String message, String[] deviceId, int[] notificationTypes) throws SQLException
+	{	
+		String[] targetDeviceId = sortOut(deviceId, notificationTypes);
 		
 		if(targetDeviceId.length == 0)
 		{
 			log.warn("There is no active device registered for Push-Messages for the given type! No one will receive a message!");
 			return;
 		}
-			
+		
+		DataOutputStream out = null;
+		BufferedReader in = null;
 		
 		try
 		{
@@ -110,7 +128,7 @@ public class PushService
 			out.writeBytes(data);
 			log.debug("PushService is sending a message to Google...");
 			
-			//TODO: vermutlich ist die Antwort egal
+			//Only for Logging - Answer is ignored by program logic
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
@@ -141,7 +159,7 @@ public class PushService
 		}
 	}
 	
-	private static String[] sortOut(String[] devicesBefore, int notificationType) throws SQLException, IllegalStateException
+	private static String[] sortOut(String[] devicesBefore, int[] notificationTypes) throws SQLException, IllegalStateException
 	{
 		ArrayList<String> devicesAfter = new ArrayList<String>();
 		
@@ -157,15 +175,23 @@ public class PushService
 			} catch(IndexOutOfBoundsException e)
 			{
 				String correspondingUser = (String) tmpObject.get("registereduser");
-				String[] arguments = { correspondingUser, DatabaseHandler.SETTINGS[notificationType] };
-				JSONArray tmpArray2 = DatabaseHandler.getdb().executeQuery("SELECT settingvalue FROM setting WHERE useraccount = ? AND setting = ?", arguments);
-				JSONObject tmpObject2 = (JSONObject) tmpArray2.get(0);
 				
-				boolean settingvalue = Boolean.parseBoolean(tmpObject2.get("settingvalue").toString());
-				
-				if(settingvalue)
+				for (int j = 0; j < notificationTypes.length; j++)
 				{
-					devicesAfter.add(devicesBefore[i]);
+					if((notificationTypes[j] < NOTIFICATION_ALERT_SEGV || notificationTypes[j] > NOTIFICATION_ALERT_OV) && notificationTypes.length != 1)
+						throw new IllegalArgumentException("This method is only allowed for alert notifications!");
+					
+					String[] arguments = { correspondingUser, DatabaseHandler.SETTINGS[notificationTypes[j]] };
+					JSONArray tmpArray2 = DatabaseHandler.getdb().executeQuery("SELECT settingvalue FROM setting WHERE useraccount = ? AND setting = ?", arguments);
+					JSONObject tmpObject2 = (JSONObject) tmpArray2.get(0);
+					
+					boolean settingvalue = Boolean.parseBoolean(tmpObject2.get("settingvalue").toString());
+					
+					if(settingvalue)
+					{
+						devicesAfter.add(devicesBefore[i]);
+						break;
+					}
 				}
 			}
 		}
