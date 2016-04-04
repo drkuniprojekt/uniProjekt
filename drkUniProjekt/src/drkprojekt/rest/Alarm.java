@@ -60,7 +60,6 @@ public class Alarm
 			throw new IllegalStateException("No alertevent found!");
 		
 		int[] notificationTypes = convertNotificationTypes();
-		eventId = fetchEventIdFromDatabase();
 		
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NULL", JSON);
 		DatabaseHandler.getdb().executeUpdate("DELETE FROM alertgroup WHERE event_id = ?", eventId + "");
