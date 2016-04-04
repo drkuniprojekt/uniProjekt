@@ -1,7 +1,5 @@
-##Announcment
-Nothing yet.
-
 ##Changelog
+`01.04.2016` USERGROUP in EVENT deleted | New table ALERTGROUP added for mapping Alerts to the Usergroups  
 `01.04.2016` USERGROUP in EVENT added (because of changerequest)  
 `31.03.2016` Further settings added (alert-groups)  
 `29.03.2016` DELETED flag in USER added  
