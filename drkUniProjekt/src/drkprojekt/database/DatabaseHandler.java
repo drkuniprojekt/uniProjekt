@@ -1,6 +1,7 @@
 package drkprojekt.database;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -8,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimeZone;
@@ -27,6 +29,7 @@ public class DatabaseHandler
 		"notification_alert_segs", "notification_alert_sbf", "notification_alert_ov" };
 	
 	private Connection conn;
+	private ArrayList<String> columns;
 	private static DatabaseHandler db;
 	private static Logger log;
 	private static SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm");	
@@ -39,6 +42,7 @@ public class DatabaseHandler
 			InitialContext ctx 	= new InitialContext();
 			DataSource ds 		= (DataSource) ctx.lookup("java:comp/env/jdbc/DefaultDB");
 			conn 				= ds.getConnection();
+			columns             = fetchColumns();
 
 			log.info("Databaseconnection successfull ");
 			fmt.setTimeZone(TimeZone.getTimeZone("CET"));
@@ -367,6 +371,23 @@ public class DatabaseHandler
 				log.error("Databaseconnection failed " + e.getMessage());
 			}
 		}
+	}
+	
+	private ArrayList<String> fetchColumns() throws SQLException
+	{
+		ArrayList<String> allColumns = new ArrayList<String>();
+		
+		DatabaseMetaData meta = conn.getMetaData();
+		ResultSet rs = meta.getColumns(null, "NEO_8R9GH51R32X9VK9BO9GL2FX5M", null, null);
+		
+		while (rs.next())
+		{
+			String tmpName = rs.getString("COLUMN_NAME");
+			//log.debug("Column: " + tmpName);
+			allColumns.add(tmpName);
+		}
+		
+		return allColumns;
 	}
 	
 	private void closeResources(ResultSet rs, Statement stmt)
