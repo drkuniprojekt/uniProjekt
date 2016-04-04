@@ -23,7 +23,7 @@ public class ChatEndpoint
 	private static Logger log	= LoggerFactory.getLogger(ChatEndpoint.class);
 	
 	@OnOpen
-	public void onOpen(Session session, @PathParam("name") String clientID)
+	public void onOpen(Session session, @PathParam("name") String clientID) throws SQLException
 	{
 
 		ChatClient c = ClientFactory.getClient(clientID);
@@ -117,7 +117,7 @@ public class ChatEndpoint
 	}
 
 	private JSONObject handleMessage(String data, String clientID,
-			JSONObject msgJson, String recipient) {
+			JSONObject msgJson, String recipient) throws SQLException {
 		String message		= ((String) msgJson.get("message")).trim();
 		
 		
@@ -181,7 +181,7 @@ public class ChatEndpoint
 	}
 
 	@OnClose
-	public void onClose(Session session, @PathParam("name") String clientID)
+	public void onClose(Session session, @PathParam("name") String clientID) throws SQLException
 	{
 		ClientFactory.getClient(clientID).deleteSession(session);
 	}
