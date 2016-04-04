@@ -1,7 +1,6 @@
-##Announcment
-Nothing yet.
-
 ##Changelog
+`04.04.2016` USERGROUP in EVENT deleted | New table ALERTGROUP added for mapping Alerts to the Usergroups  
+`01.04.2016` USERGROUP in EVENT added (because of changerequest)  
 `31.03.2016` Further settings added (alert-groups)  
 `29.03.2016` DELETED flag in USER added  
 `24.03.2016` ZIP is now VARCHAR(5) (formerly INT)  
@@ -39,6 +38,7 @@ HOUSENUMBER     |VARCHAR(10)      |  |  |
 ZIP		|VARCHAR(5)	|  |  |
 TOWN	|VARCHAR(255)	|  |  |
 CREATOR     |VARCHAR(255)    |  |X  |References to USER(LOGIN_ID)
+USERGROUP     |VARCHAR(255)    |  |   |Used to send push notifications just to specific usergroups. Use groups described in SETTING (notification_alert_segv etc.)
 
 Example SQL statement, to insert a timestamp  
 ```

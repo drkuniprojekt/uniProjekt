@@ -33,7 +33,7 @@ public class UserProcessor extends HttpServlet
 			
 			if(userId == null)
 			{
-				AuthHelper.assertIsAdmin(request, response);
+				AuthHelper.assertIsAdmin(request);
 				User user = new User();
 				JSONArray responseJSONArray = user.getJSONArray();
 				if(responseJSONArray.isEmpty())
@@ -59,7 +59,7 @@ public class UserProcessor extends HttpServlet
 	{
 		try
 		{
-			AuthHelper.assertIsAdmin(request, response);
+			AuthHelper.assertIsAdmin(request);
 			User user = new User(Helper.getRequestJSON(request));
 			user.create();
 		} catch (SQLException | ParseException | SignatureException e)
@@ -93,7 +93,7 @@ public class UserProcessor extends HttpServlet
 	{
 		try
 		{	
-			String userId = Helper.getSubResource(request, false);				
+			String userId = Helper.getSubResource(request, false);
 
 
 			//TODO: Wieder weg
@@ -117,7 +117,7 @@ public class UserProcessor extends HttpServlet
 
 
 
-			AuthHelper.assertIsAdmin(request, response);
+			AuthHelper.assertIsAdmin(request);
 			User user = new User(userId);
 			user.delete(AuthHelper.getToken(request).getUserId());
 		} catch (IllegalStateException | IllegalArgumentException | SQLException | SignatureException | NoSuchElementException e)

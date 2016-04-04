@@ -114,4 +114,18 @@ public class Helper
 		}
 		
 	}
+	
+	public static int getSubResourceID(HttpServletRequest request, boolean allowMainResource) throws NoSuchElementException
+	{
+		String subResourceString = getSubResource(request, allowMainResource);
+		try
+		{
+			int subResourceInt = Integer.parseInt(subResourceString);
+			return subResourceInt;
+		} catch (NumberFormatException e)
+		{
+			throw new NoSuchElementException("ID has to be an Integer - Element not found!");
+		}
+		
+	}
 }

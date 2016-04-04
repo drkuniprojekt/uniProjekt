@@ -2,6 +2,7 @@ package drkprojekt.rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.NoSuchElementException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,8 +14,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-@WebServlet("/response/*")
-public class AlarmResponseProcessor extends HttpServlet
+@WebServlet("/eventresponse/*")
+public class EventResponseProcessor extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
 
@@ -22,12 +23,14 @@ public class AlarmResponseProcessor extends HttpServlet
 	{
 		try
 		{
-			Alarm alarm = new Alarm();
-			JSONArray responseJSON = alarm.getAllAnswers();	
+			int eventId = Helper.getSubResourceID(request, false);
+			
+			Event event = new Event();
+			JSONArray responseJSON = event.getAllAnswers(eventId);	
 			if(responseJSON.isEmpty())
 				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 			Helper.setResponseJSONArray(response, responseJSON);
-		} catch (IllegalStateException | SQLException e)
+		} catch (IllegalStateException | SQLException | NoSuchElementException e)
 		{
 			Helper.handleException(e, response);
 		}
@@ -37,16 +40,17 @@ public class AlarmResponseProcessor extends HttpServlet
 	{
 		try
 		{
-			Alarm alarm = new Alarm();
-			JSONObject alarmResponse = Helper.getRequestJSON(request);
+			int eventId = Helper.getSubResourceID(request, false);
 			
-			alarm.accept(Boolean.parseBoolean(alarmResponse.get("answer").toString()),
-					     Boolean.parseBoolean(alarmResponse.get("availablecar").toString()), 
-					     alarmResponse.get("answerer").toString());			
+			Event event = new Event();
+			JSONObject eventResponse = Helper.getRequestJSON(request);
+			
+			event.accept(Boolean.parseBoolean(eventResponse.get("answer").toString()),
+					     eventResponse.get("answerer").toString(), eventId);
 		} catch (NullPointerException e)
 		{
 			Helper.handleException(new SQLException("Argument must not be null!"), response);
-		} catch (IllegalStateException | SQLException | ParseException e)
+		} catch (IllegalStateException | SQLException | ParseException | NoSuchElementException e)
 		{
 			Helper.handleException(e, response);
 		}

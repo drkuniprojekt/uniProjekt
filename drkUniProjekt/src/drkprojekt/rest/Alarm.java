@@ -8,6 +8,8 @@ import drkprojekt.database.DatabaseHandler;
 
 public class Alarm
 {
+	private static final String[] ALERT_GROUPS = { "SEGV", "SEGS", "SBF", "OV" };
+	
 	private JSONObject JSON;
 	private int eventId;
 	
@@ -35,10 +37,12 @@ public class Alarm
 	{
 		if(!fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("An alertevent is already running!");
+		
+		int notificationType = getNotificationType();
 			
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, starttime, ?)"
 				+ " VALUES(EVENT_ID.NEXTVAL, TRUE, CURRENT_TIMESTAMP, ?)", JSON);
-		PushService.sendBroadCastMessage("Neuer Alarm!", PushService.NOTIFICATION_EVENT);
+		PushService.sendBroadCastMessage("Neuer Alarm!", notificationType);
 	}
 
 	public void change() throws SQLException, IllegalStateException
@@ -46,9 +50,10 @@ public class Alarm
 		if(fetchJSONFromDatabase().isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
-		//TODO: Creator ändern zulassen?
+		int notificationType = getNotificationType();
+		
 		DatabaseHandler.getdb().executeUpdate("UPDATE event SET ? WHERE alertevent = TRUE AND endtime IS NULL", JSON);
-		PushService.sendBroadCastMessage("Der aktuelle Alarm wurde bearbeitet!!", PushService.NOTIFICATION_EVENT);
+		PushService.sendBroadCastMessage("Der aktuelle Alarm wurde bearbeitet!", notificationType);
 	}
 
 	public void delete() throws SQLException, IllegalStateException
@@ -73,22 +78,13 @@ public class Alarm
 		if(JSON.isEmpty())
 			throw new IllegalStateException("No alertevent found!");
 		
-//		JSONArray result = DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, answerer FROM eventanswer WHERE event = ?", eventId + "");
-//		JSONArray displaynames = DatabaseHandler.getdb().executeQuery("SELECT displayname FROM user");
-//		
-//		for (int i = 0; i < result.size(); i++)
-//		{
-//			JSONObject data = (JSONObject) result.get(i);
-//			
-//		}
-		
-		return DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, displayname AS answerer FROM user, eventanswer WHERE event = ? AND login_id = eventanswer.answerer", eventId + "");
+		return DatabaseHandler.getdb().executeQuery("SELECT answer, availablecar, answerer, displayname FROM user, eventanswer WHERE event = ? AND login_id = eventanswer.answerer", eventId + "");
 	}
 	
 	private JSONObject fetchJSONFromDatabase() throws SQLException, IllegalStateException
 	{
 		JSONArray array = DatabaseHandler.getdb().executeQuery(
-				"SELECT description, requiredthings, quantitymembers, street, housenumber, zip, town "
+				"SELECT description, requiredthings, quantitymembers, street, housenumber, zip, town, usergroup "
 				+ "FROM event WHERE alertevent = TRUE AND endtime IS NULL");
 		
 		if(array.isEmpty())
@@ -118,6 +114,23 @@ public class Alarm
 		JSONObject json = (JSONObject) array.get(0);
 
 		return (int) json.get("event_id");
+	}
+	
+	private int getNotificationType() throws SQLException
+	{
+		String shortDescr = (String) JSON.get("usergroup");
+		if(shortDescr == null)
+			throw new SQLException("Group not found!");
+		
+		for (int i = 0; i < ALERT_GROUPS.length; i++)
+		{
+			if(shortDescr.equals(ALERT_GROUPS[i]))
+			{
+				return (i+6); 
+			}
+		}
+		
+		throw new SQLException("Group not found!");
 	}
 	
 	public JSONObject getJSON()

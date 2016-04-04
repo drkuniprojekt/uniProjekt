@@ -23,13 +23,14 @@ import org.slf4j.LoggerFactory;
 public class DatabaseHandler
 {
 	public static final String[] SETTINGS = { "car", "gui_highcontrast", "gui_showexpirationdate", 
-		"notification_event", "notification_groupchat", "notification_chat" };
+		"notification_event", "notification_groupchat", "notification_chat", "notification_alert_segv",
+		"notification_alert_segs", "notification_alert_sbf", "notification_alert_ov" };
 	
 	private Connection conn;
 	private static DatabaseHandler db;
 	private static Logger log;
-	private static SimpleDateFormat fmt = new SimpleDateFormat("dd. MMMM yyyy hh:mm");	
-	
+	private static SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm");	
+
 	private DatabaseHandler()
 	{
 		try
@@ -54,7 +55,7 @@ public class DatabaseHandler
 		java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(
 				now.getTime());
 	
-		return currentTimestamp.toString();
+		return fmt.format(currentTimestamp);
 	}
 
 	public static DatabaseHandler getdb()
@@ -66,16 +67,16 @@ public class DatabaseHandler
 	}
 	
 	
-	public void closeConnection()
-	{
-		try
-		{
-			conn.close();
-		} catch (SQLException e)
-		{
-			log.error("Could not close connection");
-		}
-	}
+//	public void closeConnection()
+//	{
+//		try
+//		{
+//			conn.close();
+//		} catch (SQLException e)
+//		{
+//			log.error("Could not close connection");
+//		}
+//	}
 
 		
 	/**	 * 
@@ -404,10 +405,7 @@ public class DatabaseHandler
 	private Object cleanObject(Object in)
 	{		
 		if(in instanceof Timestamp)
-		{
-			SimpleDateFormat fmt = new SimpleDateFormat("dd. MMMM yyyy hh:mm");
-			fmt.setTimeZone(TimeZone.getTimeZone("CET"));
-			
+		{	
 			Object out	= null;
 			out			= fmt.format(in);
 			return out;

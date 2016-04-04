@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import drkprojekt.database.DatabaseHandler;
 import drkprojekt.rest.Helper;
@@ -20,6 +22,7 @@ import drkprojekt.rest.Helper;
 @WebServlet("/test/*")
 public class testServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static Logger log	= LoggerFactory.getLogger(testServlet.class);
 	private Helper helper;   
     /**
      * @see HttpServlet#HttpServlet()
@@ -37,13 +40,30 @@ public class testServlet extends HttpServlet {
 		//String test			= DatabaseHandler.getdb().test();
 		//JSONObject answer	= new JSONObject();
 		//answer.put("Test_Output", test);		
-		try {
-			helper.setResponseJSONArray(response, DatabaseHandler.getdb().executeQuery("SELECT * FROM TESTTABELLE"));
+		try 
+		{
+			log.debug("Test Servlet called: \n {}");
+			if(Helper.getSubResource(request, true) == null)
+			{
+				Helper.setResponseJSONArray(response, DatabaseHandler.getdb().executeQuery("SELECT * FROM PHONEGAPID"));
+			}else
+			{
+				Helper.setResponseJSONArray(response, DatabaseHandler.getdb().executeQuery("SELECT * FROM PHONEGAPID WHERE REGISTEREDUSER = ?", Helper.getSubResource(request, true)));
+			}
+			
 		} catch (SQLException e) {
 			JSONObject eo	= new JSONObject();
 			eo.put("Error", e);
 			helper.setResponseJSON(response, eo);
 			e.printStackTrace();
+		}
+	}
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+	{
+		try {
+			DatabaseHandler.getdb().executeUpdate("DELETE FROM PHONEGAPID");
+		} catch (SQLException e) {
+			log.error("Error while deleteing: {}", e);
 		}
 	}
 
