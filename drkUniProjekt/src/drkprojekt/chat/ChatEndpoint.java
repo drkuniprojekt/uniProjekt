@@ -33,15 +33,15 @@ public class ChatEndpoint
 			{
 				c.addSession(session);	
 				log.info("New Chat Client " + clientID);
-				try 
-				{
-					session.getBasicRemote().sendText(getMessagesFromDB(clientID).toJSONString());
-				} 
-				catch (Exception e) 
-				{
-					log.error("Unkown Error occured while Opening Socket:\n {} ", e);
-					session.getBasicRemote().sendText("Unknown Error occured");
-				}
+//				try 
+//				{
+//					session.getBasicRemote().sendText(getMessagesFromDB(clientID).toJSONString());
+//				} 
+//				catch (Exception e) 
+//				{
+//					log.error("Unkown Error occured while Opening Socket:\n {} ", e);
+//					session.getBasicRemote().sendText("Unknown Error occured");
+//				}
 			}
 			else
 			{
@@ -63,6 +63,7 @@ public class ChatEndpoint
 		try
 		{
 			JSONObject msgJson 	= (JSONObject) new JSONParser().parse(data);
+			JSONObject answer	= new JSONObject();
 			String recipient	= (String) msgJson.get("to");
 			String token 		= (String) msgJson.get("token");
 			if(!AuthHelper.isRegistered(token)){
@@ -80,63 +81,23 @@ public class ChatEndpoint
 			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))
 			{
 			   log.debug("init");
-			   return getMessagesFromDB(clientID).toJSONString();
+			   answer.put("data", getMessagesFromDB(clientID));			   
 			}
 			else if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
 			{
 			    log.debug("loadData");			    
 			    int message_id = Integer.parseInt((String)msgJson.get("lastMessage_id"));
 			    
-			    return getMessagesFromDB(clientID, recipient, message_id).toJSONString();
+			    answer.put("data", getMessagesFromDB(clientID, recipient, message_id));
 			    //ClientFactory.getClient(clientID).sendMessage(outJSON);
 			}
 			else
-			{
-        			    
-        			log.debug("sendMessage");
-        			String message		= ((String) msgJson.get("message")).trim();
-        			
-        			
-        			if(message.length() == 0)
-        			{
-        				throw new IllegalArgumentException("Please Provide a non-empty Message");
-        			}
-        			JSONObject outJSON = new JSONObject();
-        			outJSON.put("messagecontent", message);       			
-        			outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
-        			outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
-        			
-        			if(recipient == null || recipient.equals("Gruppenchat"))
-        			{
-        				log.debug("Got new Broadcast-Message: " + data);
-        				boolean	msgRead;
-        				ArrayList<ChatClient>	clients = ClientFactory.getAllClients();
-        				
-        				for (ChatClient c : clients) 
-        				{
-        					if(!c.getName().equals(clientID))
-        					{
-        						msgRead	= c.sendMessage(outJSON);
-        						//TODO: savemessageLogik entwirren
-        						//      message darf nur EINMAL insgesamt abgespeichert werden, unread jedoch pro user
-        						saveMessageToDB(message, msgRead, clientID, c.getName(), true);
-        					}else
-        					{
-        						saveMessageToDB(message, false, clientID, c.getName(), true);
-        					}
-        					
-        				}								
-        			}
-        			else
-        			{
-        				log.debug("Got new Message to " + recipient + ": "+ data);
-        				boolean	msgRead;				
-        				msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
-        				saveMessageToDB(message, msgRead, clientID, recipient, false);				
-        			}
-        			return outJSON.toJSONString();
-        		}
-			
+			{        			    
+        		log.debug("sendMessage");
+        		answer.put("data", handleMessage(data, clientID, msgJson, recipient));
+        	}
+			answer.put("requestType", msgJson.get("requestType"));
+			return answer.toJSONString();
 			
 		} catch (ParseException | NullPointerException e)
 		{
@@ -154,15 +115,81 @@ public class ChatEndpoint
 		}
 		
 	}
+
+	private JSONObject handleMessage(String data, String clientID,
+			JSONObject msgJson, String recipient) {
+		String message		= ((String) msgJson.get("message")).trim();
+		
+		
+		if(message.length() == 0)
+		{
+			throw new IllegalArgumentException("Please Provide a non-empty Message");
+		}
+		JSONObject outJSON = new JSONObject();
+		outJSON.put("messagecontent", message);       			
+		outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
+		outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
+		
+		if(recipient == null || recipient.equals("Gruppenchat"))
+		{
+			log.debug("Got new Broadcast-Message: " + data);
+			saveBroadcastMessageToDB(message, clientID);
+			processBroadcastMessage(outJSON, clientID);        												
+		}
+		else
+		{
+			log.debug("Got new Message to " + recipient + ": "+ data);
+			boolean	msgRead;				
+			msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
+			saveMessageToDB(message, msgRead, clientID, recipient, false);	
+			
+		}
+		return outJSON;
+	}
 	
 
+
+
+
+	/**
+	 * @param outJSON
+	 * @param clientID
+	 */
+	private void processBroadcastMessage(JSONObject outJSON, String clientID) {
+		boolean	msgRead;
+		ArrayList<ChatClient>	clients = ClientFactory.getAllClients();
+		for (ChatClient c : clients) 
+		{
+		    	if (c instanceof RealClient && !c.getName().equals(clientID))
+		    	{
+		    	    	msgRead	= c.sendMessage(outJSON);
+		    	
+        			if(!msgRead)
+        			{
+        			    	try
+        			    	{
+        			    	    	DatabaseHandler.getdb().executeUpdate("INSERT INTO MESSAGESUNREAD VALUES(MESSAGE_ID.CURRVAL, ?)", c.getName());
+            			
+        			    	} catch (SQLException e) 
+        			    	{
+        			    	    	log.error("SQL Error while saving unread message to DB:\n ",e);
+        			    	}
+        			}
+		    	}
+    		}
+	    
+	}
 
 	@OnClose
 	public void onClose(Session session, @PathParam("name") String clientID)
 	{
 		ClientFactory.getClient(clientID).deleteSession(session);
 	}
-	//TODO: anpassen siehe 127
+	
+	private void saveBroadcastMessageToDB(String message, String clientID) {
+	    saveMessageToDB(message, true, clientID, "", true);
+ 	}
+	
 	private void saveMessageToDB(String message, boolean read, String from, String to, boolean broadcast)
 	{
 		log.debug("Trying to save message to Database: " + message);
@@ -194,8 +221,7 @@ public class ChatEndpoint
 			log.error("SQL Error while Saving Message to DB:\n ",e);
 		}
 	}
-	//TODO: getmessages ändern, sodass wirklich die letzten 50 nachrichten kommen
-	// inner select mit order by und top 50, äußeres select order by entgegengesetzt?
+
 	/**
 	 * @param clientID
 	 * @param recipient
@@ -224,13 +250,12 @@ public class ChatEndpoint
 		    }
 	    }
 	    
-	    JSONArray msg = db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
-	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ? ORDER BY createtime ASC", new String[]{"" + chatroomID, ""+message_id});
+	    JSONArray msg = db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
+	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ? ORDER BY createtime DESC) ORDER BY createtime ASC", new String[]{"" + chatroomID, ""+message_id});
 	    out.put("messages", msg);
 	    return out;
 	}
 	
-	//TODO: siehe 204 anpassen dementsprechend
 	private JSONArray getMessagesFromDB(String forUser) throws SQLException
 	{
 		JSONArray	res		= new JSONArray();
@@ -252,13 +277,15 @@ public class ChatEndpoint
 			{
         			if(persons.size() == 1)
         			{
-        				room.put("name", (String)((JSONObject)persons.get(0)).get("displayname"));
+        				room.put("loginid", (String)((JSONObject)persons.get(0)).get("login_id"));
+        				room.put("displayname", (String)((JSONObject)persons.get(0)).get("displayname"));
         			}
         			else if( persons.size() > 1) // Ignore room if theres less than 1 other person
         			{
-        				room.put("name", "Gruppenchat");
+        				room.put("loginid", "Gruppenchat");
+        				room.put("displayname", "Gruppenchat");
         			}
-        			JSONArray msg		= db.executeQuery("SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? ORDER BY createtime ASC", "" + number);
+        			JSONArray msg		= db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? ORDER BY createtime DESC) ORDER BY createtime ASC", "" + number);
         			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
         						
         			room.put("persons", persons);
