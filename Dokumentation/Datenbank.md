@@ -147,5 +147,5 @@ ITEM_ID |INT	|X  |  |Use sequencer ITEM_ID.nextval for insert (auto_increment)
 ITEMNAME |VARCHAR(255)	|  |  |
 QUANTITY |INT	|  |  |
 QUANTITYUNIT |VARCHAR(255)	|  |  |
-EXPIRATIONDATE |TIMESTAMP	|  |  |YYYY-MM-DD HH:SS
+EXPIRATIONDATE |DATE	|  |  |YYYY-MM-DD
 EQUIPMENTITEM |BOOLEAN	|  |  |IF true (1) then item is an equipment
