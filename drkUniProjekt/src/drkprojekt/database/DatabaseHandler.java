@@ -33,7 +33,6 @@ public class DatabaseHandler
 	private static DatabaseHandler db;
 	private static Logger log;
 	private static SimpleDateFormat timestamp = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-	private static SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
 
 	private DatabaseHandler()
 	{
@@ -264,7 +263,7 @@ public class DatabaseHandler
 		{
 			String column = (String) iterator.next();
 			String value = (String) json.get(column).toString();
-			
+
 			stmt.setString(i, value);
 			i++;
 		}
@@ -430,11 +429,6 @@ public class DatabaseHandler
 		{	
 			Object out	= null;
 			out			= timestamp.format(in);
-			return out;
-		} else if(in instanceof java.sql.Date)
-		{
-			Object out = null;
-			out = date.format(in);
 			return out;
 		} else if(in instanceof Byte)
 		{
