@@ -70,19 +70,6 @@ public class DatabaseHandler
 		return db;
 	}
 	
-	
-//	public void closeConnection()
-//	{
-//		try
-//		{
-//			conn.close();
-//		} catch (SQLException e)
-//		{
-//			log.error("Could not close connection");
-//		}
-//	}
-
-		
 	/**	 * 
 	 * @param query The Query to execute
 	 * @return An JSONObject containing the result
@@ -209,9 +196,12 @@ public class DatabaseHandler
 	
 	/**
 	 * Executes a an UPDATE-Statement or INSERT-Statement that can be filled in with the data of a JSONObject
-	 * Use ? as placeholder for the data to be filled from the JSONObject
+	 * Use ? as placeholder for the data to be filled from the JSONObject (2 times for INSERT-Statements, 1 time for UPDATE-Statements)
+	 * You may also add attributes to your statement which are not in the JSONObject
 	 * Example1: "UPDATE table_name SET ? WHERE where_condition"
-	 * Example2: "INSERT INTO table_name (?) VALUES (?)"
+	 * Example2: "UPDATE table_name SET some_column = some_value, some_column2 = some_value 2, ? WHERE where_condition"
+	 * Example3: "INSERT INTO table_name (?) VALUES (?)"
+	 * Example4: "INSERT INTO table_name (some_column, ?) VALUES (some_value, ?)"
 	 * @param query Query to execute
 	 * @param json JSONObject with all relevant data for the new or changed entry
 	 * @return Number of rows affected
@@ -223,20 +213,21 @@ public class DatabaseHandler
 		log.debug("Executing query:\n {}", query);
 		if(json.size() == 0)
 			return 0;
-		
-		Statement stmt 	= conn.createStatement();
 			
 		String tmp1 = "";
 		String tmp2 = "";
-		
+		query = query.replace("?", "placeholder");
 		
 		for(Iterator iterator = json.keySet().iterator(); iterator.hasNext();)
-		{
+		{			
 			String column = (String) iterator.next();
-			String value = (String) json.get(column).toString();
+			if(!columns.contains(column.toUpperCase()))
+				throw new SQLException("The column \"" + column + "\" in the given JSON does not exist in the schema! "
+						+ "The update has been refused due to security reasons.");			
+			
 			if(query.toUpperCase().startsWith("UPDATE"))
 			{
-				tmp1 = tmp1 + column + " = " + "'" + value + "', ";
+				tmp1 = tmp1 + column + " = " + "?, ";
 				
 				if(!iterator.hasNext())
 				{
@@ -246,7 +237,7 @@ public class DatabaseHandler
 			else if(query.toUpperCase().startsWith("INSERT"))
 			{
 				tmp1 = tmp1 + column + ", ";
-				tmp2 = tmp2 + "'" + value + "', ";
+				tmp2 = tmp2 + "?, ";
 				
 				if(!iterator.hasNext())
 				{
@@ -255,21 +246,29 @@ public class DatabaseHandler
 				}
 			}
 			else
-			{
-				closeStatement(stmt);
 				return 0;
-			}
 		}
 		
 		log.debug("SQL-String: " + query);
-		log.debug("First '?' replaced with: " + tmp1);
-		log.debug("First '?' replaced with: " + tmp2);
+		log.debug("First placeholder replaced with: " + tmp1);
+		log.debug("Second placeholder replaced with: " + tmp2);
 		
-		query = query.replace("?", "placeholder");
 		query = query.replaceFirst("placeholder", tmp1);
 		query = query.replaceFirst("placeholder", tmp2);
 		
-		int rowcount = stmt.executeUpdate(query);
+		PreparedStatement stmt 	= conn.prepareStatement(query);
+		
+		int i = 1;
+		for(Iterator iterator = json.keySet().iterator(); iterator.hasNext();)
+		{
+			String column = (String) iterator.next();
+			String value = (String) json.get(column).toString();
+			
+			stmt.setString(i, value);
+			i++;
+		}
+
+		int rowcount = stmt.executeUpdate();
 		closeStatement(stmt);
 		return rowcount;
 	}
@@ -363,6 +362,7 @@ public class DatabaseHandler
 				InitialContext ctx 	= new InitialContext();
 				DataSource ds 		= (DataSource) ctx.lookup("java:comp/env/jdbc/DefaultDB");
 				conn 				= ds.getConnection();
+				columns             = fetchColumns();
 
 				log.info("Database-Reconnection successfull ");
 
@@ -383,8 +383,8 @@ public class DatabaseHandler
 		while (rs.next())
 		{
 			String tmpName = rs.getString("COLUMN_NAME");
-			//log.debug("Column: " + tmpName);
-			allColumns.add(tmpName);
+			log.debug("Column: " + tmpName);
+			allColumns.add(tmpName.toUpperCase());
 		}
 		
 		return allColumns;
