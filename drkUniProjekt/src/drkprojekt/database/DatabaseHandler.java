@@ -32,7 +32,8 @@ public class DatabaseHandler
 	private ArrayList<String> columns;
 	private static DatabaseHandler db;
 	private static Logger log;
-	private static SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm");	
+	private static SimpleDateFormat timestamp = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+	private static SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
 
 	private DatabaseHandler()
 	{
@@ -45,7 +46,7 @@ public class DatabaseHandler
 			columns             = fetchColumns();
 
 			log.info("Databaseconnection successfull ");
-			fmt.setTimeZone(TimeZone.getTimeZone("CET"));
+			timestamp.setTimeZone(TimeZone.getTimeZone("CET"));
 
 		} catch (Exception e)
 		{
@@ -59,7 +60,7 @@ public class DatabaseHandler
 		java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(
 				now.getTime());
 	
-		return fmt.format(currentTimestamp);
+		return timestamp.format(currentTimestamp);
 	}
 
 	public static DatabaseHandler getdb()
@@ -428,7 +429,12 @@ public class DatabaseHandler
 		if(in instanceof Timestamp)
 		{	
 			Object out	= null;
-			out			= fmt.format(in);
+			out			= timestamp.format(in);
+			return out;
+		} else if(in instanceof java.sql.Date)
+		{
+			Object out = null;
+			out = date.format(in);
 			return out;
 		} else if(in instanceof Byte)
 		{

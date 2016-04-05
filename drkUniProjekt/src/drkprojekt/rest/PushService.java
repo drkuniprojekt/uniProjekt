@@ -20,7 +20,7 @@ import drkprojekt.database.DatabaseHandler;
 public class PushService
 {
 	//Emanuel: APA91bHsJdpaOueOeVmXifChEGH0RPp35I3Qh_RNjvGTb3pqPBDWd3oinQXntIcT7CBXZkK0cESaEmadNya5CFFFOC6LQwo59KiTUcwqVTTrw22q4MUJ_3s
-	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
+	private static final String SENDER_ID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
 	private static Logger log = LoggerFactory.getLogger(PushService.class);
 	
 	public static final int NOTIFICATION_EVENT = 3;
@@ -208,7 +208,7 @@ public class PushService
 		HttpURLConnection connection = (HttpURLConnection) googleUrl.openConnection();
 	    connection.setRequestMethod("POST");
 	    connection.setRequestProperty("Content-Type", "application/json");
-	    connection.setRequestProperty("Authorization","key=" + SENDERID); 
+	    connection.setRequestProperty("Authorization","key=" + SENDER_ID); 
 	    connection.setDoOutput(true);
 	    connection.setUseCaches(false);
 	    
