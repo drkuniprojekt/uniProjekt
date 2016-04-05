@@ -131,8 +131,8 @@ public class ChatEndpoint
 		outJSON.put("messagecontent", message);       			
 		outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
 		outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
-		outJSON.put("toroom", msgJson.get("toroom"));
-		
+		outJSON.put("toroom",msgJson.get("toroom"));
+
 		if(recipient == null || recipient.equals("Gruppenchat"))
 		{
 			log.debug("Got new Broadcast-Message: " + data);
@@ -239,8 +239,9 @@ public class ChatEndpoint
 	    DatabaseHandler db	= DatabaseHandler.getdb();
 	    
 	    int chatroomID;
-	    if(chatpartner == null || chatpartner.equals("Gruppenchat")){
-		chatroomID = 1;
+	    if(chatpartner == null || chatpartner.equals("Gruppenchat"))
+	    {
+	    	chatroomID = 1;
 	    }
 	    else
 	    {
@@ -255,7 +256,9 @@ public class ChatEndpoint
 			chatroomID = (int) ((JSONObject)chatroom.get(0)).get("chatroom");
 		    }
 	    }
-	    out.put("toroom", chatroomID);
+
+	    out.put("toroom",chatroomID);
+
 	    JSONArray msg = db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
 	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ? ORDER BY createtime DESC) ORDER BY createtime ASC", new String[]{"" + chatroomID, ""+message_id});
 	    out.put("messages", msg);
