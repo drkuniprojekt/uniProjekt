@@ -81,7 +81,8 @@ public class ChatEndpoint
 			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))
 			{
 			   log.debug("init");
-			   answer.put("data", getMessagesFromDB(clientID));			   
+			   answer.put("data", getMessagesFromDB(clientID));
+			   answer.put("requestType", msgJson.get("requestType"));
 			}
 			else if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("loadData"))
 			{
@@ -89,14 +90,15 @@ public class ChatEndpoint
 			    int message_id = (int)(long)msgJson.get("lastMessage_id");
 			    
 			    answer.put("data", getMessagesFromDB(clientID, recipient, message_id));
+			    answer.put("requestType", msgJson.get("requestType"));
 			}
 			else
 			{        			    
 			    log.debug("sendMessage");
-			    answer.put("data", handleMessage(data, clientID, msgJson, recipient));
+			    answer =  handleMessage(data, clientID, msgJson, recipient);
 			}
 			
-			answer.put("requestType", msgJson.get("requestType"));
+			
 			return answer.toJSONString();
 			
 		} catch (ParseException | NullPointerException e)
@@ -129,6 +131,7 @@ public class ChatEndpoint
 		outJSON.put("messagecontent", message);       			
 		outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
 		outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
+		outJSON.put("toroom", msgJson.get("toroom"));
 		
 		if(recipient == null || recipient.equals("Gruppenchat"))
 		{
@@ -144,7 +147,10 @@ public class ChatEndpoint
 			saveMessageToDB(message, msgRead, clientID, recipient, false);	
 			
 		}
-		return outJSON;
+		JSONObject returnJSON = new JSONObject();
+		returnJSON.put("data", outJSON);
+		returnJSON.put("requestType", msgJson.get("requestType"));
+		return returnJSON;
 	}
 	
 
@@ -249,10 +255,11 @@ public class ChatEndpoint
 			chatroomID = (int) ((JSONObject)chatroom.get(0)).get("chatroom");
 		    }
 	    }
-	    
+	    out.put("toroom", chatroomID);
 	    JSONArray msg = db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
 	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ? ORDER BY createtime DESC) ORDER BY createtime ASC", new String[]{"" + chatroomID, ""+message_id});
 	    out.put("messages", msg);
+	    
 	    return out;
 	}
 	
