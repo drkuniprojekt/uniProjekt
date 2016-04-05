@@ -164,11 +164,12 @@ public class Alarm
 	{
 		log.debug("Converting Notification Type...");
 		JSONArray usergroup = (JSONArray) JSON.get("usergroup");
+		if(usergroup == null || usergroup.size() == 0)
+			throw new SQLException("No group found!");
 		Object[] shortDescr = usergroup.toArray();
 		JSON.remove("usergroup");
 		
-		if(shortDescr == null || shortDescr.length == 0)
-			throw new SQLException("No group found!");
+		
 		
 		int[] types = new int[shortDescr.length];
 		
