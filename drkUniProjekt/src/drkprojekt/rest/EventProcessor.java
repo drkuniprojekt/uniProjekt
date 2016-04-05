@@ -31,7 +31,7 @@ public class EventProcessor extends HttpServlet
 			if(sy == null || sm == null)
 				throw new IllegalArgumentException("Mandatory parameters not supplied!");
 			
-			int startYear = Integer.parseInt(sy);;
+			int startYear = Integer.parseInt(sy);
 			int startMonth = Integer.parseInt(sm);
 			
 			Event event = new Event(startYear, startMonth);

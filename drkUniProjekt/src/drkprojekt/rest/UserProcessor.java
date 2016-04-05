@@ -104,6 +104,9 @@ public class UserProcessor extends HttpServlet
 				{
 					DatabaseHandler.getdb().executeUpdate("DELETE FROM setting WHERE useraccount = '" + userId + "'");
 					DatabaseHandler.getdb().executeUpdate("DELETE FROM chatroommapping WHERE useraccount = '" + userId + "'");
+					DatabaseHandler.getdb().executeUpdate("DELETE FROM messagesunread WHERE useraccount = '" + userId + "'");
+					DatabaseHandler.getdb().executeUpdate("DELETE FROM message WHERE useraccount = '" + userId + "'");
+					DatabaseHandler.getdb().executeUpdate("DELETE FROM eventanswer WHERE answerer = '" + userId + "'");
 					DatabaseHandler.getdb().executeUpdate("DELETE FROM user WHERE login_id = '" + userId + "'");
 					return;
 				}

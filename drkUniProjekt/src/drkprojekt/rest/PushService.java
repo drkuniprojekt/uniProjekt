@@ -219,9 +219,14 @@ public class PushService
 	{
 		JSONObject request = new JSONObject();
 		JSONObject data = new JSONObject();
+		JSONObject extra = new JSONObject();
 		
 		data.put("message", message);
 		data.put("title", message);
+		
+		//TODO:
+		extra.put("url", "KalenerController.controller.js");
+		data.put("extra", extra);
 		
 		if(deviceId.length == 1)
 			request.put("to", deviceId[0]);
@@ -239,7 +244,6 @@ public class PushService
 			request.put("registration_ids", sb);
 		}
 		request.put("data", data);
-		//TODO: Collapse-Key festlegen
 		//request.put("collapse_key", "DRK-Alarm"); 
 		//request.put("delay_while_idle", true);
 		
