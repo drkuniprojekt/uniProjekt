@@ -83,7 +83,7 @@ public class testServlet extends HttpServlet {
 			String chatroom = "28"; 		
 			if(Helper.getSubResource(request, true) == null || !Helper.getSubResource(request, true).contains("doit"))
 			{
-				throw new NoSuchElementException("Please dont use this before reading and understandig the code !");
+				throw new IllegalArgumentException("Please dont use this before reading and understandig the code !");
 			}
 			for(int i = 1; i < 56; i++)
 			{
@@ -94,7 +94,7 @@ public class testServlet extends HttpServlet {
 		} catch (SQLException e) 
 		{
 			log.error("SQL Error while Saving Message to DB:\n ",e);
-		}catch (NoSuchElementException e)
+		}catch (IllegalArgumentException e)
 		{
 			helper.handleException(e, response);
 		}
