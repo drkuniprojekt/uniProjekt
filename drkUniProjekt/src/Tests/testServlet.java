@@ -2,6 +2,7 @@ package Tests;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.NoSuchElementException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -70,8 +71,33 @@ public class testServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+		DatabaseHandler db = DatabaseHandler.getdb();
+		
+		//code from saveMessageToDB
+		
+		try
+		{
+
+			String chatroom = "28"; 		
+			if(!Helper.getSubResource(request, true).contains("doit"))
+			{
+				
+			}
+			for(int i = 1; i < 56; i++)
+			{
+				db.executeUpdate("INSERT INTO MESSAGE VALUES(MESSAGE_ID.NEXTVAL, CURRENT_TIMESTAMP, ?,?,?)", 
+						new String[]{"Message" + i, "User1", chatroom});
+			}
+
+		} catch (SQLException e) 
+		{
+			log.error("SQL Error while Saving Message to DB:\n ",e);
+		}catch (NoSuchElementException e)
+		{
+			helper.handleException(e, response);
+		}
 	}
 //Test Git
 }
