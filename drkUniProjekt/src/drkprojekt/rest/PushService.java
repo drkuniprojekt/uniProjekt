@@ -20,7 +20,7 @@ import drkprojekt.database.DatabaseHandler;
 public class PushService
 {
 	//Emanuel: APA91bHsJdpaOueOeVmXifChEGH0RPp35I3Qh_RNjvGTb3pqPBDWd3oinQXntIcT7CBXZkK0cESaEmadNya5CFFFOC6LQwo59KiTUcwqVTTrw22q4MUJ_3s
-	private static final String SENDERID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
+	private static final String SENDER_ID = "AIzaSyDcavG3GYtXKerQcxDBnUiecBHuqHUlX3U";
 	private static Logger log = LoggerFactory.getLogger(PushService.class);
 	
 	public static final int NOTIFICATION_EVENT = 3;
@@ -208,7 +208,7 @@ public class PushService
 		HttpURLConnection connection = (HttpURLConnection) googleUrl.openConnection();
 	    connection.setRequestMethod("POST");
 	    connection.setRequestProperty("Content-Type", "application/json");
-	    connection.setRequestProperty("Authorization","key=" + SENDERID); 
+	    connection.setRequestProperty("Authorization","key=" + SENDER_ID); 
 	    connection.setDoOutput(true);
 	    connection.setUseCaches(false);
 	    
@@ -219,9 +219,14 @@ public class PushService
 	{
 		JSONObject request = new JSONObject();
 		JSONObject data = new JSONObject();
+		JSONObject extra = new JSONObject();
 		
 		data.put("message", message);
 		data.put("title", message);
+		
+		//TODO:
+		extra.put("url", "KalenerController.controller.js");
+		data.put("extra", extra);
 		
 		if(deviceId.length == 1)
 			request.put("to", deviceId[0]);
@@ -239,7 +244,6 @@ public class PushService
 			request.put("registration_ids", sb);
 		}
 		request.put("data", data);
-		//TODO: Collapse-Key festlegen
 		//request.put("collapse_key", "DRK-Alarm"); 
 		//request.put("delay_while_idle", true);
 		

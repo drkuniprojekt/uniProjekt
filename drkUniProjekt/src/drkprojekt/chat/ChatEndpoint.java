@@ -281,7 +281,7 @@ public class ChatEndpoint
 		    	
 			JSONObject	room	= (JSONObject) chatroom.get(i);
 			int number			= (int) room.get("chatroom"); 	
-			JSONArray persons	= db.executeQuery("SELECT useraccount , u.displayname FROM CHATROOMMAPPING INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
+			JSONArray persons	= db.executeQuery("SELECT useraccount , u.login_id, u.displayname FROM CHATROOMMAPPING INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? AND useraccount <> ?", new String[]{"" + number, forUser});			
 			if(persons.size() == 0){
 			    log.debug("Persons is empty");
 			}

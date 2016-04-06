@@ -1,4 +1,5 @@
 ##Changelog
+`05.04.2016` STORAGE created  
 `04.04.2016` USERGROUP in EVENT deleted | New table ALERTGROUP added for mapping Alerts to the Usergroups  
 `01.04.2016` USERGROUP in EVENT added (because of changerequest)  
 `31.03.2016` Further settings added (alert-groups)  
@@ -136,3 +137,15 @@ Attributname 		|Type    |Key     |Foreign Key  |Notes
 ------|------|------|------|------|
 MESSAGE |INT	|X  |X |References to MESSAGE(MESSAGE_ID)
 USERACCOUNT |VARCHAR(255)	|X |X |References to USER(LOGIN_ID)
+
+----------------------------------------------
+
+#STORAGE  
+Attributname 		|Type    |Key     |Foreign Key  |Notes
+------|------|------|------|------|
+ITEM_ID |INT	|X  |  |Use sequencer ITEM_ID.nextval for insert (auto_increment)
+ITEMNAME |VARCHAR(255)	|  |  |
+QUANTITY |INT	|  |  |
+QUANTITYUNIT |VARCHAR(255)	|  |  |
+EXPIRATIONDATE |DATE	|  |  |YYYY-MM-DD
+EQUIPMENTITEM |BOOLEAN	|  |  |IF true (1) then item is an equipment

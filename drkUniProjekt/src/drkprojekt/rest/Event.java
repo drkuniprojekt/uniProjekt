@@ -42,7 +42,7 @@ public class Event
 			throw new IllegalStateException("The desired event was not found!");
 		
 		//TODO: Hier auch Push?
-		//PushService.sendBroadCastMessage("Ein Termin wurde bearbeitet", PushService.NOTIFICATION_EVENT);
+		PushService.sendBroadCastMessage("Ein Termin wurde bearbeitet", PushService.NOTIFICATION_EVENT);
 	}
 
 	public void delete(int eventId) throws SQLException, IllegalStateException
