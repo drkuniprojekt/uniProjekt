@@ -272,7 +272,7 @@ public class ChatEndpoint
 	{
 		JSONArray	res		= new JSONArray();
 		DatabaseHandler db	= DatabaseHandler.getdb();
-		JSONArray chatroom	= db.executeQuery("SELECT chatroom FROM CHATROOMMAPPING WHERE USERACCOUNT = ?", forUser);
+		JSONArray chatroom	= db.executeQuery("SELECT c.chatroom, max(createtime) FROM chatroommapping AS c LEFT JOIN message AS m ON c.chatroom = m.chatroom WHERE c.useraccount = ? GROUP BY c.chatroom ORDER BY max(createtime) DESC", forUser);
 		
 		log.debug("Chatroom size: " +chatroom.size());
 		
