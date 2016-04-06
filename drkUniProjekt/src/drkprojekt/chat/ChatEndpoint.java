@@ -261,7 +261,7 @@ public class ChatEndpoint
 
 	    out.put("toroom",chatroomID);
 
-	    JSONArray msg = db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount"
+	    JSONArray msg = db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, displayname AS from"
 	    	+ " FROM MESSAGE WHERE Chatroom = ? AND message_id < ? ORDER BY createtime DESC) ORDER BY createtime ASC", new String[]{"" + chatroomID, ""+message_id});
 	    out.put("messages", msg);
 	    
@@ -272,7 +272,7 @@ public class ChatEndpoint
 	{
 		JSONArray	res		= new JSONArray();
 		DatabaseHandler db	= DatabaseHandler.getdb();
-		JSONArray chatroom	= db.executeQuery("SELECT c.chatroom, max(createtime) FROM chatroommapping AS c LEFT JOIN message AS m ON c.chatroom = m.chatroom WHERE c.useraccount = ? GROUP BY c.chatroom ORDER BY max(createtime) DESC", forUser);
+		JSONArray chatroom	= db.executeQuery("SELECT c.chatroom, max(createtime) AS lasttime FROM chatroommapping AS c LEFT JOIN message AS m ON c.chatroom = m.chatroom WHERE c.useraccount = ? GROUP BY c.chatroom ORDER BY max(createtime) DESC", forUser);
 		
 		log.debug("Chatroom size: " +chatroom.size());
 		log.debug("Chatroom: " + chatroom.toJSONString());
@@ -297,10 +297,10 @@ public class ChatEndpoint
         				room.put("loginid", "Gruppenchat");
         				room.put("displayname", "Gruppenchat");
         			}
-        			JSONArray msg		= db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? ORDER BY createtime DESC) ORDER BY createtime ASC", "" + number);
+        			JSONArray msg		= db.executeQuery("SELECT * FROM (SELECT TOP 50 createtime, messagecontent, chatroom, message_id, useraccount, u.displayname AS from FROM MESSAGE INNER JOIN user AS u ON useraccount = u.login_id WHERE Chatroom = ? ORDER BY createtime DESC) ORDER BY createtime ASC", "" + number);
         			int unread			= db.executeQuery("SELECT u.message FROM MESSAGESUNREAD AS u INNER JOIN MESSAGE AS m	ON m.message_id    = u.message	WHERE m.chatroom  = ? AND u.useraccount = ?", new String[]{"" + number, forUser}).size();
         						
-        			room.put("persons", persons);
+        			//room.put("persons", persons);
         			room.put("messages", msg);
         			room.put("unreadMessages", unread);
         			res.add(room);	
