@@ -81,7 +81,7 @@ public class testServlet extends HttpServlet {
 		{
 
 			String chatroom = "28"; 		
-			if(!Helper.getSubResource(request, true).contains("doit"))
+			if(Helper.getSubResource(request, true) == null || !Helper.getSubResource(request, true).contains("doit"))
 			{
 				throw new NoSuchElementException("Please dont use this before reading and understandig the code !");
 			}
