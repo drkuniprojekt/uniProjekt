@@ -43,7 +43,7 @@ public class RealClient extends ChatClient
 			{
 				for (String s : phonegap_ids) 
 				{
-					PushService.sendUnicastMessage("Neue Chatnachricht von " + (String)msgJSON.get("from"), s, PushService.NOTIFICATION_CHAT);
+					PushService.sendUnicastMessage("Neue Chatnachricht von " + (String)((JSONObject) msgJSON.get("data")).get("from"), s, PushService.NOTIFICATION_CHAT);
 				}
 				return false;
 			}
