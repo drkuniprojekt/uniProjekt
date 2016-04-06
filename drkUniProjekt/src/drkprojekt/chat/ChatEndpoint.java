@@ -275,7 +275,7 @@ public class ChatEndpoint
 		JSONArray chatroom	= db.executeQuery("SELECT c.chatroom, max(createtime) FROM chatroommapping AS c LEFT JOIN message AS m ON c.chatroom = m.chatroom WHERE c.useraccount = ? GROUP BY c.chatroom ORDER BY max(createtime) DESC", forUser);
 		
 		log.debug("Chatroom size: " +chatroom.size());
-		
+		log.debug("Chatroom: " + chatroom.toJSONString());
 		for (int i = 0; i < chatroom.size(); i++)
 		{
 		    	
