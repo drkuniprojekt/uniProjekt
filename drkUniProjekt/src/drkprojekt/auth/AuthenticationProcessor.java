@@ -60,21 +60,23 @@ public class AuthenticationProcessor extends HttpServlet {
 		return;
 	    }
 	    String device_id = (String) json.get("device_id");
-	    //TODO: If phonegap. Else what?
+
 	    if (device_id != null) {
 		log.debug("device_id: " + device_id);
 		
-		
+		//TODO: Select überhaupt iwie benötigt?
 		int check_pid	= db.executeQuery("SELECT * FROM phonegapid WHERE device_id = ?", device_id).size();
-		log.debug("Check_pid" + check_pid);
-			if(check_pid < 1)
-			{
-				String[] tmp2 = { login_id, device_id };
-				ClientFactory.getClient(login_id).addPhonegap_id(device_id);
-				db.executeUpdate(
-						"INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)",
-						tmp2);
-			}
+		log.debug("Check_pid: " + check_pid);
+		if(check_pid != 0)
+		{
+			log.debug("Logout old user");
+			db.executeUpdate("DELETE FROM phonegapid WHERE device_id = ?",device_id);
+		}
+		String[] tmp2 = { login_id, device_id };
+		ClientFactory.getClient(login_id).addPhonegap_id(device_id);
+		db.executeUpdate(
+				"INSERT INTO phonegapid (registeredUser, device_id, registertime) VALUES(?,?,CURRENT_TIMESTAMP)",
+				tmp2);
 		
 	    }else{
 		log.debug("device_id is null");
