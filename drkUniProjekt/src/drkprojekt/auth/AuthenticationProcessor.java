@@ -64,14 +64,7 @@ public class AuthenticationProcessor extends HttpServlet {
 	    if (device_id != null) {
 		log.debug("device_id: " + device_id);
 		
-		//TODO: Select überhaupt iwie benötigt?
-		int check_pid	= db.executeQuery("SELECT * FROM phonegapid WHERE device_id = ?", device_id).size();
-		log.debug("Check_pid: " + check_pid);
-		if(check_pid != 0)
-		{
-			log.debug("Logout old user");
-			db.executeUpdate("DELETE FROM phonegapid WHERE device_id = ?",device_id);
-		}
+		db.executeUpdate("DELETE FROM phonegapid WHERE device_id = ?",device_id);		
 		String[] tmp2 = { login_id, device_id };
 		ClientFactory.getClient(login_id).addPhonegap_id(device_id);
 		db.executeUpdate(
