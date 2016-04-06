@@ -96,6 +96,7 @@ public class ChatEndpoint
 			{        			    
 			    log.debug("sendMessage");
 			    answer =  handleMessage(data, clientID, msgJson, recipient);
+			    log.debug("HandleMessage: " + answer.toJSONString());
 			}
 			
 			
@@ -132,24 +133,25 @@ public class ChatEndpoint
 		outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
 		outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
 		outJSON.put("toroom",msgJson.get("toroom"));
-
+		JSONObject returnJSON = new JSONObject();
+		returnJSON.put("data", outJSON);
+		returnJSON.put("requestType", msgJson.get("requestType"));
+		
 		if(recipient == null || recipient.equals("Gruppenchat"))
 		{
 			log.debug("Got new Broadcast-Message: " + data);
 			saveBroadcastMessageToDB(message, clientID);
-			processBroadcastMessage(outJSON, clientID);        												
+			processBroadcastMessage(returnJSON, clientID);        												
 		}
 		else
 		{
 			log.debug("Got new Message to " + recipient + ": "+ data);
 			boolean	msgRead;				
-			msgRead	= ClientFactory.getClient(recipient).sendMessage(outJSON);
+			msgRead	= ClientFactory.getClient(recipient).sendMessage(returnJSON);
 			saveMessageToDB(message, msgRead, clientID, recipient, false);	
 			
 		}
-		JSONObject returnJSON = new JSONObject();
-		returnJSON.put("data", outJSON);
-		returnJSON.put("requestType", msgJson.get("requestType"));
+		
 		return returnJSON;
 	}
 	
