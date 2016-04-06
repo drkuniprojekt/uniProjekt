@@ -181,8 +181,7 @@ public class AuthHelper {
     
     public static void assertIsAdmin(HttpServletRequest request) throws SignatureException
     {
-    	//TODO: Scharf stellen
-//    	if(!isAdmin(request))
-//    		throw new SignatureException("Authorization failed - You are not an Admin!");
+    	if(!isAdmin(request))
+    		throw new SignatureException("Authorization failed - You are not an Admin!");
     }
 }

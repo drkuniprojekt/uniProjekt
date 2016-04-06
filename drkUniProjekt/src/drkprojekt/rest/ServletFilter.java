@@ -39,8 +39,8 @@ public class ServletFilter implements Filter
 				||  !request.getRequestURL().toString().endsWith("authentication")))
 		{
 		    log.info("Not authenticated!");
-		    //response.sendError(HttpServletResponse.SC_FORBIDDEN);	
-		    //return;
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN);	
+		    return;
 		}else{
 		    log.debug("Successful authenticated!");
 		}
