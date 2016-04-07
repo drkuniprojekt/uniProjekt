@@ -225,7 +225,7 @@ public class PushService
 		data.put("title", message);
 		
 		//TODO:
-		extra.put("url", "KalenerController.controller.js");
+		extra.put("type", "alarm");
 		data.put("extra", extra);
 		
 		if(deviceId.length == 1)
