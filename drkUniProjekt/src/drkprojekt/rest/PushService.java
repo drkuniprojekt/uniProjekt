@@ -122,7 +122,7 @@ public class PushService
 		{
 			HttpURLConnection connection = connect();
 			
-			String data = prepareRequestJSON(message, targetDeviceId);
+			String data = prepareRequestJSON(message, targetDeviceId, notificationTypes[0]);
 
 			out = new DataOutputStream (connection.getOutputStream());
 			out.writeBytes(data);
@@ -215,7 +215,7 @@ public class PushService
 	    return connection;
 	}
 	
-	private static String prepareRequestJSON(String message, String[] deviceId)
+	private static String prepareRequestJSON(String message, String[] deviceId, int notificationType)
 	{
 		JSONObject request = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -224,8 +224,23 @@ public class PushService
 		data.put("message", message);
 		data.put("title", message);
 		
-		//TODO:
-		extra.put("type", "alarm");
+		switch (notificationType)
+		{
+		case NOTIFICATION_EVENT:
+			extra.put("type", "kalenderView");
+			break;
+		case NOTIFICATION_CHAT:
+		case NOTIFICATION_GROUPCHAT:
+			extra.put("type", "chatMain");
+			break;
+		case NOTIFICATION_ALERT_OV:
+		case NOTIFICATION_ALERT_SBF:
+		case NOTIFICATION_ALERT_SEGS:
+		case NOTIFICATION_ALERT_SEGV:
+			extra.put("type", "alarm");
+			break;
+		}
+		
 		data.put("extra", extra);
 		
 		if(deviceId.length == 1)
