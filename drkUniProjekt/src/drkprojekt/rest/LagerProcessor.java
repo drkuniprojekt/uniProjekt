@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 import drkprojekt.auth.AuthHelper;
@@ -26,53 +27,76 @@ public class LagerProcessor extends HttpServlet
 	{
 		try
 		{
-			String sy = request.getParameter("year");
-			String sm = request.getParameter("month");
+			String subId = Helper.getSubResource(request, true);
 			
-			if(sy == null ^ sm == null)
-				throw new IllegalArgumentException("Parameters not completely supplied!");
-			
-			if(sy != null & sm != null)
+			if(subId != null)
 			{
-				int startYear = Integer.parseInt(sy);
-				int startMonth = Integer.parseInt(sm);
-				
-				if(startMonth < 1 || startMonth > 12)
-					throw new IllegalArgumentException("Month is invalid!");
-				
-				String param1 = startYear + "-" + startMonth + "-01";
-				String param2;
-				
-				switch (startMonth)
+				if(subId.equals("expirationdate"))
 				{
-				case 11:
-					param2 = (startYear+1) + "-01-01";
-					break;
-				case 12:
-					param2 = (startYear+1) + "-02-01";
-				default:
-					param2 = startYear + "-" + (startMonth+2) + "-01";
-					break;
+					JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT DAYS_BETWEEN(CURRENT_TIMESTAMP, "
+							+ "MIN(expirationdate)) AS days FROM storage");
+					
+					if(array.isEmpty())
+						response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+					
+					JSONObject answer = (JSONObject) array.get(0);
+					Helper.setResponseJSON(response, answer);
+					
 				}
-				
-				String arguments[] = { param1, param2 };
-				
-				JSONArray array = DatabaseHandler.getdb().executeQuery(
-						"SELECT * FROM storage WHERE expirationdate >= ? AND expirationdate < ? ORDER BY expirationdate", arguments);
-				
-				if(array.isEmpty())
-					response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-				Helper.setResponseJSONArray(response, array);
-			}
+				else
+					throw new NoSuchElementException("Ressource not found!");
+			}	
 			else
 			{
-				JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT * FROM storage ORDER BY expirationdate");
-				
-				if(array.isEmpty())
-					response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-				Helper.setResponseJSONArray(response, array);
+
+				String sy = request.getParameter("year");
+				String sm = request.getParameter("month");
+
+				if(sy == null ^ sm == null)
+					throw new IllegalArgumentException("Parameters not completely supplied!");
+
+				if(sy != null & sm != null)
+				{
+					int startYear = Integer.parseInt(sy);
+					int startMonth = Integer.parseInt(sm);
+
+					if(startMonth < 1 || startMonth > 12)
+						throw new IllegalArgumentException("Month is invalid!");
+
+					String param1 = startYear + "-" + startMonth + "-01";
+					String param2;
+
+					switch (startMonth)
+					{
+					case 11:
+						param2 = (startYear+1) + "-01-01";
+						break;
+					case 12:
+						param2 = (startYear+1) + "-02-01";
+					default:
+						param2 = startYear + "-" + (startMonth+2) + "-01";
+						break;
+					}
+
+					String arguments[] = { param1, param2 };
+
+					JSONArray array = DatabaseHandler.getdb().executeQuery(
+							"SELECT * FROM storage WHERE expirationdate >= ? AND expirationdate < ? ORDER BY expirationdate", arguments);
+
+					if(array.isEmpty())
+						response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+					Helper.setResponseJSONArray(response, array);
+				}
+				else
+				{
+					JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT * FROM storage ORDER BY expirationdate");
+
+					if(array.isEmpty())
+						response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+					Helper.setResponseJSONArray(response, array);
+				}
 			}
-		} catch (SQLException | IllegalArgumentException e)
+		} catch (SQLException | IllegalArgumentException | NoSuchElementException e)
 		{
 			Helper.handleException(e, response);
 		}
