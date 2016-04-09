@@ -58,7 +58,7 @@ public class LagerProcessor extends HttpServlet
 				String arguments[] = { param1, param2 };
 				
 				JSONArray array = DatabaseHandler.getdb().executeQuery(
-						"SELECT * FROM storage WHERE expirationdate >= ? AND expirationdate < ?", arguments);
+						"SELECT * FROM storage WHERE expirationdate >= ? AND expirationdate < ? ORDER BY expirationdate", arguments);
 				
 				if(array.isEmpty())
 					response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -66,7 +66,7 @@ public class LagerProcessor extends HttpServlet
 			}
 			else
 			{
-				JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT * FROM storage");
+				JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT * FROM storage ORDER BY expirationdate");
 				
 				if(array.isEmpty())
 					response.setStatus(HttpServletResponse.SC_NO_CONTENT);

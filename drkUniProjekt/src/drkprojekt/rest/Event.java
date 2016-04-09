@@ -94,7 +94,7 @@ public class Event
 		
 		JSONArray array = DatabaseHandler.getdb().executeQuery(
 				"SELECT event_id, starttime, endtime, name, description, street, housenumber, zip, town "
-				+ "FROM event WHERE alertevent = FALSE AND starttime >= ? AND starttime < ?", arguments);
+				+ "FROM event WHERE alertevent = FALSE AND starttime >= ? AND starttime < ? ORDER BY starttime", arguments);
 		
 		return array;
 	}
