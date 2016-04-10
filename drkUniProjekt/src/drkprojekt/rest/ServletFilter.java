@@ -41,11 +41,12 @@ public class ServletFilter implements Filter
 		log.debug("URL " + url);
 		//if(!AuthHelper.isRegistered(request) && !(request.getRequestURL().toString().endsWith("authentication/")
 		//		||  request.getRequestURL().toString().endsWith("authentication")))
-		if(AuthHelper.isRegistered(request) || (url.split("drkUniProjekt/"))[1].equals("authentication/")
-				||  (url.split("drkUniProjekt/"))[1].equals("authentication") || url.startsWith(CHATRESSOURCEPATH))
+		if(request.getMethod().equalsIgnoreCase("OPTIONS") || AuthHelper.isRegistered(request) || (url.split("drkUniProjekt/"))[1].equals("authentication/")
+				||  (url.split("drkUniProjekt/"))[1].equals("authentication") || url.startsWith(CHATRESSOURCEPATH) )
 		{
 		    //log.debug("Successful authenticated!");
-		}else{  
+		    log.debug(request.getMethod());
+		}else{  	
 		    log.info("Not authenticated!");
 		    response.sendError(HttpServletResponse.SC_FORBIDDEN);	
 		    return;
