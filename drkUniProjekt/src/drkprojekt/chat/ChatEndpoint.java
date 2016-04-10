@@ -66,16 +66,12 @@ public class ChatEndpoint
 			JSONObject answer	= new JSONObject();
 			String recipient	= (String) msgJson.get("to");
 			String token 		= (String) msgJson.get("token");
-			if(!AuthHelper.isRegistered(token)){
-			    if(token == null){
-				log.info("Token is null");
-				//TODO: return error bzw. if raus nehmen
-			    }else{
-				log.debug("Usertoken not registered");
+			if(!AuthHelper.userIsRegistered(token,clientID)){
+				log.debug("Usertoken for this user not registered or null");
 				JSONObject out = new JSONObject();
 				out.put("Error", "Nutzer nicht authentifiziert");
 				return  out.toJSONString();
-			    }
+			    
 			}
 			
 			if(msgJson.get("requestType") != null && msgJson.get("requestType").equals("init"))

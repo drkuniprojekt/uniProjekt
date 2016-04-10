@@ -175,6 +175,14 @@ public class AuthHelper {
 	}
 	return true;
     }
+    
+    public static boolean userIsRegistered(String token, String login_id){
+	if(isRegistered(token) && verifyToken(token).getUserId().equals(login_id)){
+	    return true;
+	}
+	return false;
+	
+    }
     public static TokenInfo getToken(HttpServletRequest request){
 	return AuthHelper.verifyToken(request.getHeader("Authorization"));
     }

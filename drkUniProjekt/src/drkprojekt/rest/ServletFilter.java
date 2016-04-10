@@ -14,6 +14,8 @@ import drkprojekt.auth.AuthHelper;
 @WebFilter("/*")
 public class ServletFilter implements Filter
 {
+    private static final String CHATRESSOURCEPATH = "https://drkprojektp1941893014trial.hanatrial.ondemand.com/drkUniProjekt/chat/";
+    
     private static Logger log; 
     
     public ServletFilter() {
@@ -35,14 +37,18 @@ public class ServletFilter implements Filter
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 		addCORSHeaders(request, response);
-		if(!AuthHelper.isRegistered(request) && !(request.getRequestURL().toString().endsWith("authentication/")
-				||  !request.getRequestURL().toString().endsWith("authentication")))
+		String url = request.getRequestURL().toString();
+		log.debug("URL " + url);
+		//if(!AuthHelper.isRegistered(request) && !(request.getRequestURL().toString().endsWith("authentication/")
+		//		||  request.getRequestURL().toString().endsWith("authentication")))
+		if(AuthHelper.isRegistered(request) || (url.split("drkUniProjekt/"))[1].equals("authentication/")
+				||  (url.split("drkUniProjekt/"))[1].equals("authentication") || url.startsWith(CHATRESSOURCEPATH))
 		{
+		    //log.debug("Successful authenticated!");
+		}else{  
 		    log.info("Not authenticated!");
 		    response.sendError(HttpServletResponse.SC_FORBIDDEN);	
 		    return;
-		}else{
-		    log.debug("Successful authenticated!");
 		}
 		chain.doFilter(req, res);
 	}
