@@ -31,7 +31,7 @@ public class Event
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, ?)"
 				+ " VALUES(EVENT_ID.NEXTVAL, FALSE, ?)", JSON);
 		//TODO: Evtl. wenigstens die Zeit übergeben?
-		PushService.sendBroadCastMessage("Ein neuer Termin wurde angelegt.", PushService.NOTIFICATION_EVENT);
+		PushService.sendBroadCastMessage("Am " + JSON.get("starttime").toString() + " wurde ein neuer Termin wurde angelegt.", PushService.NOTIFICATION_EVENT);
 	}
 
 	public void change(int eventId) throws SQLException, IllegalStateException
@@ -42,7 +42,7 @@ public class Event
 			throw new IllegalStateException("The desired event was not found!");
 		
 		//TODO: Hier auch Push?
-		PushService.sendBroadCastMessage("Ein Termin wurde bearbeitet", PushService.NOTIFICATION_EVENT);
+		PushService.sendBroadCastMessage("Am " + JSON.get("starttime").toString() + " wurde ein Termin wurde bearbeitet", PushService.NOTIFICATION_EVENT);
 	}
 
 	public void delete(int eventId) throws SQLException, IllegalStateException
