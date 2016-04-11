@@ -46,7 +46,27 @@ public class EventResponseProcessor extends HttpServlet
 			JSONObject eventResponse = Helper.getRequestJSON(request);
 			
 			event.accept(Boolean.parseBoolean(eventResponse.get("answer").toString()),
-					     eventResponse.get("answerer").toString(), eventId);
+					     eventResponse.get("answerer").toString(), eventId, true);
+		} catch (NullPointerException e)
+		{
+			Helper.handleException(new SQLException("Argument must not be null!"), response);
+		} catch (IllegalStateException | SQLException | ParseException | NoSuchElementException e)
+		{
+			Helper.handleException(e, response);
+		}
+	}
+	
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+		try
+		{
+			int eventId = Helper.getSubResourceID(request, false);
+			
+			Event event = new Event();
+			JSONObject eventResponse = Helper.getRequestJSON(request);
+			
+			event.accept(Boolean.parseBoolean(eventResponse.get("answer").toString()),
+					     eventResponse.get("answerer").toString(), eventId, false);
 		} catch (NullPointerException e)
 		{
 			Helper.handleException(new SQLException("Argument must not be null!"), response);

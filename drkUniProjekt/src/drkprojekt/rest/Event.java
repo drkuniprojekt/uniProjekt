@@ -53,13 +53,23 @@ public class Event
 			throw new IllegalStateException("The desired event was not found!");
 	}
 	
-	public void accept(boolean accepted, String user, int eventId) throws SQLException, IllegalStateException
+	public void accept(boolean accepted, String user, int eventId, boolean newRecord) throws SQLException, IllegalStateException
 	{
 		if(DatabaseHandler.getdb().executeQuery("SELECT event_id FROM event WHERE event_id = ? AND alertevent = FALSE", eventId + "").isEmpty())
 			throw new IllegalStateException("The desired event was not found!");
 		
 		String[] arguments = { accepted + "", eventId + "", user };
-		DatabaseHandler.getdb().executeUpdate("INSERT INTO eventanswer (answer, event, answerer) VALUES(?,?,?)", arguments);
+		
+		if(newRecord)
+		{
+			DatabaseHandler.getdb().executeUpdate("INSERT INTO eventanswer (answer, event, answerer) VALUES(?,?,?)", arguments);
+		}
+		else
+		{
+			int rows = DatabaseHandler.getdb().executeUpdate("UPDATE eventanswer SET answer = ? WHERE event = ? AND answerer = ?", arguments);
+			if(rows == 0)
+				throw new IllegalStateException("The answer does not exist!");
+		}
 	}
 	
 	public JSONArray getAllAnswers(int eventId) throws SQLException, IllegalStateException
