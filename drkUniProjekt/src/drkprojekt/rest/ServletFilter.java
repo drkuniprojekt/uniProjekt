@@ -45,13 +45,11 @@ public class ServletFilter implements Filter
 				||  (url.split("drkUniProjekt/"))[1].equals("authentication") || url.startsWith(CHATRESSOURCEPATH) )
 		{
 		    //log.debug("Successful authenticated!");
-		    log.debug(request.getMethod());
+		    chain.doFilter(req, res);
 		}else{  	
 		    log.info("Not authenticated!");
 		    response.sendError(HttpServletResponse.SC_FORBIDDEN);	
-		    return;
 		}
-		chain.doFilter(req, res);
 	}
 
 
