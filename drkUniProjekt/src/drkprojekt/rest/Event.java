@@ -1,14 +1,23 @@
 package drkprojekt.rest;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import drkprojekt.database.DatabaseHandler;
 
 public class Event
 {	
+	private SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private SimpleDateFormat targetFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+	
+	private static Logger log = LoggerFactory.getLogger(Event.class);
+	
 	private JSONObject JSON;
 	private JSONArray JSONArray;
 
@@ -30,8 +39,18 @@ public class Event
 	{			
 		DatabaseHandler.getdb().executeUpdate("INSERT INTO event (event_id, alertevent, ?)"
 				+ " VALUES(EVENT_ID.NEXTVAL, FALSE, ?)", JSON);
-		//TODO: Evtl. wenigstens die Zeit übergeben?
-		PushService.sendBroadCastMessage("Am " + JSON.get("starttime").toString() + " wurde ein neuer Termin wurde angelegt.", PushService.NOTIFICATION_EVENT);
+		
+		String date;
+		try
+		{
+			date = targetFormat.format(sourceFormat.parse(JSON.get("starttime").toString())) + " Uhr";
+		} catch (ParseException e)
+		{
+			log.warn("An exception was raised while executing the Request:\n " , e);
+			date = "Neuer Termin angelegt";
+		}
+		
+		PushService.sendBroadCastMessage("Neuer Termin angelegt", date, PushService.NOTIFICATION_EVENT);
 	}
 
 	public void change(int eventId) throws SQLException, IllegalStateException
@@ -41,8 +60,17 @@ public class Event
 		if(rows == 0)
 			throw new IllegalStateException("The desired event was not found!");
 		
-		//TODO: Hier auch Push?
-		PushService.sendBroadCastMessage("Am " + JSON.get("starttime").toString() + " wurde ein Termin wurde bearbeitet", PushService.NOTIFICATION_EVENT);
+		String date;
+		try
+		{
+			date = targetFormat.format(sourceFormat.parse(JSON.get("starttime").toString())) + " Uhr";
+		} catch (ParseException e)
+		{
+			log.warn("An exception was raised while executing the Request:\n " , e);
+			date = "Ein Termin wurde bearbeitet";
+		}
+		
+		PushService.sendBroadCastMessage("Ein Termin wurde bearbeitet", date, PushService.NOTIFICATION_EVENT);
 	}
 
 	public void delete(int eventId) throws SQLException, IllegalStateException
