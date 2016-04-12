@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import drkprojekt.auth.AuthHelper;
 import drkprojekt.database.DatabaseHandler;
@@ -21,6 +23,7 @@ import drkprojekt.database.DatabaseHandler;
 @WebServlet("/lager/*")
 public class LagerProcessor extends HttpServlet
 {
+	private static Logger log = LoggerFactory.getLogger(LagerProcessor.class);
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -35,6 +38,9 @@ public class LagerProcessor extends HttpServlet
 				{
 					JSONArray array = DatabaseHandler.getdb().executeQuery("SELECT DAYS_BETWEEN(CURRENT_TIMESTAMP, "
 							+ "MIN(expirationdate)) AS days FROM storage");
+					
+					log.debug("Current_time: " + DatabaseHandler.getdb().executeQuery("SELECT CURRENT_TIMESTAMP FROM dummy").toString());
+					log.debug("Expirationdate: " + DatabaseHandler.getdb().executeQuery("SELECT MIN(expirationdate) FROM storage").toString());
 					
 					if(array.isEmpty())
 						response.setStatus(HttpServletResponse.SC_NO_CONTENT);

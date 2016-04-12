@@ -43,7 +43,8 @@ public class RealClient extends ChatClient
 			{
 				for (String s : phonegap_ids) 
 				{
-					PushService.sendUnicastMessage("Neue Chatnachricht von " + (String)((JSONObject) msgJSON.get("data")).get("from"), s, PushService.NOTIFICATION_CHAT);
+					//PushService.sendUnicastMessage("Neue Chatnachricht von " + (String)((JSONObject) msgJSON.get("data")).get("from"), s, PushService.NOTIFICATION_CHAT);
+					PushService.sendUnicastMessage("Neue Chatnachricht", (String)((JSONObject) msgJSON.get("data")).get("from") + " hat dir eine Nachricht geschickt", s, PushService.NOTIFICATION_CHAT);
 				}
 				return false;
 			}
@@ -64,29 +65,30 @@ public class RealClient extends ChatClient
  */
 public boolean sendMessage(String msg)
 {
-	try 
-	{
-		if(sessionList.size() > 0) //User is online at minimum 1 device
-		{
-			for (Session s : sessionList) 
-			{
-				s.getBasicRemote().sendText(msg);
-			}
-			return true;				
-		}else if (phonegap_ids.size() > 0) //User is offline, but at least one Device can get a phonegap push
-		{
-			for (String s : phonegap_ids) 
-			{
-				PushService.sendUnicastMessage(msg, s, PushService.NOTIFICATION_CHAT);
-			}
-			return false;
-		}
-		//The user is neigher reachable through phonegap, nor through websocket -> Just save to DB
-		return false;
-	} catch (Exception e) 
-	{
-		log.error("Could not send message to " + name + ", because an Error occured:\n ", e);
-	}
+//	try 
+//	{
+//		if(sessionList.size() > 0) //User is online at minimum 1 device
+//		{
+//			for (Session s : sessionList) 
+//			{
+//				s.getBasicRemote().sendText(msg);
+//			}
+//			return true;				
+//		}else if (phonegap_ids.size() > 0) //User is offline, but at least one Device can get a phonegap push
+//		{
+//			for (String s : phonegap_ids) 
+//			{
+//				//PushService.sendUnicastMessage(msg, s, PushService.NOTIFICATION_CHAT);
+//				PushService.sendUnicastMessage("Neue Nachricht", msg, s, PushService.NOTIFICATION_CHAT);
+//			}
+//			return false;
+//		}
+//		//The user is neigher reachable through phonegap, nor through websocket -> Just save to DB
+//		return false;
+//	} catch (Exception e) 
+//	{
+//		log.error("Could not send message to " + name + ", because an Error occured:\n ", e);
+//	}
 	return false;
 }
 

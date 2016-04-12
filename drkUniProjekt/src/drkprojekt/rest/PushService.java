@@ -38,13 +38,13 @@ public class PushService
 	 * @param notificationType Type of notification (Use constants of this class!)
 	 * @throws SQLException
 	 */
-	public static void sendUnicastMessage(String message, String deviceId, int notificationType) throws SQLException
+	public static void sendUnicastMessage(String title, String message, String deviceId, int notificationType) throws SQLException
 	{
 		String[] singleDevice = new String[1];
 		singleDevice[0] = deviceId;
 		int[] singleNotificationType = new int[1];
 		singleNotificationType[0] = notificationType;
-		sendMessage(message, singleDevice, singleNotificationType);
+		sendMessage(title, message, singleDevice, singleNotificationType);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class PushService
 	 * @param notificationType Type of notification (Use constants of this class!)
 	 * @throws SQLException
 	 */
-	public static void sendMulticastMessage(String message, String userId, int notificationType) throws SQLException
+	public static void sendMulticastMessage(String title, String message, String userId, int notificationType) throws SQLException
 	{
 		JSONArray array = null;
 		
@@ -75,7 +75,7 @@ public class PushService
 		
 		int[] singleNotificationType = new int[1];
 		singleNotificationType[0] = notificationType;
-		sendMessage(message, allDevices, singleNotificationType);
+		sendMessage(title, message, allDevices, singleNotificationType);
 	}
 	
 	/**
@@ -84,9 +84,9 @@ public class PushService
 	 * @param notificationType Type of notification (Use constants of this class!)
 	 * @throws SQLException
 	 */
-	public static void sendBroadCastMessage(String message, int notificationType) throws SQLException
+	public static void sendBroadCastMessage(String title, String message, int notificationType) throws SQLException
 	{
-		sendMulticastMessage(message, null, notificationType);
+		sendMulticastMessage(title, message, null, notificationType);
 	}
 	
 	public static void sendMulticastAlert(String message, int[] notificationTypes) throws SQLException
@@ -102,10 +102,10 @@ public class PushService
 			allDevices[i] = (String) json.get("device_id");
 		}		
 		
-		sendMessage(message, allDevices, notificationTypes);
+		sendMessage(message, message, allDevices, notificationTypes);
 	}
 	
-	private static void sendMessage(String message, String[] deviceId, int[] notificationTypes) throws SQLException
+	private static void sendMessage(String title, String message, String[] deviceId, int[] notificationTypes) throws SQLException
 	{	
 		String[] targetDeviceId = sortOut(deviceId, notificationTypes);
 		
@@ -122,7 +122,7 @@ public class PushService
 		{
 			HttpURLConnection connection = connect();
 			
-			String data = prepareRequestJSON(message, targetDeviceId, notificationTypes[0]);
+			String data = prepareRequestJSON(title, message, targetDeviceId, notificationTypes[0]);
 
 			out = new DataOutputStream (connection.getOutputStream());
 			out.writeBytes(data);
@@ -215,14 +215,14 @@ public class PushService
 	    return connection;
 	}
 	
-	private static String prepareRequestJSON(String message, String[] deviceId, int notificationType)
+	private static String prepareRequestJSON(String title, String message, String[] deviceId, int notificationType)
 	{
 		JSONObject request = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONObject extra = new JSONObject();
 		
 		data.put("message", message);
-		data.put("title", message);
+		data.put("title", title);
 		
 		switch (notificationType)
 		{
