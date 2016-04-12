@@ -3,6 +3,8 @@ package drkprojekt.rest;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -13,7 +15,7 @@ import drkprojekt.database.DatabaseHandler;
 
 public class Event
 {	
-	private SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 	private SimpleDateFormat targetFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	
 	private static Logger log = LoggerFactory.getLogger(Event.class);
@@ -26,9 +28,11 @@ public class Event
 		JSONArray = fetchJSONArrayFromDatabase(startYear, startMonth);
 	}
 
-	public Event(JSONObject json)
+	public Event(JSONObject json) throws IllegalStateException, SQLException
 	{
 		this.JSON = json;
+		TimeZone timezone = TimeZone.getTimeZone( "Europe/Berlin" );
+		targetFormat.setTimeZone(timezone);
 		checkJSON();
 	}
 	
@@ -137,9 +141,20 @@ public class Event
 		return array;
 	}
 	
-	private void checkJSON()
+	private void checkJSON() throws IllegalStateException, SQLException
 	{
-		//TODO: Check ob Starttime vor Endtime
+		try
+		{
+			Date start = sourceFormat.parse(JSON.get("starttime").toString());
+			Date end = sourceFormat.parse(JSON.get("endtime").toString());
+			
+			if(start.after(end))
+				throw new IllegalStateException("Endtime is before starttime!");
+			
+		} catch (ParseException e)
+		{
+			throw new SQLException("Invalid endtime or starttime!");
+		}
 	}
 
 	public JSONArray getJSONArray()

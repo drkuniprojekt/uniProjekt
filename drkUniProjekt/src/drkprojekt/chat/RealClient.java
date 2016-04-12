@@ -22,7 +22,6 @@ public class RealClient extends ChatClient
 		super(name, displayName);				
 	}
 	
-	
 /**
 	 * Sends a message to this client. This class decides,  weather the Message is send through phonegap or websocket
 	 * @param msgJSON Message JSON containing the Parameter "from" and "message"
