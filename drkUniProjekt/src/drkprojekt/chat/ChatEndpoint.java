@@ -133,7 +133,7 @@ public class ChatEndpoint
 		returnJSON.put("data", outJSON);
 		returnJSON.put("requestType", msgJson.get("requestType"));
 		
-		if(recipient == null || recipient.equals("Gruppenchat"))
+		if(recipient != null && recipient.equals("Gruppenchat"))
 		{
 			log.debug("Got new Broadcast-Message: " + data);
 			saveBroadcastMessageToDB(message, clientID);
@@ -144,8 +144,7 @@ public class ChatEndpoint
 			log.debug("Got new Message to " + recipient + ": "+ data);
 			boolean	msgRead;				
 			msgRead	= ClientFactory.getClient(recipient).sendMessage(returnJSON);
-			saveMessageToDB(message, msgRead, clientID, recipient, false);	
-			
+			saveMessageToDB(message, msgRead, clientID, recipient, false);				
 		}
 		
 		return returnJSON;
