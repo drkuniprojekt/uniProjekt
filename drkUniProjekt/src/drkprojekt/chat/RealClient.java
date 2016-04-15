@@ -62,8 +62,8 @@ public class RealClient extends ChatClient
  * @param msg Message to send
  * @return True, if the user read the Message, false if unread
  */
-public boolean sendMessage(String msg)
-{
+//public boolean sendMessage(String msg)
+//{
 //	try 
 //	{
 //		if(sessionList.size() > 0) //User is online at minimum 1 device
@@ -88,8 +88,8 @@ public boolean sendMessage(String msg)
 //	{
 //		log.error("Could not send message to " + name + ", because an Error occured:\n ", e);
 //	}
-	return false;
-}
+//	return false;
+//}
 
 public void deleteSession(Session s)
 {

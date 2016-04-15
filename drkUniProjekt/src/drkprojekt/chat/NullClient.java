@@ -19,10 +19,10 @@ public class NullClient extends ChatClient
 		throw new IllegalArgumentException("The client " + name + " does not exist");		
 	}
 
-	@Override
-	public boolean sendMessage(String msg) {
-		throw new IllegalArgumentException("The client " + name + " does not exist");
-	}
+//	@Override
+//	public boolean sendMessage(String msg) {
+//		throw new IllegalArgumentException("The client " + name + " does not exist");
+//	}
 
 	@Override
 	public void deleteSession(Session session) {

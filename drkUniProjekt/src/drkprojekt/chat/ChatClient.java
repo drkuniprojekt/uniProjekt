@@ -31,7 +31,7 @@ public abstract class ChatClient
 	
 	public abstract boolean sendMessage(JSONObject msg);
 	
-	public abstract boolean sendMessage(String msg);
+//	public abstract boolean sendMessage(String msg);
 	
 	public abstract void deleteSession(Session session);
 	
