@@ -129,6 +129,7 @@ public class ChatEndpoint
 		outJSON.put("from", ClientFactory.getClient(clientID).getDisplayName());
 		outJSON.put("createtime", DatabaseHandler.getCurrentTimeStamp());
 		outJSON.put("toroom",msgJson.get("toroom"));
+		outJSON.put("useraccount", ClientFactory.getClient(clientID).getName());
 		JSONObject returnJSON = new JSONObject();
 		returnJSON.put("data", outJSON);
 		returnJSON.put("requestType", msgJson.get("requestType"));
