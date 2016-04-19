@@ -259,7 +259,7 @@ public class PushService
 			request.put("registration_ids", sb);
 		}
 		request.put("data", data);
-		//request.put("collapse_key", "DRK-Alarm"); 
+		//request.put("collapse_key", extra.get("type").toString()); 
 		//request.put("delay_while_idle", true);
 		
 		System.out.println("Request: " + request.toJSONString());

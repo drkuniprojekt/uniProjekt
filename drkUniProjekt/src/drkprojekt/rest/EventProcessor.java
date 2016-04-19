@@ -52,7 +52,7 @@ public class EventProcessor extends HttpServlet
 			AuthHelper.assertIsAdmin(request);
 			Event event = new Event(Helper.getRequestJSON(request));
 			event.create();
-		} catch (ParseException | SQLException | SignatureException e)
+		} catch (ParseException | SQLException | SignatureException | IllegalStateException e)
 		{
 			Helper.handleException(e, response);
 		}

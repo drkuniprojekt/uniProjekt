@@ -21,11 +21,11 @@ public class DeletedClient extends ChatClient
 		throw new IllegalArgumentException("The client " + name + " has been deleted");			
 	}
 
-	@Override
-	public boolean sendMessage(String msg)
-	{
-		throw new IllegalArgumentException("The client " + name + " has been deleted");	
-	}
+//	@Override
+//	public boolean sendMessage(String msg)
+//	{
+//		throw new IllegalArgumentException("The client " + name + " has been deleted");	
+//	}
 
 	@Override
 	public void deleteSession(Session session)
