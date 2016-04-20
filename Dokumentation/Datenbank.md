@@ -1,5 +1,5 @@
 ##Changelog
-`05.04.2016` STORAGE QUANTITY changed to double  
+`19.04.2016` STORAGE QUANTITY changed to double  
 `05.04.2016` STORAGE created  
 `04.04.2016` USERGROUP in EVENT deleted | New table ALERTGROUP added for mapping Alerts to the Usergroups  
 `01.04.2016` USERGROUP in EVENT added (because of changerequest)  
